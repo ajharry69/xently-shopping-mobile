@@ -5,9 +5,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RemoteProductDataSource @Inject constructor() : ProductDataSource<Product.RemoteRequest, Product.RemoteResponse> {
+class RemoteProductDataSource @Inject constructor() :
+    ProductDataSource<Product.RemoteRequest, Product.RemoteResponse> {
     override suspend fun addProduct(product: Product.RemoteRequest): Product.RemoteResponse {
-        TODO("Not yet implemented")
+        return product.toRemoteResponse()
     }
 
     override suspend fun getProductById(id: Long): Product.RemoteResponse? {

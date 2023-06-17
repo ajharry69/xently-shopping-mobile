@@ -2,7 +2,6 @@ package ke.co.xently.products.ui.subscreens
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -30,15 +29,11 @@ fun AddProductNamePage(
     }
     AddProductPage(
         modifier = modifier,
-        buttons = {
+        heading = R.string.xently_product_name_page_title,
+        onBackClick = onPreviousClick,
+        continueButton = {
             Button(
-                modifier = Modifier.weight(1f),
-                onClick = onPreviousClick,
-            ) {
-                Text(stringResource(R.string.xently_button_label_back))
-            }
-            Button(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     ProductName.LocalViewModel.default.copy(
                         name = name.text,
@@ -50,10 +45,6 @@ fun AddProductNamePage(
             }
         },
     ) {
-        Text(
-            text = stringResource(R.string.xently_product_name_page_title),
-            style = MaterialTheme.typography.headlineSmall,
-        )
         TextField(
             value = name,
             onValueChange = { name = it },

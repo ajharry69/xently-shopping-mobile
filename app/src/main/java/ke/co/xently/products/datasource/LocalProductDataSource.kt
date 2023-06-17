@@ -8,7 +8,7 @@ import javax.inject.Singleton
 class LocalProductDataSource @Inject constructor() :
     ProductDataSource<Product.LocalEntityRequest, Product.LocalEntityResponse> {
     override suspend fun addProduct(product: Product.LocalEntityRequest): Product.LocalEntityResponse {
-        TODO("Not yet implemented")
+        return product.toLocalEntityResponse()
     }
 
     override suspend fun getProductById(id: Long): Product.LocalEntityResponse? {

@@ -2,37 +2,37 @@ package ke.co.xently.products.models
 
 sealed interface AttributeValue {
     val id: Long
-    val name: String
+    val value: String
     val attribute: Attribute
 
     data class RemoteRequest(
         override val id: Long,
-        override val name: String,
+        override val value: String,
         override val attribute: Attribute.RemoteRequest,
     ) : AttributeValue
 
     data class RemoteResponse(
         override val id: Long,
-        override val name: String,
+        override val value: String,
         override val attribute: Attribute.RemoteResponse,
     ) : AttributeValue
 
     data class LocalEntityRequest(
         override val id: Long,
-        override val name: String,
+        override val value: String,
         override val attribute: Attribute.LocalEntityRequest,
     ) : AttributeValue
 
     data class LocalEntityResponse(
         override val id: Long,
-        override val name: String,
+        override val value: String,
         override val attribute: Attribute.LocalEntityResponse,
     ) : AttributeValue
 
 
     data class LocalViewModel(
         override val id: Long,
-        override val name: String,
+        override val value: String,
         override val attribute: Attribute.LocalViewModel,
     ) : AttributeValue
 
@@ -42,7 +42,7 @@ sealed interface AttributeValue {
             is LocalEntityRequest -> {
                 RemoteRequest(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toRemoteRequest(),
                 )
             }
@@ -50,7 +50,7 @@ sealed interface AttributeValue {
             is LocalEntityResponse -> {
                 RemoteRequest(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toRemoteRequest(),
                 )
             }
@@ -58,7 +58,7 @@ sealed interface AttributeValue {
             is LocalViewModel -> {
                 RemoteRequest(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toRemoteRequest(),
                 )
             }
@@ -70,7 +70,7 @@ sealed interface AttributeValue {
             is RemoteResponse -> {
                 RemoteRequest(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toRemoteRequest(),
                 )
             }
@@ -83,7 +83,7 @@ sealed interface AttributeValue {
             is LocalEntityRequest -> {
                 RemoteResponse(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toRemoteResponse(),
                 )
             }
@@ -91,7 +91,7 @@ sealed interface AttributeValue {
             is LocalEntityResponse -> {
                 RemoteResponse(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toRemoteResponse(),
                 )
             }
@@ -99,7 +99,7 @@ sealed interface AttributeValue {
             is LocalViewModel -> {
                 RemoteResponse(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toRemoteResponse(),
                 )
             }
@@ -107,7 +107,7 @@ sealed interface AttributeValue {
             is RemoteRequest -> {
                 RemoteResponse(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toRemoteResponse(),
                 )
             }
@@ -128,7 +128,7 @@ sealed interface AttributeValue {
             is LocalEntityResponse -> {
                 LocalEntityRequest(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalEntityRequest(),
                 )
             }
@@ -136,7 +136,7 @@ sealed interface AttributeValue {
             is LocalViewModel -> {
                 LocalEntityRequest(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalEntityRequest(),
                 )
             }
@@ -144,7 +144,7 @@ sealed interface AttributeValue {
             is RemoteRequest -> {
                 LocalEntityRequest(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalEntityRequest(),
                 )
             }
@@ -152,7 +152,7 @@ sealed interface AttributeValue {
             is RemoteResponse -> {
                 LocalEntityRequest(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalEntityRequest(),
                 )
             }
@@ -165,7 +165,7 @@ sealed interface AttributeValue {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalEntityResponse(),
                 )
             }
@@ -177,7 +177,7 @@ sealed interface AttributeValue {
             is LocalViewModel -> {
                 LocalEntityResponse(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalEntityResponse(),
                 )
             }
@@ -185,7 +185,7 @@ sealed interface AttributeValue {
             is RemoteRequest -> {
                 LocalEntityResponse(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalEntityResponse(),
                 )
             }
@@ -193,7 +193,7 @@ sealed interface AttributeValue {
             is RemoteResponse -> {
                 LocalEntityResponse(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalEntityResponse(),
                 )
             }
@@ -206,7 +206,7 @@ sealed interface AttributeValue {
             is LocalEntityRequest -> {
                 LocalViewModel(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalViewModel(),
                 )
             }
@@ -214,7 +214,7 @@ sealed interface AttributeValue {
             is LocalEntityResponse -> {
                 LocalViewModel(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalViewModel(),
                 )
             }
@@ -226,7 +226,7 @@ sealed interface AttributeValue {
             is RemoteRequest -> {
                 LocalViewModel(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalViewModel(),
                 )
             }
@@ -234,7 +234,7 @@ sealed interface AttributeValue {
             is RemoteResponse -> {
                 LocalViewModel(
                     id = id,
-                    name = name,
+                    value = value,
                     attribute = attribute.toLocalViewModel(),
                 )
             }

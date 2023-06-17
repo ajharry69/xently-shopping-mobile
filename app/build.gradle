@@ -3,6 +3,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 android {
@@ -10,8 +11,8 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "ke.co.xently"
-        minSdk 24
+        applicationId "ke.co.xently.shopping"
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -55,9 +56,14 @@ dependencies {
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation 'androidx.compose.material3:material3:1.2.0-alpha02'
+
+    implementation 'com.google.maps.android:maps-compose:2.11.4'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+
+    implementation "androidx.compose.foundation:foundation:1.5.0-beta02"
+
     implementation 'com.google.dagger:hilt-android:2.46.1'
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
-
     kapt 'com.google.dagger:hilt-compiler:2.46.1'
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"

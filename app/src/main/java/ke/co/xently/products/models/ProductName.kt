@@ -41,8 +41,8 @@ sealed interface ProductName : IdNameSymbolAndPlural {
         override val namePlural: String?,
         override val symbol: String?,
         override val symbolPlural: String?,
-    ) : ProductName{
-        companion object{
+    ) : ProductName {
+        companion object {
             val default = LocalViewModel(
                 id = -1,
                 name = "",
