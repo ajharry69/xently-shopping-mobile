@@ -1,5 +1,13 @@
 <resources>
     <string name="app_name">Xently</string>
-    <string name="add_products">Add products</string>
-    <string name="get_recommendations">Get Recommendations</string>
+    <string name="xently_home_tab_title_products">Add products</string>
+    <string name="xently_home_tab_title_recommendations">Get Recommendations</string>
+    <string name="xently_button_label_continue">Continue</string>
+    <string name="xently_button_label_back">Back</string>
+    <string name="xently_product_name_page_title">Name of product</string>
+    <string name="xently_text_field_label_name_required">Name*</string>
+    <string name="xently_text_field_label_name_plural">Name plural</string>
+    <string name="xently_measurement_unit_page_title">Measurement unit of product</string>
+    <string name="xently_text_field_label_symbol">Symbol</string>
+    <string name="xently_text_field_label_symbol_plural">Symbol plural</string>
 </resources>

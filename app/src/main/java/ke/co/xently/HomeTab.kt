@@ -3,6 +3,6 @@ package ke.co.xently
 import androidx.annotation.StringRes
 
 enum class HomeTab(@StringRes val title: Int) {
-    AddProducts(R.string.add_products),
-    GetRecommendations(R.string.get_recommendations)
+    GetRecommendations(R.string.xently_home_tab_title_recommendations),
+    AddProducts(R.string.xently_home_tab_title_products),
 }

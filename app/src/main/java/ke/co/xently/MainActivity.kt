@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Scaffold(
                         topBar = {
-                            TopAppBar(
+                            CenterAlignedTopAppBar(
                                 title = {
                                     Text(stringResource(R.string.app_name))
                                 },
