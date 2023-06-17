@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Xently</string>
+    <string name="add_products">Add products</string>
+    <string name="get_recommendations">Get Recommendations</string>
+</resources>
