@@ -30,4 +30,7 @@
     <string name="xently_text_field_label_time_purchased">Time purchased</string>
     <string name="xently_text_field_label_date_purchased">Date purchased</string>
     <string name="xently_date_time_picker_confirm_button_label">Confirm selection</string>
+    <string name="xently_button_label_loading">Loading…</string>
+    <string name="xently_content_description_add_attribute">Add attribute</string>
+    <string name="xently_content_description_remove_item">Remove \"%1$s\"</string>
 </resources>

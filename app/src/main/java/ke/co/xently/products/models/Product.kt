@@ -1,5 +1,7 @@
 package ke.co.xently.products.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -76,7 +78,7 @@ sealed interface Product {
         override val attributes: List<AttributeValue.LocalEntityResponse>,
     ) : Product
 
-
+    @Parcelize
     data class LocalViewModel(
         override val id: Long,
         override val name: ProductName.LocalViewModel,
@@ -89,7 +91,7 @@ sealed interface Product {
         override val datePurchased: LocalDateTime,
         override val brands: List<Brand.LocalViewModel>,
         override val attributes: List<AttributeValue.LocalViewModel>,
-    ) : Product {
+    ) : Product, Parcelable {
         companion object {
             val default = LocalViewModel(
                 id = -1,

@@ -1,5 +1,8 @@
 package ke.co.xently.products.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 sealed interface ProductName : IdNameSymbolAndPlural {
 
     data class RemoteRequest(
@@ -34,14 +37,14 @@ sealed interface ProductName : IdNameSymbolAndPlural {
         override val symbolPlural: String?,
     ) : ProductName
 
-
+    @Parcelize
     data class LocalViewModel(
         override val id: Long,
         override val name: String,
         override val namePlural: String?,
         override val symbol: String?,
         override val symbolPlural: String?,
-    ) : ProductName {
+    ) : ProductName, Parcelable {
         companion object {
             val default = LocalViewModel(
                 id = -1,

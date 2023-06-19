@@ -7,12 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import ke.co.xently.products.ui.AddProductScreen
 import ke.co.xently.ui.theme.XentlyTheme
@@ -24,10 +23,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             XentlyTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     Scaffold(
                         topBar = {
@@ -38,14 +36,15 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                     ) { paddingValues ->
-                        var selectedTab by remember { mutableStateOf(HomeTab.GetRecommendations) }
+                        val viewModel = hiltViewModel<MainViewModel>()
+                        val selectedTab by viewModel.currentlyActiveTab.collectAsState()
                         Column(modifier = Modifier.padding(paddingValues)) {
                             TabRow(selectedTabIndex = selectedTab.ordinal) {
                                 for (tab in HomeTab.values()) {
                                     Tab(
                                         selected = selectedTab == tab,
                                         onClick = {
-                                            selectedTab = tab
+                                            viewModel.saveCurrentlyActiveTab(tab)
                                         },
                                         text = {
                                             Text(stringResource(tab.title))

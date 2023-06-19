@@ -1,5 +1,8 @@
 package ke.co.xently.products.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 sealed interface Store {
     val id: Long
     val name: String
@@ -29,12 +32,12 @@ sealed interface Store {
         override val shop: Shop.LocalEntityResponse,
     ) : Store
 
-
+    @Parcelize
     data class LocalViewModel(
         override val id: Long,
         override val name: String,
         override val shop: Shop.LocalViewModel,
-    ) : Store {
+    ) : Store, Parcelable {
         companion object {
             val default = LocalViewModel(
                 id = -1,

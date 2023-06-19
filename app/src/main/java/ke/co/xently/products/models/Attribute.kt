@@ -1,5 +1,8 @@
 package ke.co.xently.products.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 sealed interface Attribute {
     val id: Long
     val name: String
@@ -24,12 +27,33 @@ sealed interface Attribute {
         override val name: String,
     ) : Attribute
 
-
+    @Parcelize
     data class LocalViewModel(
         override val id: Long,
         override val name: String,
-    ) : Attribute
+    ) : Attribute, Parcelable {
+        override fun hashCode(): Int {
+            return name.lowercase().trim().hashCode()
+        }
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as LocalViewModel
+
+            if (name.lowercase().trim() != other.name.lowercase().trim()) return false
+
+            return true
+        }
+
+        companion object {
+            val default = LocalViewModel(
+                id = -1,
+                name = "",
+            )
+        }
+    }
 
     fun toRemoteRequest(): RemoteRequest {
         return when (this) {

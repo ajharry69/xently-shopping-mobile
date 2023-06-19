@@ -28,6 +28,7 @@ fun AddProductPage(
     @StringRes
     subHeading: Int? = null,
     showBackButton: Boolean = true,
+    enableBackButton: Boolean = true,
     onBackClick: () -> Unit = {},
     continueButton: @Composable BoxScope.() -> Unit,
     form: @Composable ColumnScope.() -> Unit,
@@ -68,6 +69,7 @@ fun AddProductPage(
                     OutlinedButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = onBackClick,
+                        enabled = enableBackButton,
                     ) {
                         Text(stringResource(R.string.xently_button_label_back))
                     }

@@ -6,15 +6,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import ke.co.xently.products.models.Product
+import ke.co.xently.products.models.AttributeValue
+import ke.co.xently.products.models.Brand
 import ke.co.xently.products.ui.subscreens.AddAttributesPage
 import ke.co.xently.products.ui.subscreens.AddBrandsPage
 import ke.co.xently.products.ui.subscreens.AddGeneralDetailsPage
@@ -27,27 +27,24 @@ fun AddProductScreen(
     modifier: Modifier = Modifier,
     viewModel: ProductViewModel = hiltViewModel(),
 ) {
-    var product by remember { mutableStateOf(Product.LocalViewModel.default) }
-    var addProductStep by remember {
-        mutableStateOf(AddProductStep.valueOfOrdinalOrFirstByOrdinal(0))
-    }
+    val addProductStep by viewModel.currentlyActiveStep.collectAsState()
+    val product by viewModel.product.collectAsState()
 
-    fun navigateToNextScreenAndPermanentlyPersistDataIfNecessary() {
-        // Return to the first step after reaching the end but, before doing that, permanently persist the data
-        if (addProductStep.ordinal == AddProductStep.values().lastIndex) {
-            viewModel.savePermanently(product)
-        } else {
-            viewModel.saveDraft(product)
+    val isTheLastStep by remember(addProductStep) {
+        derivedStateOf {
+            addProductStep.ordinal == AddProductStep.values().lastIndex
         }
-        addProductStep = AddProductStep.valueOfOrdinalOrFirstByOrdinal(addProductStep.ordinal + 1)
     }
 
-    val navigateToPrevious: () -> Unit by rememberUpdatedState(
-        newValue = {
-            addProductStep =
-                AddProductStep.valueOfOrdinalOrFirstByOrdinal(addProductStep.ordinal - 1)
-        },
-    )
+    val navigateToNext: () -> Unit by rememberUpdatedState {
+        AddProductStep.valueOfOrdinalOrFirstByOrdinal(addProductStep.ordinal + 1)
+            .also(viewModel::saveCurrentlyActiveStep)
+    }
+
+    val navigateToPrevious: () -> Unit by rememberUpdatedState {
+        AddProductStep.valueOfOrdinalOrFirstByOrdinal(addProductStep.ordinal - 1)
+            .also(viewModel::saveCurrentlyActiveStep)
+    }
 
     val progress by remember(addProductStep) {
         derivedStateOf {
@@ -64,8 +61,9 @@ fun AddProductScreen(
             when (step) {
                 AddProductStep.Store -> {
                     AddStorePage(modifier = Modifier.fillMaxSize(), store = product.store) {
-                        product = product.copy(store = it.toLocalViewModel())
-                        navigateToNextScreenAndPermanentlyPersistDataIfNecessary()
+                        product.copy(store = it.toLocalViewModel())
+                            .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        navigateToNext()
                     }
                 }
 
@@ -75,8 +73,9 @@ fun AddProductScreen(
                         productName = product.name,
                         onPreviousClick = navigateToPrevious,
                     ) {
-                        product = product.copy(name = it.toLocalViewModel())
-                        navigateToNextScreenAndPermanentlyPersistDataIfNecessary()
+                        product.copy(name = it.toLocalViewModel())
+                            .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        navigateToNext()
                     }
                 }
 
@@ -86,8 +85,9 @@ fun AddProductScreen(
                         product = product,
                         onPreviousClick = navigateToPrevious,
                     ) {
-                        product = it.toLocalViewModel()
-                        navigateToNextScreenAndPermanentlyPersistDataIfNecessary()
+                        it.toLocalViewModel()
+                            .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        navigateToNext()
                     }
                 }
 
@@ -97,8 +97,9 @@ fun AddProductScreen(
                         product = product,
                         onPreviousClick = navigateToPrevious,
                     ) {
-                        product = it.toLocalViewModel()
-                        navigateToNextScreenAndPermanentlyPersistDataIfNecessary()
+                        it.toLocalViewModel()
+                            .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        navigateToNext()
                     }
                 }
 
@@ -106,22 +107,36 @@ fun AddProductScreen(
                     AddBrandsPage(
                         modifier = Modifier.fillMaxSize(),
                         brands = product.brands,
+                        suggestionsState = viewModel.brandSuggestions,
+                        search = viewModel::searchBrand,
                         onPreviousClick = navigateToPrevious,
+                        saveDraft = {
+                            product.copy(brands = it.map(Brand::toLocalViewModel))
+                                .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        },
                     ) { brands ->
-                        product = product.copy(brands = brands.map { it.toLocalViewModel() })
-                        navigateToNextScreenAndPermanentlyPersistDataIfNecessary()
+                        product.copy(brands = brands.map(Brand::toLocalViewModel))
+                            .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        navigateToNext()
                     }
                 }
 
                 AddProductStep.Attributes -> {
                     AddAttributesPage(
+                        stateState = viewModel.addProductState,
                         modifier = Modifier.fillMaxSize(),
                         attributes = product.attributes,
+                        suggestionsState = viewModel.attributeSuggestions,
+                        search = viewModel::searchAttribute,
                         onPreviousClick = navigateToPrevious,
+                        saveDraft = {
+                            product.copy(attributes = it.map(AttributeValue::toLocalViewModel))
+                                .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        },
                     ) { attributes ->
-                        product =
-                            product.copy(attributes = attributes.map { it.toLocalViewModel() })
-                        navigateToNextScreenAndPermanentlyPersistDataIfNecessary()
+                        product.copy(attributes = attributes.map(AttributeValue::toLocalViewModel))
+                            .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        navigateToNext()
                     }
                 }
             }
