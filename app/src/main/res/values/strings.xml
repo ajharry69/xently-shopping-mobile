@@ -33,4 +33,12 @@
     <string name="xently_button_label_loading">Loading…</string>
     <string name="xently_content_description_add_attribute">Add attribute</string>
     <string name="xently_content_description_remove_item">Remove \"%1$s\"</string>
+    <string name="xently_strict_measurement_unit">With strict measurement unit</string>
+    <string name="xently_optional_measurement_unit">With optional measurement unit</string>
+    <string name="xently_checkbox_label_enforce_strict_measurement_unit">Enforce strict measurement unit?</string>
+    <string name="xently_content_description_add_item">Add "%1$s"</string>
+    <string name="xently_empty_shopping_list_message">You have an empty shopping list. Please fill in the form above to get started adding items to your shopping list.</string>
+    <string name="xently_text_field_label_shopping_list_item_name">Descriptive item name</string>
+    <string name="xently_text_field_help_text_shopping_list_item_name">For example, (2packs of) 400g (brown) bread (by eliot). Descriptions in brackets are optional.</string>
+    <string name="xently_button_label_get_recommendations">Get recommendations</string>
 </resources>
