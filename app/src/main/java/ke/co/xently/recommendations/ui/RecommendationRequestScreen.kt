@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -24,16 +29,21 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
@@ -42,16 +52,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.R
 import ke.co.xently.recommendations.models.Recommendation
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun RecommendationRequestScreen(
     modifier: Modifier = Modifier,
     viewModel: RecommendationViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+
+    val recommendationsState by viewModel.recommendationsState.collectAsState()
     val request by viewModel.recommendationRequest.collectAsState()
     val draftShoppingListItem by viewModel.draftShoppingListItem.collectAsState()
-    var shoppingListItemValue by remember {
-        mutableStateOf(TextFieldValue(""))
+    var shoppingListItemValue by remember(draftShoppingListItem.name) {
+        mutableStateOf(TextFieldValue(draftShoppingListItem.name))
     }
     val shoppingList = remember(request.shoppingList) {
         mutableStateListOf(*request.shoppingList.toTypedArray())
@@ -63,9 +79,34 @@ fun RecommendationRequestScreen(
         }
     }
 
-    val showAddButton by remember {
+    val showAddButton by remember(shoppingListItemValue) {
         derivedStateOf {
             shoppingListItemValue.text.isNotBlank()
+        }
+    }
+
+    val recommendationsLoading by remember(recommendationsState) {
+        derivedStateOf {
+            recommendationsState is State.Loading
+        }
+    }
+
+    var gettingRecommendationsButtonLabel by remember(context) {
+        mutableStateOf(context.getString(R.string.xently_button_label_getting_recommendations))
+    }
+
+    LaunchedEffect(recommendationsState, context) {
+        var count = 0
+        while (recommendationsState is State.Loading) {
+            if (count == 4) count = 0
+            delay(1.seconds)
+            gettingRecommendationsButtonLabel = buildString {
+                append(context.getString(R.string.xently_button_label_getting_recommendations))
+                for (c in 1..count) {
+                    append('.')
+                }
+            }
+            count += 1
         }
     }
 
@@ -99,6 +140,18 @@ fun RecommendationRequestScreen(
                         Text(text = stringResource(R.string.xently_checkbox_label_enforce_strict_measurement_unit))
                     }
                 }
+                val addShoppingListItem: () -> Unit by rememberUpdatedState {
+                    draftShoppingListItem.copy(name = shoppingListItemValue.text)
+                        .let(shoppingList::add)
+
+                    request.copy(shoppingList = shoppingList.toList())
+                        .let(viewModel::saveDraftRecommendationRequest)
+                    viewModel.clearDraftShoppingListItem()
+                    shoppingListItemValue = TextFieldValue("")
+                }
+                var imeActionClickedOnce by remember {
+                    mutableStateOf(false)
+                }
                 TextField(
                     value = shoppingListItemValue,
                     onValueChange = {
@@ -111,19 +164,26 @@ fun RecommendationRequestScreen(
                     supportingText = {
                         Text(text = stringResource(R.string.xently_text_field_help_text_shopping_list_item_name))
                     },
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (imeActionClickedOnce) {
+                                // Apparently, we need to click the IME action once before the
+                                // field can be cleared
+                                imeActionClickedOnce = false
+                                if (showAddButton) {
+                                    addShoppingListItem()
+                                } else {
+                                    focusManager.clearFocus()
+                                }
+                            } else {
+                                imeActionClickedOnce = true
+                            }
+                        },
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                     trailingIcon = if (showAddButton) {
                         {
-                            IconButton(
-                                onClick = {
-                                    draftShoppingListItem.copy(name = shoppingListItemValue.text)
-                                        .let(shoppingList::add)
-
-                                    request.copy(shoppingList = shoppingList.toList())
-                                        .let(viewModel::saveDraftRecommendationRequest)
-                                    viewModel.clearDraftShoppingListItem()
-                                    shoppingListItemValue = TextFieldValue("")
-                                },
-                            ) {
+                            IconButton(onClick = addShoppingListItem) {
                                 Icon(
                                     Icons.Default.Add,
                                     contentDescription = stringResource(
@@ -151,13 +211,25 @@ fun RecommendationRequestScreen(
                         )
                     }
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    val lazyListState = rememberLazyListState()
+                    LaunchedEffect(request.shoppingList) {
+                        lazyListState.animateScrollToItem(request.shoppingList.lastIndex)
+                    }
+
+                    LazyColumn(
+                        reverseLayout = true,
+                        state = lazyListState,
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
                         itemsIndexed(request.shoppingList) { i, item: Recommendation.Request.ShoppingListItem ->
                             ListItem(
                                 headlineContent = {
-                                    Text(text = item.name)
+                                    Text(
+                                        text = item.name,
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
                                 },
-                                overlineContent = {
+                                supportingContent = {
                                     Text(
                                         text = if (item.enforceStrictMeasurementUnit) {
                                             stringResource(R.string.xently_strict_measurement_unit)
@@ -167,20 +239,50 @@ fun RecommendationRequestScreen(
                                     )
                                 },
                                 trailingContent = {
-                                    IconButton(
-                                        onClick = {
-                                            shoppingList.removeAt(i)
-                                            request.copy(shoppingList = shoppingList.toList())
-                                                .let(viewModel::saveDraftRecommendationRequest)
-                                        },
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Close,
-                                            contentDescription = stringResource(
-                                                R.string.xently_content_description_remove_item,
-                                                item,
-                                            ),
-                                        )
+                                    var showShoppingListItemMenu by remember {
+                                        mutableStateOf(false)
+                                    }
+                                    Box {
+                                        IconButton(
+                                            onClick = {
+                                                showShoppingListItemMenu = true
+                                            },
+                                        ) {
+                                            Icon(
+                                                Icons.Default.MoreVert,
+                                                contentDescription = stringResource(
+                                                    R.string.xently_content_description_options_for_item,
+                                                    item,
+                                                ),
+                                            )
+                                        }
+                                        DropdownMenu(
+                                            expanded = showShoppingListItemMenu,
+                                            onDismissRequest = {
+                                                showShoppingListItemMenu = false
+                                            },
+                                        ) {
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(text = stringResource(R.string.xently_edit))
+                                                },
+                                                onClick = {
+                                                    viewModel.saveDraftShoppingListItem(item)
+                                                    showShoppingListItemMenu = false
+                                                },
+                                            )
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(text = stringResource(R.string.xently_remove))
+                                                },
+                                                onClick = {
+                                                    shoppingList.removeAt(i)
+                                                    request.copy(shoppingList = shoppingList.toList())
+                                                        .let(viewModel::saveDraftRecommendationRequest)
+                                                    showShoppingListItemMenu = false
+                                                },
+                                            )
+                                        }
                                     }
                                 },
                             )
@@ -197,13 +299,22 @@ fun RecommendationRequestScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Divider()
+            val enableGetRecommendationsButton by remember(recommendationsLoading, request) {
+                derivedStateOf {
+                    !recommendationsLoading && request.shoppingList.isNotEmpty()
+                }
+            }
             Button(
+                enabled = enableGetRecommendationsButton,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = viewModel::getRecommendations,
             ) {
                 Text(
-                    text = stringResource(R.string.xently_button_label_get_recommendations)
-                        .toUpperCase(Locale.current),
+                    text = if (recommendationsLoading) {
+                        gettingRecommendationsButtonLabel
+                    } else {
+                        stringResource(R.string.xently_button_label_get_recommendations)
+                    }.toUpperCase(Locale.current),
                 )
             }
         }

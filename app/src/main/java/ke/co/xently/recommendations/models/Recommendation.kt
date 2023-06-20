@@ -13,6 +13,26 @@ sealed interface Recommendation {
         val storeDistanceMeters: Number,
         val shoppingList: List<ShoppingListItem>,
     ) : Recommendation, Parcelable {
+        override fun hashCode(): Int {
+            var result = currentLocation.hashCode()
+            result = 31 * result + storeDistanceMeters.hashCode()
+            result = 31 * result + shoppingList.hashCode()
+            return result
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Request
+
+            if (currentLocation != other.currentLocation) return false
+            if (storeDistanceMeters != other.storeDistanceMeters) return false
+            if (shoppingList != other.shoppingList) return false
+
+            return true
+        }
+
         @Parcelize
         data class ShoppingListItem(
             val name: String,
@@ -29,6 +49,26 @@ sealed interface Recommendation {
              */
             val enforceStrictMeasurementUnit: Boolean = true,
         ) : Parcelable {
+            override fun hashCode(): Int {
+                var result = name.hashCode()
+                result = 31 * result + quantityToPurchase.hashCode()
+                result = 31 * result + enforceStrictMeasurementUnit.hashCode()
+                return result
+            }
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as ShoppingListItem
+
+                if (name != other.name) return false
+                if (quantityToPurchase != other.quantityToPurchase) return false
+                if (enforceStrictMeasurementUnit != other.enforceStrictMeasurementUnit) return false
+
+                return true
+            }
+
             companion object {
                 val default = ShoppingListItem(name = "")
             }
