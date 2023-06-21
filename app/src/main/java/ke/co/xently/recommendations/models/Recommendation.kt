@@ -69,6 +69,10 @@ sealed interface Recommendation {
                 return true
             }
 
+            override fun toString(): String {
+                return name
+            }
+
             companion object {
                 val default = ShoppingListItem(name = "")
             }

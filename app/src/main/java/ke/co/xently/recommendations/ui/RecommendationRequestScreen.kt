@@ -40,7 +40,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -60,9 +59,9 @@ fun RecommendationRequestScreen(
     modifier: Modifier = Modifier,
     viewModel: RecommendationViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
+    val draftShoppingListItemIndex by viewModel.draftShoppingListItemIndex.collectAsState()
     val recommendationsState by viewModel.recommendationsState.collectAsState()
     val request by viewModel.recommendationRequest.collectAsState()
     val draftShoppingListItem by viewModel.draftShoppingListItem.collectAsState()
@@ -91,17 +90,20 @@ fun RecommendationRequestScreen(
         }
     }
 
-    var gettingRecommendationsButtonLabel by remember(context) {
-        mutableStateOf(context.getString(R.string.xently_button_label_getting_recommendations))
+    val getRecommendationsButtonLabel =
+        stringResource(R.string.xently_button_label_getting_recommendations)
+
+    var gettingRecommendationsButtonLabel by remember {
+        mutableStateOf(getRecommendationsButtonLabel)
     }
 
-    LaunchedEffect(recommendationsState, context) {
+    LaunchedEffect(recommendationsState, getRecommendationsButtonLabel) {
         var count = 0
         while (recommendationsState is State.Loading) {
             if (count == 4) count = 0
             delay(1.seconds)
             gettingRecommendationsButtonLabel = buildString {
-                append(context.getString(R.string.xently_button_label_getting_recommendations))
+                append(getRecommendationsButtonLabel)
                 for (c in 1..count) {
                     append('.')
                 }
@@ -118,12 +120,14 @@ fun RecommendationRequestScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                val onEnforceStrictMeasurementUnitChange: (Boolean) -> Unit by rememberUpdatedState { enforce ->
+                    draftShoppingListItem.copy(enforceStrictMeasurementUnit = enforce).let {
+                        viewModel.saveDraftShoppingListItem(it, draftShoppingListItemIndex)
+                    }
+                }
                 Surface(
                     checked = draftShoppingListItem.enforceStrictMeasurementUnit,
-                    onCheckedChange = {
-                        draftShoppingListItem.copy(enforceStrictMeasurementUnit = it)
-                            .let(viewModel::saveDraftShoppingListItem)
-                    },
+                    onCheckedChange = onEnforceStrictMeasurementUnitChange,
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -132,17 +136,19 @@ fun RecommendationRequestScreen(
                     ) {
                         Checkbox(
                             checked = draftShoppingListItem.enforceStrictMeasurementUnit,
-                            onCheckedChange = {
-                                draftShoppingListItem.copy(enforceStrictMeasurementUnit = it)
-                                    .let(viewModel::saveDraftShoppingListItem)
-                            },
+                            onCheckedChange = onEnforceStrictMeasurementUnitChange,
                         )
                         Text(text = stringResource(R.string.xently_checkbox_label_enforce_strict_measurement_unit))
                     }
                 }
                 val addShoppingListItem: () -> Unit by rememberUpdatedState {
-                    draftShoppingListItem.copy(name = shoppingListItemValue.text)
-                        .let(shoppingList::add)
+                    draftShoppingListItem.copy(name = shoppingListItemValue.text).let {
+                        if (draftShoppingListItemIndex == RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX) {
+                            shoppingList.add(it)
+                        } else {
+                            shoppingList.set(draftShoppingListItemIndex, it)
+                        }
+                    }
 
                     request.copy(shoppingList = shoppingList.toList())
                         .let(viewModel::saveDraftRecommendationRequest)
@@ -221,7 +227,7 @@ fun RecommendationRequestScreen(
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        itemsIndexed(request.shoppingList) { i, item: Recommendation.Request.ShoppingListItem ->
+                        itemsIndexed(request.shoppingList) { index, item: Recommendation.Request.ShoppingListItem ->
                             ListItem(
                                 headlineContent = {
                                     Text(
@@ -267,7 +273,7 @@ fun RecommendationRequestScreen(
                                                     Text(text = stringResource(R.string.xently_edit))
                                                 },
                                                 onClick = {
-                                                    viewModel.saveDraftShoppingListItem(item)
+                                                    viewModel.saveDraftShoppingListItem(item, index)
                                                     showShoppingListItemMenu = false
                                                 },
                                             )
@@ -276,7 +282,7 @@ fun RecommendationRequestScreen(
                                                     Text(text = stringResource(R.string.xently_remove))
                                                 },
                                                 onClick = {
-                                                    shoppingList.removeAt(i)
+                                                    shoppingList.removeAt(index)
                                                     request.copy(shoppingList = shoppingList.toList())
                                                         .let(viewModel::saveDraftRecommendationRequest)
                                                     showShoppingListItemMenu = false

@@ -22,9 +22,11 @@ class RecommendationViewModel @Inject constructor(
     private val stateHandle: SavedStateHandle,
 ) : ViewModel() {
     companion object {
+        const val DEFAULT_SHOPPING_LIST_ITEM_INDEX = -1
         private val TAG = RecommendationViewModel::class.java.simpleName
         private val REQUEST_KEY = TAG.plus("REQUEST_KEY")
         private val SHOPPING_LIST_ITEM_KEY = TAG.plus("SHOPPING_LIST_ITEM_KEY")
+        private val SHOPPING_LIST_ITEM_INDEX_KEY = TAG.plus("SHOPPING_LIST_ITEM_INDEX_KEY")
     }
 
     private val mutableRecommendationsState = MutableStateFlow<State>(State.Idle)
@@ -41,17 +43,26 @@ class RecommendationViewModel @Inject constructor(
         SHOPPING_LIST_ITEM_KEY,
         Recommendation.Request.ShoppingListItem.default,
     )
+    val draftShoppingListItemIndex = stateHandle.getStateFlow(
+        SHOPPING_LIST_ITEM_INDEX_KEY,
+        DEFAULT_SHOPPING_LIST_ITEM_INDEX,
+    )
 
     fun saveDraftRecommendationRequest(request: Recommendation.Request) {
         stateHandle[REQUEST_KEY] = request
     }
 
-    fun saveDraftShoppingListItem(item: Recommendation.Request.ShoppingListItem) {
+    fun saveDraftShoppingListItem(
+        item: Recommendation.Request.ShoppingListItem,
+        index: Int = DEFAULT_SHOPPING_LIST_ITEM_INDEX,
+    ) {
         stateHandle[SHOPPING_LIST_ITEM_KEY] = item
+        stateHandle[SHOPPING_LIST_ITEM_INDEX_KEY] = index
     }
 
     fun clearDraftShoppingListItem() {
         stateHandle[SHOPPING_LIST_ITEM_KEY] = Recommendation.Request.ShoppingListItem.default
+        stateHandle[SHOPPING_LIST_ITEM_INDEX_KEY] = DEFAULT_SHOPPING_LIST_ITEM_INDEX
     }
 
     fun getRecommendations() {
