@@ -1,10 +1,12 @@
 package ke.co.xently.products.ui.subscreens
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
@@ -31,10 +33,14 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.products.models.Brand
+import ke.co.xently.products.models.Product
 import ke.co.xently.products.ui.components.AddProductPage
+import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -170,5 +176,22 @@ fun AddBrandsPage(
                 }
             }
         }
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
+@Composable
+fun AddBrandsPagePreview() {
+    XentlyTheme {
+        AddBrandsPage(
+            modifier = Modifier.fillMaxSize(),
+            brands = Product.LocalViewModel.default.brands,
+            suggestionsState = MutableStateFlow(emptyList()),
+            search = {},
+            saveDraft = {},
+            onPreviousClick = {},
+            onContinueClick = {},
+        )
     }
 }

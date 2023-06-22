@@ -1,5 +1,6 @@
 package ke.co.xently.products.ui.subscreens
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
@@ -33,11 +35,15 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.products.models.AttributeValue
+import ke.co.xently.products.models.Product
 import ke.co.xently.products.ui.State
 import ke.co.xently.products.ui.components.AddProductPage
+import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -241,5 +247,23 @@ fun AddAttributesPage(
                 }
             }
         }
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
+@Composable
+fun AddAttributesPagePreview() {
+    XentlyTheme {
+        AddAttributesPage(
+            modifier = Modifier.fillMaxSize(),
+            attributes = Product.LocalViewModel.default.attributes,
+            stateState = MutableStateFlow(State.Idle),
+            suggestionsState = MutableStateFlow(emptyList()),
+            search = {},
+            saveDraft = {},
+            onPreviousClick = {},
+            onContinueClick = {},
+        )
     }
 }

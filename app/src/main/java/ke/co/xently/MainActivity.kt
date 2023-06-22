@@ -24,44 +24,39 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             XentlyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
-                    Scaffold(
-                        topBar = {
-                            CenterAlignedTopAppBar(
-                                title = {
-                                    Text(stringResource(R.string.app_name))
-                                },
-                            )
-                        },
-                    ) { paddingValues ->
-                        val viewModel = hiltViewModel<MainViewModel>()
-                        val selectedTab by viewModel.currentlyActiveTab.collectAsState()
-                        Column(modifier = Modifier.padding(paddingValues)) {
-                            TabRow(selectedTabIndex = selectedTab.ordinal) {
-                                for (tab in HomeTab.values()) {
-                                    Tab(
-                                        selected = selectedTab == tab,
-                                        onClick = {
-                                            viewModel.saveCurrentlyActiveTab(tab)
-                                        },
-                                        text = {
-                                            Text(stringResource(tab.title))
-                                        },
-                                    )
-                                }
+                Scaffold(
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            title = {
+                                Text(stringResource(R.string.app_name))
+                            },
+                        )
+                    },
+                ) { paddingValues ->
+                    val viewModel = hiltViewModel<MainViewModel>()
+                    val selectedTab by viewModel.currentlyActiveTab.collectAsState()
+                    Column(modifier = Modifier.padding(paddingValues)) {
+                        TabRow(selectedTabIndex = selectedTab.ordinal) {
+                            for (tab in HomeTab.values()) {
+                                Tab(
+                                    selected = selectedTab == tab,
+                                    onClick = {
+                                        viewModel.saveCurrentlyActiveTab(tab)
+                                    },
+                                    text = {
+                                        Text(stringResource(tab.title))
+                                    },
+                                )
+                            }
+                        }
+
+                        when (selectedTab) {
+                            HomeTab.AddProducts -> {
+                                AddProductScreen(modifier = Modifier.fillMaxSize())
                             }
 
-                            when (selectedTab) {
-                                HomeTab.AddProducts -> {
-                                    AddProductScreen(modifier = Modifier.fillMaxSize())
-                                }
-
-                                HomeTab.GetRecommendations -> {
-                                    RecommendationRequestScreen(modifier = Modifier.fillMaxSize())
-                                }
+                            HomeTab.GetRecommendations -> {
+                                RecommendationRequestScreen(modifier = Modifier.fillMaxSize())
                             }
                         }
                     }

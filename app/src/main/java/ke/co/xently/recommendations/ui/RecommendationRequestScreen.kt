@@ -1,5 +1,6 @@
 package ke.co.xently.recommendations.ui
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,24 +48,50 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.R
 import ke.co.xently.recommendations.models.Recommendation
+import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun RecommendationRequestScreen(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     viewModel: RecommendationViewModel = hiltViewModel(),
 ) {
-    val focusManager = LocalFocusManager.current
+    val draftShoppingListItemIndex: Int by viewModel.draftShoppingListItemIndex.collectAsState()
+    val recommendationsState: State by viewModel.recommendationsState.collectAsState()
+    val request: Recommendation.Request by viewModel.recommendationRequest.collectAsState()
+    val draftShoppingListItem: Recommendation.Request.ShoppingListItem by viewModel.draftShoppingListItem.collectAsState()
 
-    val draftShoppingListItemIndex by viewModel.draftShoppingListItemIndex.collectAsState()
-    val recommendationsState by viewModel.recommendationsState.collectAsState()
-    val request by viewModel.recommendationRequest.collectAsState()
-    val draftShoppingListItem by viewModel.draftShoppingListItem.collectAsState()
+    RecommendationRequestScreen(
+        draftShoppingListItem = draftShoppingListItem,
+        request = request,
+        recommendationsState = recommendationsState,
+        modifier = modifier,
+        saveIndexedDraftShoppingListItem = viewModel::saveDraftShoppingListItem,
+        draftShoppingListItemIndex = draftShoppingListItemIndex,
+        saveDraftRecommendationRequest = viewModel::saveDraftRecommendationRequest,
+        clearDraftShoppingListItem = viewModel::clearDraftShoppingListItem,
+        getRecommendations = viewModel::getRecommendations,
+    )
+}
+
+@Composable
+fun RecommendationRequestScreen(
+    draftShoppingListItem: Recommendation.Request.ShoppingListItem,
+    request: Recommendation.Request,
+    recommendationsState: State,
+    modifier: Modifier,
+    draftShoppingListItemIndex: Int,
+    saveDraftRecommendationRequest: (request: Recommendation.Request) -> Unit,
+    clearDraftShoppingListItem: () -> Unit,
+    getRecommendations: () -> Unit,
+    saveIndexedDraftShoppingListItem: (Recommendation.Request.ShoppingListItem, Int) -> Unit = { _, _ -> },
+) {
     var shoppingListItemValue by remember(draftShoppingListItem.name) {
         mutableStateOf(TextFieldValue(draftShoppingListItem.name))
     }
@@ -121,9 +148,10 @@ fun RecommendationRequestScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 val onEnforceStrictMeasurementUnitChange: (Boolean) -> Unit by rememberUpdatedState { enforce ->
-                    draftShoppingListItem.copy(enforceStrictMeasurementUnit = enforce).let {
-                        viewModel.saveDraftShoppingListItem(it, draftShoppingListItemIndex)
-                    }
+                    saveIndexedDraftShoppingListItem(
+                        draftShoppingListItem.copy(enforceStrictMeasurementUnit = enforce),
+                        draftShoppingListItemIndex,
+                    )
                 }
                 Surface(
                     checked = draftShoppingListItem.enforceStrictMeasurementUnit,
@@ -151,13 +179,14 @@ fun RecommendationRequestScreen(
                     }
 
                     request.copy(shoppingList = shoppingList.toList())
-                        .let(viewModel::saveDraftRecommendationRequest)
-                    viewModel.clearDraftShoppingListItem()
+                        .let(saveDraftRecommendationRequest)
+                    clearDraftShoppingListItem()
                     shoppingListItemValue = TextFieldValue("")
                 }
                 var imeActionClickedOnce by remember {
                     mutableStateOf(false)
                 }
+                val focusManager = LocalFocusManager.current
                 TextField(
                     value = shoppingListItemValue,
                     onValueChange = {
@@ -273,7 +302,7 @@ fun RecommendationRequestScreen(
                                                     Text(text = stringResource(R.string.xently_edit))
                                                 },
                                                 onClick = {
-                                                    viewModel.saveDraftShoppingListItem(item, index)
+                                                    saveIndexedDraftShoppingListItem(item, index)
                                                     showShoppingListItemMenu = false
                                                 },
                                             )
@@ -284,7 +313,7 @@ fun RecommendationRequestScreen(
                                                 onClick = {
                                                     shoppingList.removeAt(index)
                                                     request.copy(shoppingList = shoppingList.toList())
-                                                        .let(viewModel::saveDraftRecommendationRequest)
+                                                        .let(saveDraftRecommendationRequest)
                                                     showShoppingListItemMenu = false
                                                 },
                                             )
@@ -313,7 +342,7 @@ fun RecommendationRequestScreen(
             Button(
                 enabled = enableGetRecommendationsButton,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = viewModel::getRecommendations,
+                onClick = getRecommendations,
             ) {
                 Text(
                     text = if (recommendationsLoading) {
@@ -324,5 +353,23 @@ fun RecommendationRequestScreen(
                 )
             }
         }
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
+@Composable
+fun RecommendationRequestScreenPreview() {
+    XentlyTheme {
+        RecommendationRequestScreen(
+            modifier = Modifier.fillMaxSize(),
+            draftShoppingListItem = Recommendation.Request.ShoppingListItem.default,
+            request = Recommendation.Request.default,
+            recommendationsState = State.Idle,
+            draftShoppingListItemIndex = RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX,
+            saveDraftRecommendationRequest = {},
+            clearDraftShoppingListItem = {},
+            getRecommendations = {},
+        )
     }
 }

@@ -1,5 +1,7 @@
 package ke.co.xently.products.ui.subscreens
 
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -12,9 +14,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.products.models.ProductName
 import ke.co.xently.products.ui.components.AddProductPage
+import ke.co.xently.ui.theme.XentlyTheme
 
 @Composable
 fun AddProductNamePage(
@@ -62,6 +66,20 @@ fun AddProductNamePage(
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
+@Composable
+fun AddProductNamePagePreview() {
+    XentlyTheme {
+        AddProductNamePage(
+            modifier = Modifier.fillMaxSize(),
+            productName = ProductName.LocalViewModel.default,
+            onPreviousClick = {},
+            onContinueClick = {},
         )
     }
 }
