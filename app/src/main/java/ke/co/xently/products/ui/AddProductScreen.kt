@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
 import ke.co.xently.products.models.Product
+import ke.co.xently.products.models.Store
 import ke.co.xently.products.ui.subscreens.AddAttributesPage
 import ke.co.xently.products.ui.subscreens.AddBrandsPage
 import ke.co.xently.products.ui.subscreens.AddGeneralDetailsPage
@@ -49,22 +50,28 @@ fun AddProductScreen(
         addProductState = viewModel.addProductState,
         attributeSuggestionsState = viewModel.attributeSuggestions,
         searchAttribute = viewModel::searchAttribute,
+        searchStores = viewModel::searchStore,
+        storeSuggestionsState = viewModel.storeSuggestions,
+        onStoreSearchSuggestionSelected = viewModel::clearStoreSearchSuggestions,
     )
 }
 
 @Composable
 fun AddProductScreen(
     addProductStep: AddProductStep,
-    savePermanently: (product: Product.LocalViewModel) -> Unit,
-    saveDraft: (product: Product.LocalViewModel) -> Unit,
-    saveCurrentlyActiveStep: (step: AddProductStep) -> Unit,
     modifier: Modifier,
     product: Product.LocalViewModel,
     brandSuggestionsState: StateFlow<List<Brand>>,
-    searchBrands: (brand: Brand) -> Unit,
     addProductState: StateFlow<State>,
     attributeSuggestionsState: StateFlow<List<AttributeValue>>,
-    searchAttribute: (attribute: AttributeValue) -> Unit,
+    storeSuggestionsState: StateFlow<List<Store>>,
+    savePermanently: (Product.LocalViewModel) -> Unit,
+    saveDraft: (Product.LocalViewModel) -> Unit,
+    saveCurrentlyActiveStep: (AddProductStep) -> Unit,
+    searchBrands: (Brand) -> Unit,
+    searchAttribute: (AttributeValue) -> Unit,
+    searchStores: (Store) -> Unit,
+    onStoreSearchSuggestionSelected: () -> Unit,
 ) {
     val saveAsDraftOrPermanently: (Product.LocalViewModel) -> Unit by remember(addProductStep) {
         derivedStateOf {
@@ -100,7 +107,17 @@ fun AddProductScreen(
         AnimatedContent(targetState = addProductStep) { step ->
             when (step) {
                 AddProductStep.Store -> {
-                    AddStorePage(modifier = Modifier.fillMaxSize(), store = product.store) {
+                    AddStorePage(
+                        modifier = Modifier.fillMaxSize(),
+                        store = product.store,
+                        suggestionsState = storeSuggestionsState,
+                        search = searchStores,
+                        saveDraft = {
+                            product.copy(store = it.toLocalViewModel())
+                                .let(saveAsDraftOrPermanently)
+                        },
+                        onSearchSuggestionSelected = onStoreSearchSuggestionSelected,
+                    ) {
                         product.copy(store = it.toLocalViewModel())
                             .let(saveAsDraftOrPermanently)
                         navigateToNext()
@@ -203,16 +220,19 @@ fun AddProductScreenPreview() {
     XentlyTheme {
         AddProductScreen(
             addProductStep = AddProductStep.valueOfOrdinalOrFirstByOrdinal(0),
-            savePermanently = {},
-            saveDraft = {},
-            saveCurrentlyActiveStep = {},
             modifier = Modifier.fillMaxSize(),
             product = Product.LocalViewModel.default,
             brandSuggestionsState = MutableStateFlow(emptyList()),
-            searchBrands = {},
             addProductState = MutableStateFlow(State.Idle),
             attributeSuggestionsState = MutableStateFlow(emptyList()),
+            storeSuggestionsState = MutableStateFlow(emptyList()),
+            savePermanently = {},
+            saveDraft = {},
+            saveCurrentlyActiveStep = {},
+            searchBrands = {},
             searchAttribute = {},
+            searchStores = {},
+            onStoreSearchSuggestionSelected = {},
         )
     }
 }

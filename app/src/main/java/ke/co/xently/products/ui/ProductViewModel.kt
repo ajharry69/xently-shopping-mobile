@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
 import ke.co.xently.products.models.Product
+import ke.co.xently.products.models.Store
 import ke.co.xently.products.repositories.ProductRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
@@ -25,10 +27,8 @@ class ProductViewModel @Inject constructor(
 ) : ViewModel() {
     companion object {
         private val TAG = ProductViewModel::class.java.simpleName
-        private val CURRENT_ACTIVE_STEP_KEY =
-            ProductViewModel::class.java.simpleName.plus("CURRENT_ACTIVE_STEP_KEY")
-        private val CURRENT_PRODUCT_KEY =
-            ProductViewModel::class.java.simpleName.plus("CURRENT_PRODUCT_KEY")
+        private val CURRENT_ACTIVE_STEP_KEY = TAG.plus("CURRENT_ACTIVE_STEP_KEY")
+        private val CURRENT_PRODUCT_KEY = TAG.plus("CURRENT_PRODUCT_KEY")
     }
 
     val currentlyActiveStep = stateHandle.getStateFlow(
@@ -46,6 +46,10 @@ class ProductViewModel @Inject constructor(
     private val attributeSuggestionsMutable = MutableStateFlow<List<AttributeValue>>(emptyList())
 
     val attributeSuggestions = attributeSuggestionsMutable.asStateFlow()
+
+    private val storeSuggestionsMutable = MutableStateFlow<List<Store>>(emptyList())
+
+    val storeSuggestions = storeSuggestionsMutable.asStateFlow()
 
     private val addProductStateMutable = MutableStateFlow<State>(State.Idle)
 
@@ -78,10 +82,31 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchAttribute(attribute: AttributeValue) {
-
+        attributeSuggestionsMutable.value = List(Random(0).nextInt(5)) {
+            attribute.toLocalViewModel()
+                .copy(value = buildString { append(attribute.value); append(it + 1) })
+        }
     }
 
     fun searchBrand(brand: Brand) {
+        brandSuggestionsMutable.value = List(Random(0).nextInt(5)) {
+            brand.toLocalViewModel().copy(name = buildString { append(brand.name); append(it + 1) })
+        }
+    }
 
+    fun searchStore(store: Store) {
+        Log.d(TAG, "searchStore: ${store.name}...")
+        storeSuggestionsMutable.value = List(Random.nextInt(0, 5)) {
+            store.toLocalViewModel().copy(
+                name = buildString { append(store.name); if (!endsWith(' ')) append(' '); append(it + 1) },
+                shop = store.shop.toLocalViewModel().copy(
+                    name = "Shop name ${Random.nextInt()}"
+                ),
+            )
+        }
+    }
+
+    fun clearStoreSearchSuggestions() {
+        storeSuggestionsMutable.value = emptyList()
     }
 }

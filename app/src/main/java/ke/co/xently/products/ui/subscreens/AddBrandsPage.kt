@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.StateFlow
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddBrandsPage(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     brands: List<Brand>,
     suggestionsState: StateFlow<List<Brand>>,
     search: (Brand) -> Unit,
@@ -55,9 +55,6 @@ fun AddBrandsPage(
     onContinueClick: (List<Brand>) -> Unit,
 ) {
     val suggestions by suggestionsState.collectAsState()
-    val manufacturers = remember {
-        mutableStateListOf(*brands.toTypedArray())
-    }
     var brandNameQuery by remember {
         mutableStateOf("")
     }
@@ -70,6 +67,9 @@ fun AddBrandsPage(
         derivedStateOf {
             brandNameQuery.isNotBlank() && suggestions.isNotEmpty()
         }
+    }
+    val manufacturers = remember {
+        mutableStateListOf(*brands.toTypedArray())
     }
 
     LaunchedEffect(manufacturers) {
@@ -92,8 +92,8 @@ fun AddBrandsPage(
         },
     ) {
         val doSearch: () -> Unit by rememberUpdatedState {
-            val brand = Brand.LocalViewModel.default.copy(name = brandNameQuery)
-            search(brand)
+            Brand.LocalViewModel.default.copy(name = brandNameQuery)
+                .let(search)
         }
         DockedSearchBar(
             query = brandNameQuery,
@@ -123,7 +123,7 @@ fun AddBrandsPage(
                     ) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = stringResource(R.string.xently_content_description_add_attribute),
+                            contentDescription = stringResource(R.string.xently_content_description_add_brand),
                         )
                     }
                 }
