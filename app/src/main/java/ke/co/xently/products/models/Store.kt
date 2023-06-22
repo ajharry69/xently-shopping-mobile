@@ -6,29 +6,34 @@ import kotlinx.parcelize.Parcelize
 sealed interface Store {
     val id: Long
     val name: String
+    val location: Location
     val shop: Shop
 
     data class RemoteRequest(
         override val id: Long,
         override val name: String,
+        override val location: Location,
         override val shop: Shop.RemoteRequest,
     ) : Store
 
     data class RemoteResponse(
         override val id: Long,
         override val name: String,
+        override val location: Location,
         override val shop: Shop.RemoteResponse,
     ) : Store
 
     data class LocalEntityRequest(
         override val id: Long,
         override val name: String,
+        override val location: Location,
         override val shop: Shop.LocalEntityRequest,
     ) : Store
 
     data class LocalEntityResponse(
         override val id: Long,
         override val name: String,
+        override val location: Location,
         override val shop: Shop.LocalEntityResponse,
     ) : Store
 
@@ -36,6 +41,7 @@ sealed interface Store {
     data class LocalViewModel(
         override val id: Long,
         override val name: String,
+        override val location: Location,
         override val shop: Shop.LocalViewModel,
         /**
          * This is in meters
@@ -46,6 +52,7 @@ sealed interface Store {
             val default = LocalViewModel(
                 id = -1,
                 name = "",
+                location = Location.default,
                 shop = Shop.LocalViewModel.default,
                 distance = null,
             )
@@ -58,6 +65,7 @@ sealed interface Store {
                 RemoteRequest(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toRemoteRequest(),
                 )
             }
@@ -66,6 +74,7 @@ sealed interface Store {
                 RemoteRequest(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toRemoteRequest(),
                 )
             }
@@ -74,6 +83,7 @@ sealed interface Store {
                 RemoteRequest(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toRemoteRequest(),
                 )
             }
@@ -86,6 +96,7 @@ sealed interface Store {
                 RemoteRequest(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toRemoteRequest(),
                 )
             }
@@ -99,6 +110,7 @@ sealed interface Store {
                 RemoteResponse(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toRemoteResponse(),
                 )
             }
@@ -107,6 +119,7 @@ sealed interface Store {
                 RemoteResponse(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toRemoteResponse(),
                 )
             }
@@ -115,6 +128,7 @@ sealed interface Store {
                 RemoteResponse(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toRemoteResponse(),
                 )
             }
@@ -123,6 +137,7 @@ sealed interface Store {
                 RemoteResponse(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toRemoteResponse(),
                 )
             }
@@ -144,6 +159,7 @@ sealed interface Store {
                 LocalEntityRequest(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalEntityRequest(),
                 )
             }
@@ -152,6 +168,7 @@ sealed interface Store {
                 LocalEntityRequest(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalEntityRequest(),
                 )
             }
@@ -160,6 +177,7 @@ sealed interface Store {
                 LocalEntityRequest(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalEntityRequest(),
                 )
             }
@@ -168,6 +186,7 @@ sealed interface Store {
                 LocalEntityRequest(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalEntityRequest(),
                 )
             }
@@ -181,6 +200,7 @@ sealed interface Store {
                 LocalEntityResponse(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalEntityResponse(),
                 )
             }
@@ -193,6 +213,7 @@ sealed interface Store {
                 LocalEntityResponse(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalEntityResponse(),
                 )
             }
@@ -201,6 +222,7 @@ sealed interface Store {
                 LocalEntityResponse(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalEntityResponse(),
                 )
             }
@@ -209,6 +231,7 @@ sealed interface Store {
                 LocalEntityResponse(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalEntityResponse(),
                 )
             }
@@ -222,6 +245,7 @@ sealed interface Store {
                 LocalViewModel(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalViewModel(),
                     distance = null,
                 )
@@ -231,6 +255,7 @@ sealed interface Store {
                 LocalViewModel(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalViewModel(),
                     distance = null,
                 )
@@ -244,6 +269,7 @@ sealed interface Store {
                 LocalViewModel(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalViewModel(),
                     distance = null,
                 )
@@ -253,6 +279,7 @@ sealed interface Store {
                 LocalViewModel(
                     id = id,
                     name = name,
+                    location = location,
                     shop = shop.toLocalViewModel(),
                     distance = null,
                 )
