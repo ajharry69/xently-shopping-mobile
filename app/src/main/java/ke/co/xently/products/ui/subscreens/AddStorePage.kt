@@ -134,12 +134,13 @@ fun AddStorePage(
                     showMap = true
                 },
             )
-            if (!showMap) {
+            androidx.compose.animation.AnimatedVisibility(
+                visible = !showMap,
+                modifier = Modifier.matchParentSize(),
+            ) {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f)),
+                    modifier = Modifier.background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f)),
                 ) {
                     CircularProgressIndicator()
                 }
