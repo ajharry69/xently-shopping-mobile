@@ -6,34 +6,44 @@ import kotlinx.parcelize.Parcelize
 sealed interface Shop {
     val id: Long
     val name: String
+    val ecommerceSiteUrl: String?
 
     data class RemoteRequest(
         override val id: Long,
         override val name: String,
+        override val ecommerceSiteUrl: String?,
     ) : Shop
 
     data class RemoteResponse(
         override val id: Long,
         override val name: String,
+        override val ecommerceSiteUrl: String?,
     ) : Shop
 
     data class LocalEntityRequest(
         override val id: Long,
         override val name: String,
+        override val ecommerceSiteUrl: String?,
     ) : Shop
 
     data class LocalEntityResponse(
         override val id: Long,
         override val name: String,
+        override val ecommerceSiteUrl: String?,
     ) : Shop
 
     @Parcelize
     data class LocalViewModel(
         override val id: Long,
         override val name: String,
+        override val ecommerceSiteUrl: String?,
     ) : Shop, Parcelable {
         companion object {
-            val default = LocalViewModel(id = -1, name = "")
+            val default = LocalViewModel(
+                id = -1,
+                name = "",
+                ecommerceSiteUrl = null,
+            )
         }
     }
 
@@ -43,6 +53,7 @@ sealed interface Shop {
                 RemoteRequest(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -50,6 +61,7 @@ sealed interface Shop {
                 RemoteRequest(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -57,6 +69,7 @@ sealed interface Shop {
                 RemoteRequest(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -68,6 +81,7 @@ sealed interface Shop {
                 RemoteRequest(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
         }
@@ -80,6 +94,7 @@ sealed interface Shop {
                 RemoteResponse(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -87,6 +102,7 @@ sealed interface Shop {
                 RemoteResponse(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -94,6 +110,7 @@ sealed interface Shop {
                 RemoteResponse(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -101,6 +118,7 @@ sealed interface Shop {
                 RemoteResponse(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -121,6 +139,7 @@ sealed interface Shop {
                 LocalEntityRequest(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -128,6 +147,7 @@ sealed interface Shop {
                 LocalEntityRequest(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -135,6 +155,7 @@ sealed interface Shop {
                 LocalEntityRequest(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -142,6 +163,7 @@ sealed interface Shop {
                 LocalEntityRequest(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
         }
@@ -154,6 +176,7 @@ sealed interface Shop {
                 LocalEntityResponse(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -165,6 +188,7 @@ sealed interface Shop {
                 LocalEntityResponse(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -172,6 +196,7 @@ sealed interface Shop {
                 LocalEntityResponse(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -179,6 +204,7 @@ sealed interface Shop {
                 LocalEntityResponse(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
         }
@@ -191,6 +217,7 @@ sealed interface Shop {
                 LocalViewModel(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -198,6 +225,7 @@ sealed interface Shop {
                 LocalViewModel(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -209,6 +237,7 @@ sealed interface Shop {
                 LocalViewModel(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
 
@@ -216,6 +245,7 @@ sealed interface Shop {
                 LocalViewModel(
                     id = id,
                     name = name,
+                    ecommerceSiteUrl = ecommerceSiteUrl,
                 )
             }
         }

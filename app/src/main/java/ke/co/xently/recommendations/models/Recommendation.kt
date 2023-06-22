@@ -89,7 +89,7 @@ sealed interface Recommendation {
 
     data class Response(
         val estimatedExpenditure: EstimatedExpenditure,
-        val store: Store.LocalEntityResponse,
+        val store: Store.LocalViewModel,
         val hit: Hit,
         val miss: Miss,
     ) : Recommendation {

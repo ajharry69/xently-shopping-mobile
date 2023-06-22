@@ -2,6 +2,7 @@ package ke.co.xently.products.ui
 
 enum class AddProductStep {
     Store,
+    Shop,
     ProductName,
     GeneralDetails,
     MeasurementUnit,

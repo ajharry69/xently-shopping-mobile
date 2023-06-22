@@ -37,12 +37,17 @@ sealed interface Store {
         override val id: Long,
         override val name: String,
         override val shop: Shop.LocalViewModel,
+        /**
+         * This is in meters
+         */
+        val distance: Double?,
     ) : Store, Parcelable {
         companion object {
             val default = LocalViewModel(
                 id = -1,
                 name = "",
                 shop = Shop.LocalViewModel.default,
+                distance = null,
             )
         }
     }
@@ -218,6 +223,7 @@ sealed interface Store {
                     id = id,
                     name = name,
                     shop = shop.toLocalViewModel(),
+                    distance = null,
                 )
             }
 
@@ -226,6 +232,7 @@ sealed interface Store {
                     id = id,
                     name = name,
                     shop = shop.toLocalViewModel(),
+                    distance = null,
                 )
             }
 
@@ -238,6 +245,7 @@ sealed interface Store {
                     id = id,
                     name = name,
                     shop = shop.toLocalViewModel(),
+                    distance = null,
                 )
             }
 
@@ -246,6 +254,7 @@ sealed interface Store {
                     id = id,
                     name = name,
                     shop = shop.toLocalViewModel(),
+                    distance = null,
                 )
             }
         }

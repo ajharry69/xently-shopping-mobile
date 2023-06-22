@@ -20,6 +20,7 @@ import ke.co.xently.products.ui.subscreens.AddBrandsPage
 import ke.co.xently.products.ui.subscreens.AddGeneralDetailsPage
 import ke.co.xently.products.ui.subscreens.AddMeasurementUnitPage
 import ke.co.xently.products.ui.subscreens.AddProductNamePage
+import ke.co.xently.products.ui.subscreens.AddShopPage
 import ke.co.xently.products.ui.subscreens.AddStorePage
 
 @Composable
@@ -62,6 +63,18 @@ fun AddProductScreen(
                 AddProductStep.Store -> {
                     AddStorePage(modifier = Modifier.fillMaxSize(), store = product.store) {
                         product.copy(store = it.toLocalViewModel())
+                            .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
+                        navigateToNext()
+                    }
+                }
+
+                AddProductStep.Shop -> {
+                    AddShopPage(
+                        modifier = Modifier.fillMaxSize(),
+                        shop = product.store.shop,
+                        onPreviousClick = navigateToPrevious,
+                    ) {
+                        product.copy(store = product.store.copy(shop = it.toLocalViewModel()))
                             .let(if (isTheLastStep) viewModel::savePermanently else viewModel::saveDraft)
                         navigateToNext()
                     }

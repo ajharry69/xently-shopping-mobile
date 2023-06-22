@@ -3,7 +3,6 @@ package ke.co.xently.products.ui.subscreens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import com.google.maps.android.compose.GoogleMap
 import ke.co.xently.R
 import ke.co.xently.products.models.Store
@@ -31,9 +29,6 @@ fun AddStorePage(
     onContinueClick: (Store) -> Unit,
 ) {
     var name by remember(store.name) { mutableStateOf(TextFieldValue(store.name)) }
-    var shopName by remember(store.shop.name) {
-        mutableStateOf(TextFieldValue(store.shop.name))
-    }
     var showMap by remember {
         mutableStateOf(false)
     }
@@ -47,7 +42,9 @@ fun AddStorePage(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    Store.LocalViewModel.default.let(onContinueClick)
+                    store.toLocalViewModel().copy(
+                        name = name.text,
+                    ).let(onContinueClick)
                 },
             ) {
                 Text(stringResource(R.string.xently_button_label_continue))
@@ -58,17 +55,10 @@ fun AddStorePage(
             value = name,
             onValueChange = { name = it },
             label = {
-                Text(stringResource(R.string.xently_text_field_label_store_name_required))
+                Text(stringResource(R.string.xently_text_field_label_name))
             },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        TextField(
-            value = shopName,
-            onValueChange = { shopName = it },
-            label = {
-                Text(stringResource(R.string.xently_text_field_label_shop_name_required))
+            supportingText = {
+                Text(text = stringResource(R.string.xently_text_field_help_text_store))
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
@@ -77,7 +67,7 @@ fun AddStorePage(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp),
+                .weight(1f),
             contentAlignment = Alignment.Center,
         ) {
             GoogleMap(
