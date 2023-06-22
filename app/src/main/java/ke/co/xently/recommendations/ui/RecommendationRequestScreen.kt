@@ -128,14 +128,14 @@ fun RecommendationRequestScreen(
         var count = 0
         while (recommendationsState is State.Loading) {
             if (count == 4) count = 0
-            delay(1.seconds)
+            count += 1
             gettingRecommendationsButtonLabel = buildString {
                 append(getRecommendationsButtonLabel)
                 for (c in 1..count) {
                     append('.')
                 }
             }
-            count += 1
+            delay(1.seconds)
         }
     }
 
