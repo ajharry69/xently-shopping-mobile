@@ -91,6 +91,7 @@ sealed interface Product {
         override val datePurchased: LocalDateTime,
         override val brands: List<Brand.LocalViewModel>,
         override val attributes: List<AttributeValue.LocalViewModel>,
+        val autoFillNamePlural: Boolean = true,
     ) : Product, Parcelable {
         companion object {
             val default = LocalViewModel(

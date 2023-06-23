@@ -7,30 +7,66 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
+import ke.co.xently.products.models.Product
 import ke.co.xently.products.models.ProductName
 import ke.co.xently.products.ui.components.AddProductPage
+import ke.co.xently.products.ui.components.AutoCompleteTextField
+import ke.co.xently.products.ui.components.LabeledCheckbox
+import ke.co.xently.products.ui.components.rememberAutoCompleteTextFieldState
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun AddProductNamePage(
     modifier: Modifier = Modifier,
-    productName: ProductName,
+    product: Product,
+    suggestionsState: StateFlow<List<Product>>,
+    search: (ProductName) -> Unit,
+    saveDraft: (Product) -> Unit,
+    onSearchSuggestionSelected: () -> Unit,
     onPreviousClick: () -> Unit,
-    onContinueClick: (ProductName) -> Unit,
+    onContinueClick: (Product) -> Unit,
 ) {
-    var name by remember(productName.name) { mutableStateOf(TextFieldValue(productName.name)) }
-    var namePlural by remember(productName.namePlural) {
-        mutableStateOf(TextFieldValue(productName.namePlural ?: ""))
+    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
+        query = product.name.name,
+        suggestionsState = suggestionsState
+    )
+
+    var namePlural by remember(product.name.namePlural) {
+        mutableStateOf(TextFieldValue(product.name.namePlural ?: ""))
     }
+
+    var autoFillPlural by rememberSaveable(product.toLocalViewModel().autoFillNamePlural) {
+        mutableStateOf(product.toLocalViewModel().autoFillNamePlural)
+    }
+
+    LaunchedEffect(nameAutoCompleteState.query) {
+        if (autoFillPlural) {
+            namePlural = if (nameAutoCompleteState.query.isBlank()) {
+                TextFieldValue()
+            } else {
+                val plural = buildString {
+                    append(nameAutoCompleteState.query.trim())
+                    append('s')
+                }
+                namePlural.copy(plural, selection = TextRange(plural.lastIndex))
+            }
+        }
+    }
+
     AddProductPage(
         modifier = modifier,
         heading = R.string.xently_product_name_page_title,
@@ -39,28 +75,50 @@ fun AddProductNamePage(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    ProductName.LocalViewModel.default.copy(
-                        name = name.text,
-                        namePlural = namePlural.text.takeIf { it.isNotBlank() },
-                    ).let(onContinueClick)
+                    product.toLocalViewModel().run {
+                        copy(
+                            autoFillNamePlural = autoFillPlural,
+                            name = name.copy(
+                                name = nameAutoCompleteState.query,
+                                namePlural = namePlural.text.takeIf { it.isNotBlank() },
+                            ),
+                        )
+                    }.let(onContinueClick)
                 },
             ) {
                 Text(stringResource(R.string.xently_button_label_continue))
             }
         },
     ) {
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = {
-                Text(stringResource(R.string.xently_text_field_label_name_required))
-            },
-            singleLine = true,
+        AutoCompleteTextField(
             modifier = Modifier.fillMaxWidth(),
+            state = nameAutoCompleteState,
+            onSearch = { query ->
+                ProductName.LocalViewModel.default.copy(name = query)
+                    .let(search)
+            },
+            saveDraft = saveDraft,
+            onSearchSuggestionSelected = onSearchSuggestionSelected,
+            suggestionContent = { Text(text = it.descriptiveName) },
+            placeholderContent = {
+                Text(text = stringResource(R.string.xently_search_bar_placeholder_name_required))
+            },
         )
+
+        LabeledCheckbox(
+            checked = autoFillPlural,
+            onCheckedChange = { autoFillPlural = it },
+        ) {
+            Text(text = stringResource(R.string.xently_checkbox_label_autofill_plural))
+        }
+
         TextField(
             value = namePlural,
-            onValueChange = { namePlural = it },
+            onValueChange = {
+                namePlural = it
+                // When a name plural was manually set or edited, disable autofill plural
+                autoFillPlural = false
+            },
             label = {
                 Text(stringResource(R.string.xently_text_field_label_name_plural))
             },
@@ -77,9 +135,13 @@ fun AddProductNamePagePreview() {
     XentlyTheme {
         AddProductNamePage(
             modifier = Modifier.fillMaxSize(),
-            productName = ProductName.LocalViewModel.default,
+            product = Product.LocalViewModel.default,
+            suggestionsState = MutableStateFlow(emptyList()),
+            search = {},
+            saveDraft = {},
             onPreviousClick = {},
             onContinueClick = {},
+            onSearchSuggestionSelected = {},
         )
     }
 }

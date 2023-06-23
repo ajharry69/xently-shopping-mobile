@@ -126,7 +126,7 @@ fun <T> AutoCompleteTextField(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun AutoCompleteTextFieldPreview() {
+private fun AutoCompleteTextFieldPreview() {
     XentlyTheme {
         Column(
             modifier = Modifier

@@ -5,7 +5,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -26,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -52,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.R
+import ke.co.xently.products.ui.components.LabeledCheckbox
 import ke.co.xently.recommendations.models.Recommendation
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.delay
@@ -153,22 +151,14 @@ fun RecommendationRequestScreen(
                         draftShoppingListItemIndex,
                     )
                 }
-                Surface(
+                LabeledCheckbox(
+                    modifier = Modifier.fillMaxWidth(),
                     checked = draftShoppingListItem.enforceStrictMeasurementUnit,
                     onCheckedChange = onEnforceStrictMeasurementUnitChange,
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Checkbox(
-                            checked = draftShoppingListItem.enforceStrictMeasurementUnit,
-                            onCheckedChange = onEnforceStrictMeasurementUnitChange,
-                        )
-                        Text(text = stringResource(R.string.xently_checkbox_label_enforce_strict_measurement_unit))
-                    }
+                    Text(text = stringResource(R.string.xently_checkbox_label_enforce_strict_measurement_unit))
                 }
+
                 val addShoppingListItem: () -> Unit by rememberUpdatedState {
                     draftShoppingListItem.copy(name = shoppingListItemValue.text).let {
                         if (draftShoppingListItemIndex == RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX) {

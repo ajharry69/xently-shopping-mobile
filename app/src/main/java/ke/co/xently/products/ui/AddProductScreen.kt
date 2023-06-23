@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
 import ke.co.xently.products.models.Product
+import ke.co.xently.products.models.ProductName
 import ke.co.xently.products.models.Shop
 import ke.co.xently.products.models.Store
 import ke.co.xently.products.ui.subscreens.AddAttributesPage
@@ -40,23 +41,26 @@ fun AddProductScreen(
     val product: Product.LocalViewModel by viewModel.product.collectAsState()
 
     AddProductScreen(
+        modifier = modifier,
         addProductStep = addProductStep,
+        product = product,
+        brandSuggestionsState = viewModel.brandSuggestions,
+        addProductState = viewModel.addProductState,
+        attributeSuggestionsState = viewModel.attributeSuggestions,
+        storeSuggestionsState = viewModel.storeSuggestions,
+        shopSuggestionsState = viewModel.shopSuggestions,
+        productSuggestionsState = viewModel.productSuggestions,
         savePermanently = viewModel::savePermanently,
         saveDraft = viewModel::saveDraft,
         saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
-        modifier = modifier,
-        product = product,
-        brandSuggestionsState = viewModel.brandSuggestions,
         searchBrands = viewModel::searchBrand,
-        addProductState = viewModel.addProductState,
-        attributeSuggestionsState = viewModel.attributeSuggestions,
         searchAttribute = viewModel::searchAttribute,
         searchStores = viewModel::searchStore,
         searchShops = viewModel::searchShop,
-        storeSuggestionsState = viewModel.storeSuggestions,
-        shopSuggestionsState = viewModel.shopSuggestions,
+        searchProductNames = viewModel::searchProductName,
         onStoreSearchSuggestionSelected = viewModel::clearStoreSearchSuggestions,
         onShopSearchSuggestionSelected = viewModel::clearShopSearchSuggestions,
+        onProductSearchSuggestionSelected = viewModel::clearProductSearchSuggestions,
     )
 }
 
@@ -70,6 +74,7 @@ fun AddProductScreen(
     attributeSuggestionsState: StateFlow<List<AttributeValue>>,
     storeSuggestionsState: StateFlow<List<Store>>,
     shopSuggestionsState: StateFlow<List<Shop>>,
+    productSuggestionsState: StateFlow<List<Product>>,
     savePermanently: (Product.LocalViewModel) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
@@ -79,6 +84,8 @@ fun AddProductScreen(
     onStoreSearchSuggestionSelected: () -> Unit,
     searchShops: (Shop) -> Unit,
     onShopSearchSuggestionSelected: () -> Unit,
+    searchProductNames: (ProductName) -> Unit,
+    onProductSearchSuggestionSelected: () -> Unit,
 ) {
     val saveAsDraftOrPermanently: (Product.LocalViewModel) -> Unit by remember(addProductStep) {
         derivedStateOf {
@@ -114,51 +121,65 @@ fun AddProductScreen(
         AnimatedContent(targetState = addProductStep) { step ->
             when (step) {
                 AddProductStep.Store -> {
+                    val saveProductDraft: (Store) -> Unit by rememberUpdatedState {
+                        product.copy(store = it.toLocalViewModel())
+                            .let(saveAsDraftOrPermanently)
+                    }
                     AddStorePage(
                         modifier = Modifier.fillMaxSize(),
                         store = product.store,
                         suggestionsState = storeSuggestionsState,
                         search = searchStores,
-                        saveDraft = {
-                            product.copy(store = it.toLocalViewModel())
-                                .let(saveAsDraftOrPermanently)
-                        },
+                        saveDraft = saveProductDraft,
                         onSearchSuggestionSelected = onStoreSearchSuggestionSelected,
                     ) {
-                        product.copy(store = it.toLocalViewModel())
-                            .let(saveAsDraftOrPermanently)
+                        saveProductDraft(it)
                         navigateToNext()
                     }
                 }
 
                 AddProductStep.Shop -> {
+                    val saveProductDraft: (Shop) -> Unit by rememberUpdatedState {
+                        product.run {
+                            copy(store = store.copy(shop = it.toLocalViewModel()))
+                        }.let(saveAsDraftOrPermanently)
+                    }
                     AddShopPage(
                         modifier = Modifier.fillMaxSize(),
                         shop = product.store.shop,
                         onPreviousClick = navigateToPrevious,
                         suggestionsState = shopSuggestionsState,
                         search = searchShops,
-                        saveDraft = {
-                            product.run {
-                                copy(store = store.copy(shop = it.toLocalViewModel()))
-                            }.let(saveAsDraftOrPermanently)
-                        },
+                        saveDraft = saveProductDraft,
                         onSearchSuggestionSelected = onShopSearchSuggestionSelected,
                     ) {
-                        product.copy(store = product.store.copy(shop = it.toLocalViewModel()))
-                            .let(saveAsDraftOrPermanently)
+                        saveProductDraft(it)
                         navigateToNext()
                     }
                 }
 
                 AddProductStep.ProductName -> {
+                    val saveProductDraft: (Product) -> Unit by rememberUpdatedState {
+                        val productViewModel = it.toLocalViewModel()
+                        product.copy(
+                            name = productViewModel.name,
+                            brands = productViewModel.brands,
+                            attributes = productViewModel.attributes,
+                            measurementUnit = productViewModel.measurementUnit,
+                            measurementUnitQuantity = productViewModel.measurementUnitQuantity,
+                            autoFillNamePlural = productViewModel.autoFillNamePlural,
+                        ).let(saveAsDraftOrPermanently)
+                    }
                     AddProductNamePage(
                         modifier = Modifier.fillMaxSize(),
-                        productName = product.name,
+                        product = product,
                         onPreviousClick = navigateToPrevious,
+                        suggestionsState = productSuggestionsState,
+                        search = searchProductNames,
+                        saveDraft = saveProductDraft,
+                        onSearchSuggestionSelected = onProductSearchSuggestionSelected,
                     ) {
-                        product.copy(name = it.toLocalViewModel())
-                            .let(saveAsDraftOrPermanently)
+                        saveProductDraft(it)
                         navigateToNext()
                     }
                 }
@@ -242,6 +263,7 @@ fun AddProductScreenPreview() {
             attributeSuggestionsState = MutableStateFlow(emptyList()),
             storeSuggestionsState = MutableStateFlow(emptyList()),
             shopSuggestionsState = MutableStateFlow(emptyList()),
+            productSuggestionsState = MutableStateFlow(emptyList()),
             savePermanently = {},
             saveDraft = {},
             saveCurrentlyActiveStep = {},
@@ -251,6 +273,8 @@ fun AddProductScreenPreview() {
             onStoreSearchSuggestionSelected = {},
             searchShops = {},
             onShopSearchSuggestionSelected = {},
+            searchProductNames = {},
+            onProductSearchSuggestionSelected = {},
         )
     }
 }
