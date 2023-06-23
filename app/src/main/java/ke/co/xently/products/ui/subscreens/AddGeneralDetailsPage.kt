@@ -85,7 +85,7 @@ private sealed interface GeneralDetailUIState {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddGeneralDetailsPage(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     product: Product,
     onPreviousClick: () -> Unit,
     onContinueClick: (Product) -> Unit,

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
+import ke.co.xently.products.models.MeasurementUnit
 import ke.co.xently.products.models.Product
 import ke.co.xently.products.models.ProductName
 import ke.co.xently.products.models.Shop
@@ -60,6 +61,11 @@ class ProductViewModel @Inject constructor(
     private val productSuggestionsMutable = MutableStateFlow<List<Product>>(emptyList())
 
     val productSuggestions = productSuggestionsMutable.asStateFlow()
+
+    private val measurementUnitSuggestionsMutable =
+        MutableStateFlow<List<MeasurementUnit>>(emptyList())
+
+    val measurementUnitSuggestions = measurementUnitSuggestionsMutable.asStateFlow()
 
     private val addProductStateMutable = MutableStateFlow<State>(State.Idle)
 
@@ -149,5 +155,24 @@ class ProductViewModel @Inject constructor(
 
     fun clearProductSearchSuggestions() {
         productSuggestionsMutable.value = emptyList()
+    }
+
+    fun searchMeasurementUnit(unit: MeasurementUnit) {
+        measurementUnitSuggestionsMutable.value = listOf(unit) + List(
+            Random.nextInt(0, 10)
+        ) {
+            val name = buildString {
+                append(unit.name)
+                if (!endsWith(' ')) {
+                    append(' ')
+                }
+                append(it + 1)
+            }
+            unit.toLocalViewModel().copy(name = name)
+        }
+    }
+
+    fun clearMeasurementUnitSearchSuggestions() {
+        measurementUnitSuggestionsMutable.value = emptyList()
     }
 }

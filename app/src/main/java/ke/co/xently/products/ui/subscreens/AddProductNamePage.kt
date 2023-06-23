@@ -46,7 +46,7 @@ private sealed interface ProductNameContinueButtonLabel {
 
 @Composable
 fun AddProductNamePage(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     product: Product,
     suggestionsState: StateFlow<List<Product>>,
     search: (ProductName) -> Unit,
@@ -64,10 +64,6 @@ fun AddProductNamePage(
         mutableStateOf(TextFieldValue(product.name.namePlural ?: ""))
     }
 
-    var autoFillPlural by rememberSaveable(product.toLocalViewModel().autoFillNamePlural) {
-        mutableStateOf(product.toLocalViewModel().autoFillNamePlural)
-    }
-
     var buttonLabel by remember {
         mutableStateOf<ProductNameContinueButtonLabel>(ProductNameContinueButtonLabel.Continue)
     }
@@ -78,6 +74,10 @@ fun AddProductNamePage(
         } else {
             ProductNameContinueButtonLabel.Continue
         }
+    }
+
+    var autoFillPlural by rememberSaveable(product.toLocalViewModel().autoFillNamePlural) {
+        mutableStateOf(product.toLocalViewModel().autoFillNamePlural)
     }
 
     LaunchedEffect(nameAutoCompleteState.query) {

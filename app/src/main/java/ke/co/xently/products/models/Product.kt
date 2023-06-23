@@ -92,6 +92,8 @@ sealed interface Product {
         override val brands: List<Brand.LocalViewModel>,
         override val attributes: List<AttributeValue.LocalViewModel>,
         val autoFillNamePlural: Boolean = true,
+        val autoFillMeasurementUnitNamePlural: Boolean = true,
+        val autoFillMeasurementUnitSymbolPlural: Boolean = true,
     ) : Product, Parcelable {
         companion object {
             val default = LocalViewModel(

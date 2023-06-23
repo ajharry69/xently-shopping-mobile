@@ -51,10 +51,13 @@
     <string name="xently_content_description_add_brand">Add brand</string>
     <string name="xently_content_description_store_map">Click on or drag the marker on the map to select store location</string>
     <string name="xently_search_bar_placeholder_name_required">Name*</string>
-    <string name="xently_checkbox_label_autofill_plural">Autofill plural</string>
+    <string name="xently_checkbox_label_autofill_plural">Autofill plural?</string>
     <string name="xently_button_label_missing_product_name">Please provide a product name</string>
     <string name="xently_button_label_missing_shop_name">Please provide a shop name</string>
     <string name="xently_button_label_missing_unit_price">Please provide a unit price</string>
     <string name="xently_button_label_invalid_pack_count">Invalid pack count</string>
     <string name="xently_button_label_invalid_unit_price">Invalid unit price</string>
+    <string name="xently_checkbox_label_autofill_unit_name_plural">Autofill unit name plural?</string>
+    <string name="xently_checkbox_label_autofill_unit_symbol_plural">Autofill unit symbol plural?</string>
+    <string name="xently_button_label_invalid_unit_quantity">Please provide a valid unit quantity</string>
 </resources>

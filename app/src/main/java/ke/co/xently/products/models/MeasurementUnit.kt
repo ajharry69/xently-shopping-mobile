@@ -45,6 +45,10 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
         override val symbol: String?,
         override val symbolPlural: String?,
     ) : MeasurementUnit, Parcelable {
+        override fun toString(): String {
+            return name
+        }
+
         companion object {
             val default = LocalViewModel(
                 id = -1,

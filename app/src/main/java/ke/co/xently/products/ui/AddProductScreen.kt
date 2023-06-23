@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
+import ke.co.xently.products.models.MeasurementUnit
 import ke.co.xently.products.models.Product
 import ke.co.xently.products.models.ProductName
 import ke.co.xently.products.models.Shop
@@ -41,8 +42,8 @@ fun AddProductScreen(
     val product: Product.LocalViewModel by viewModel.product.collectAsState()
 
     AddProductScreen(
-        modifier = modifier,
         addProductStep = addProductStep,
+        modifier = modifier,
         product = product,
         brandSuggestionsState = viewModel.brandSuggestions,
         addProductState = viewModel.addProductState,
@@ -56,11 +57,14 @@ fun AddProductScreen(
         searchBrands = viewModel::searchBrand,
         searchAttribute = viewModel::searchAttribute,
         searchStores = viewModel::searchStore,
-        searchShops = viewModel::searchShop,
-        searchProductNames = viewModel::searchProductName,
         onStoreSearchSuggestionSelected = viewModel::clearStoreSearchSuggestions,
+        searchShops = viewModel::searchShop,
         onShopSearchSuggestionSelected = viewModel::clearShopSearchSuggestions,
+        searchProductNames = viewModel::searchProductName,
         onProductSearchSuggestionSelected = viewModel::clearProductSearchSuggestions,
+        measurementUnitSuggestionsState = viewModel.measurementUnitSuggestions,
+        searchMeasurementUnits = viewModel::searchMeasurementUnit,
+        onMeasurementUnitSearchSuggestionSelected = viewModel::clearMeasurementUnitSearchSuggestions,
     )
 }
 
@@ -86,6 +90,9 @@ fun AddProductScreen(
     onShopSearchSuggestionSelected: () -> Unit,
     searchProductNames: (ProductName) -> Unit,
     onProductSearchSuggestionSelected: () -> Unit,
+    measurementUnitSuggestionsState: StateFlow<List<MeasurementUnit>>,
+    searchMeasurementUnits: (MeasurementUnit) -> Unit,
+    onMeasurementUnitSearchSuggestionSelected: () -> Unit,
 ) {
     val saveAsDraftOrPermanently: (Product.LocalViewModel) -> Unit by remember(addProductStep) {
         derivedStateOf {
@@ -185,13 +192,30 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.MeasurementUnit -> {
+                    val saveProductDraft: (Product) -> Unit by rememberUpdatedState {
+                        val productViewModel = it.toLocalViewModel()
+                        product.copy(
+                            name = productViewModel.name,
+                            brands = productViewModel.brands,
+                            attributes = productViewModel.attributes,
+                            measurementUnit = productViewModel.measurementUnit,
+                            measurementUnitQuantity = productViewModel.measurementUnitQuantity,
+                            autoFillMeasurementUnitNamePlural = productViewModel.autoFillMeasurementUnitNamePlural,
+                            autoFillMeasurementUnitSymbolPlural = productViewModel.autoFillMeasurementUnitSymbolPlural,
+                        ).let(saveAsDraftOrPermanently)
+                    }
                     AddMeasurementUnitPage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
+                        suggestionsState = measurementUnitSuggestionsState,
+                        search = searchMeasurementUnits,
+                        saveDraft = {
+                            saveProductDraft(product.copy(measurementUnit = it.toLocalViewModel()))
+                        },
+                        onSearchSuggestionSelected = onMeasurementUnitSearchSuggestionSelected,
                         onPreviousClick = navigateToPrevious,
                     ) {
-                        it.toLocalViewModel()
-                            .let(saveAsDraftOrPermanently)
+                        saveProductDraft(it)
                         navigateToNext()
                     }
                 }
@@ -252,7 +276,7 @@ fun AddProductScreen(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun AddProductScreenPreview() {
+private fun AddProductScreenPreview() {
     XentlyTheme {
         AddProductScreen(
             addProductStep = AddProductStep.valueOfOrdinalOrFirstByOrdinal(0),
@@ -264,6 +288,7 @@ fun AddProductScreenPreview() {
             storeSuggestionsState = MutableStateFlow(emptyList()),
             shopSuggestionsState = MutableStateFlow(emptyList()),
             productSuggestionsState = MutableStateFlow(emptyList()),
+            measurementUnitSuggestionsState = MutableStateFlow(emptyList()),
             savePermanently = {},
             saveDraft = {},
             saveCurrentlyActiveStep = {},
@@ -275,6 +300,8 @@ fun AddProductScreenPreview() {
             onShopSearchSuggestionSelected = {},
             searchProductNames = {},
             onProductSearchSuggestionSelected = {},
+            searchMeasurementUnits = {},
+            onMeasurementUnitSearchSuggestionSelected = {},
         )
     }
 }
