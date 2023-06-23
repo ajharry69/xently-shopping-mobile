@@ -54,4 +54,7 @@
     <string name="xently_checkbox_label_autofill_plural">Autofill plural</string>
     <string name="xently_button_label_missing_product_name">Please provide a product name</string>
     <string name="xently_button_label_missing_shop_name">Please provide a shop name</string>
+    <string name="xently_button_label_missing_unit_price">Please provide a unit price</string>
+    <string name="xently_button_label_invalid_pack_count">Invalid pack count</string>
+    <string name="xently_button_label_invalid_unit_price">Invalid unit price</string>
 </resources>

@@ -2,6 +2,7 @@ package ke.co.xently.products.ui.subscreens
 
 import android.content.res.Configuration
 import android.text.format.DateFormat
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.products.models.Product
+import ke.co.xently.products.ui.cleansedForNumberParsing
 import ke.co.xently.products.ui.components.AddProductPage
 import ke.co.xently.ui.javaLocale
 import ke.co.xently.ui.theme.XentlyTheme
@@ -54,6 +57,30 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.util.Date
+
+private sealed interface GeneralDetailUIState {
+    @get:StringRes
+    val message: Int
+
+    sealed interface UnitPriceError : GeneralDetailUIState
+    sealed interface PackCountError : GeneralDetailUIState
+
+    object OK : GeneralDetailUIState {
+        override val message: Int = R.string.xently_button_label_continue
+    }
+
+    object MissingUnitPrice : UnitPriceError {
+        override val message: Int = R.string.xently_button_label_missing_unit_price
+    }
+
+    object InvalidUnitPrice : UnitPriceError {
+        override val message: Int = R.string.xently_button_label_invalid_unit_price
+    }
+
+    object InvalidPackCount : PackCountError {
+        override val message: Int = R.string.xently_button_label_invalid_pack_count
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +134,7 @@ fun AddGeneralDetailsPage(
             override fun isSelectableYear(year: Int): Boolean {
                 return year <= Instant.now().atOffset(ZoneOffset.UTC).year
             }
-        }
+        },
     )
     val timePurchasedState = rememberTimePickerState(
         initialHour = product.datePurchased.hour,
@@ -118,7 +145,7 @@ fun AddGeneralDetailsPage(
         mutableStateOf(false)
     }
     AnimatedVisibility(visible = showDatePicker) {
-        val onConfirmButtonClick = {
+        val onConfirmButtonClick by rememberUpdatedState {
             val instant = datePurchasedState.selectedDateMillis?.let {
                 Instant.ofEpochMilli(it)
             } ?: Instant.now()
@@ -195,18 +222,43 @@ fun AddGeneralDetailsPage(
         }
     }
 
+    var uiState by remember {
+        mutableStateOf<GeneralDetailUIState>(GeneralDetailUIState.OK)
+    }
+
+    LaunchedEffect(unitPrice.text, packCount.text) {
+        uiState = when {
+            unitPrice.text.isBlank() -> {
+                GeneralDetailUIState.MissingUnitPrice
+            }
+
+            unitPrice.text.cleansedForNumberParsing().toBigDecimalOrNull() == null -> {
+                GeneralDetailUIState.InvalidUnitPrice
+            }
+
+            packCount.text.isNotBlank() && packCount.text.cleansedForNumberParsing()
+                .toIntOrNull() == null -> {
+                GeneralDetailUIState.InvalidPackCount
+            }
+
+            else -> {
+                GeneralDetailUIState.OK
+            }
+        }
+    }
+
     AddProductPage(
         modifier = modifier,
         heading = R.string.xently_general_details_page_title,
         onBackClick = onPreviousClick,
         continueButton = {
             Button(
+                enabled = uiState is GeneralDetailUIState.OK,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     product.toLocalViewModel().copy(
-                        packCount = packCount.text.toIntOrNull() ?: 1,
-                        unitPrice = unitPrice.text.toBigDecimalOrNull()
-                            ?: BigDecimal.ONE, // TODO: Ensure value is provided
+                        packCount = packCount.text.cleansedForNumberParsing().toIntOrNull() ?: 1,
+                        unitPrice = unitPrice.text.cleansedForNumberParsing().toBigDecimal(),
                     ).let(onContinueClick)
                 },
             ) {
@@ -220,16 +272,27 @@ fun AddGeneralDetailsPage(
             label = {
                 Text(stringResource(R.string.xently_text_field_label_pack_count))
             },
+            supportingText = if (uiState is GeneralDetailUIState.PackCountError) {
+                {
+                    Text(text = stringResource(uiState.message))
+                }
+            } else null,
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         )
         TextField(
             value = unitPrice,
+            isError = uiState is GeneralDetailUIState.UnitPriceError,
             onValueChange = { unitPrice = it },
             label = {
                 Text(stringResource(R.string.xently_text_field_label_unit_price))
             },
+            supportingText = if (uiState is GeneralDetailUIState.UnitPriceError) {
+                {
+                    Text(text = stringResource(uiState.message))
+                }
+            } else null,
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
