@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
 import ke.co.xently.products.models.Product
+import ke.co.xently.products.models.Shop
 import ke.co.xently.products.models.Store
 import ke.co.xently.products.ui.subscreens.AddAttributesPage
 import ke.co.xently.products.ui.subscreens.AddBrandsPage
@@ -51,8 +52,11 @@ fun AddProductScreen(
         attributeSuggestionsState = viewModel.attributeSuggestions,
         searchAttribute = viewModel::searchAttribute,
         searchStores = viewModel::searchStore,
+        searchShops = viewModel::searchShop,
         storeSuggestionsState = viewModel.storeSuggestions,
+        shopSuggestionsState = viewModel.shopSuggestions,
         onStoreSearchSuggestionSelected = viewModel::clearStoreSearchSuggestions,
+        onShopSearchSuggestionSelected = viewModel::clearShopSearchSuggestions,
     )
 }
 
@@ -65,6 +69,7 @@ fun AddProductScreen(
     addProductState: StateFlow<State>,
     attributeSuggestionsState: StateFlow<List<AttributeValue>>,
     storeSuggestionsState: StateFlow<List<Store>>,
+    shopSuggestionsState: StateFlow<List<Shop>>,
     savePermanently: (Product.LocalViewModel) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
@@ -72,6 +77,8 @@ fun AddProductScreen(
     searchAttribute: (AttributeValue) -> Unit,
     searchStores: (Store) -> Unit,
     onStoreSearchSuggestionSelected: () -> Unit,
+    searchShops: (Shop) -> Unit,
+    onShopSearchSuggestionSelected: () -> Unit,
 ) {
     val saveAsDraftOrPermanently: (Product.LocalViewModel) -> Unit by remember(addProductStep) {
         derivedStateOf {
@@ -129,6 +136,14 @@ fun AddProductScreen(
                         modifier = Modifier.fillMaxSize(),
                         shop = product.store.shop,
                         onPreviousClick = navigateToPrevious,
+                        suggestionsState = shopSuggestionsState,
+                        search = searchShops,
+                        saveDraft = {
+                            product.run {
+                                copy(store = store.copy(shop = it.toLocalViewModel()))
+                            }.let(saveAsDraftOrPermanently)
+                        },
+                        onSearchSuggestionSelected = onShopSearchSuggestionSelected,
                     ) {
                         product.copy(store = product.store.copy(shop = it.toLocalViewModel()))
                             .let(saveAsDraftOrPermanently)
@@ -226,6 +241,7 @@ fun AddProductScreenPreview() {
             addProductState = MutableStateFlow(State.Idle),
             attributeSuggestionsState = MutableStateFlow(emptyList()),
             storeSuggestionsState = MutableStateFlow(emptyList()),
+            shopSuggestionsState = MutableStateFlow(emptyList()),
             savePermanently = {},
             saveDraft = {},
             saveCurrentlyActiveStep = {},
@@ -233,6 +249,8 @@ fun AddProductScreenPreview() {
             searchAttribute = {},
             searchStores = {},
             onStoreSearchSuggestionSelected = {},
+            searchShops = {},
+            onShopSearchSuggestionSelected = {},
         )
     }
 }

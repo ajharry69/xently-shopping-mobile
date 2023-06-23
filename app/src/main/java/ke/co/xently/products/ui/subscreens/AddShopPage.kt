@@ -3,6 +3,7 @@ package ke.co.xently.products.ui.subscreens
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -13,21 +14,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.products.models.Shop
 import ke.co.xently.products.ui.components.AddProductPage
+import ke.co.xently.products.ui.components.AutoCompleteTextField
+import ke.co.xently.products.ui.components.rememberAutoCompleteTextFieldState
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun AddShopPage(
     modifier: Modifier = Modifier,
     shop: Shop,
+    suggestionsState: StateFlow<List<Shop>>,
+    search: (Shop) -> Unit,
+    saveDraft: (Shop) -> Unit,
+    onSearchSuggestionSelected: () -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (Shop) -> Unit,
 ) {
-    var name by remember(shop.name) { mutableStateOf(TextFieldValue(shop.name)) }
+    val nameAutoCompleteState =
+        rememberAutoCompleteTextFieldState(query = shop.name, suggestionsState = suggestionsState)
     var eCommerceWebsiteUrl by remember(shop.ecommerceSiteUrl) {
         mutableStateOf(TextFieldValue(shop.ecommerceSiteUrl ?: ""))
     }
@@ -42,7 +53,7 @@ fun AddShopPage(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     shop.toLocalViewModel().copy(
-                        name = name.text,
+                        name = nameAutoCompleteState.query,
                         ecommerceSiteUrl = eCommerceWebsiteUrl.text.takeIf { it.isNotBlank() },
                     ).let(onContinueClick)
                 },
@@ -51,14 +62,19 @@ fun AddShopPage(
             }
         },
     ) {
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = {
-                Text(stringResource(R.string.xently_text_field_label_name_required))
-            },
-            singleLine = true,
+        AutoCompleteTextField(
             modifier = Modifier.fillMaxWidth(),
+            state = nameAutoCompleteState,
+            onSearch = { query ->
+                Shop.LocalViewModel.default.copy(name = query)
+                    .let(search)
+            },
+            saveDraft = saveDraft,
+            onSearchSuggestionSelected = onSearchSuggestionSelected,
+            suggestionContent = { Text(text = it.name) },
+            placeholderContent = {
+                Text(text = stringResource(R.string.xently_search_bar_placeholder_name_required))
+            },
         )
 
         TextField(
@@ -72,6 +88,7 @@ fun AddShopPage(
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Uri),
         )
     }
 }
@@ -84,8 +101,12 @@ fun AddShopPagePreview() {
         AddShopPage(
             modifier = Modifier.fillMaxSize(),
             shop = Shop.LocalViewModel.default,
+            suggestionsState = MutableStateFlow(emptyList()),
+            search = {},
+            saveDraft = {},
             onPreviousClick = {},
             onContinueClick = {},
+            onSearchSuggestionSelected = {},
         )
     }
 }

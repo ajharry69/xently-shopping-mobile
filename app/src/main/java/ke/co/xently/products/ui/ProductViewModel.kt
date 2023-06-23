@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
 import ke.co.xently.products.models.Product
+import ke.co.xently.products.models.Shop
 import ke.co.xently.products.models.Store
 import ke.co.xently.products.repositories.ProductRepository
 import kotlinx.coroutines.delay
@@ -50,6 +51,10 @@ class ProductViewModel @Inject constructor(
     private val storeSuggestionsMutable = MutableStateFlow<List<Store>>(emptyList())
 
     val storeSuggestions = storeSuggestionsMutable.asStateFlow()
+
+    private val shopSuggestionsMutable = MutableStateFlow<List<Shop>>(emptyList())
+
+    val shopSuggestions = shopSuggestionsMutable.asStateFlow()
 
     private val addProductStateMutable = MutableStateFlow<State>(State.Idle)
 
@@ -95,8 +100,7 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchStore(store: Store) {
-        Log.d(TAG, "searchStore: ${store.name}...")
-        storeSuggestionsMutable.value = List(Random.nextInt(0, 5)) {
+        storeSuggestionsMutable.value = List(Random.nextInt(0, 10)) {
             store.toLocalViewModel().copy(
                 name = buildString { append(store.name); if (!endsWith(' ')) append(' '); append(it + 1) },
                 shop = store.shop.toLocalViewModel().copy(
@@ -108,5 +112,17 @@ class ProductViewModel @Inject constructor(
 
     fun clearStoreSearchSuggestions() {
         storeSuggestionsMutable.value = emptyList()
+    }
+
+    fun searchShop(shop: Shop) {
+        shopSuggestionsMutable.value = List(Random.nextInt(0, 10)) {
+            shop.toLocalViewModel().copy(
+                name = buildString { append(shop.name); if (!endsWith(' ')) append(' '); append(it + 1) },
+            )
+        }
+    }
+
+    fun clearShopSearchSuggestions() {
+        shopSuggestionsMutable.value = emptyList()
     }
 }

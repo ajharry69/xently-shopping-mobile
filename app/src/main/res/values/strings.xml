@@ -50,4 +50,5 @@
     <string name="xently_text_field_hint_optional_ecommerce_site_url">Leave blank if the shop does not operate an e-commerce site</string>
     <string name="xently_content_description_add_brand">Add brand</string>
     <string name="xently_content_description_store_map">Click on or drag the marker on the map to select store location</string>
+    <string name="xently_search_bar_placeholder_name_required">Name*</string>
 </resources>
