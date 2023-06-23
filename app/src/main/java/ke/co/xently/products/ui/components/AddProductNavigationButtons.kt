@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ fun AddProductNavigationButtons(
         Row(
             content = buttons,
             modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         )
     }
@@ -41,7 +43,7 @@ fun AddProductNavigationButtons(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun AddProductNavigationButtonsPreview() {
+private fun AddProductNavigationButtonsPreview() {
     XentlyTheme {
         AddProductNavigationButtons {
             Button(onClick = { }) {

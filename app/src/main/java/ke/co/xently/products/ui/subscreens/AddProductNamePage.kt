@@ -1,6 +1,7 @@
 package ke.co.xently.products.ui.subscreens
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
@@ -8,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +30,19 @@ import ke.co.xently.products.ui.components.rememberAutoCompleteTextFieldState
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+
+private sealed interface ProductNameContinueButtonLabel {
+    @get:StringRes
+    val label: Int
+
+    object Continue : ProductNameContinueButtonLabel {
+        override val label: Int = R.string.xently_button_label_continue
+    }
+
+    object MissingProductName : ProductNameContinueButtonLabel {
+        override val label: Int = R.string.xently_button_label_missing_product_name
+    }
+}
 
 @Composable
 fun AddProductNamePage(
@@ -53,6 +68,18 @@ fun AddProductNamePage(
         mutableStateOf(product.toLocalViewModel().autoFillNamePlural)
     }
 
+    var buttonLabel by remember {
+        mutableStateOf<ProductNameContinueButtonLabel>(ProductNameContinueButtonLabel.Continue)
+    }
+
+    LaunchedEffect(nameAutoCompleteState.query) {
+        buttonLabel = if (nameAutoCompleteState.query.isBlank()) {
+            ProductNameContinueButtonLabel.MissingProductName
+        } else {
+            ProductNameContinueButtonLabel.Continue
+        }
+    }
+
     LaunchedEffect(nameAutoCompleteState.query) {
         if (autoFillPlural) {
             namePlural = if (nameAutoCompleteState.query.isBlank()) {
@@ -72,7 +99,13 @@ fun AddProductNamePage(
         heading = R.string.xently_product_name_page_title,
         onBackClick = onPreviousClick,
         continueButton = {
+            val enabled by remember(buttonLabel) {
+                derivedStateOf {
+                    buttonLabel is ProductNameContinueButtonLabel.Continue
+                }
+            }
             Button(
+                enabled = enabled,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     product.toLocalViewModel().run {
@@ -86,7 +119,7 @@ fun AddProductNamePage(
                     }.let(onContinueClick)
                 },
             ) {
-                Text(stringResource(R.string.xently_button_label_continue))
+                Text(stringResource(buttonLabel.label))
             }
         },
     ) {
@@ -99,7 +132,9 @@ fun AddProductNamePage(
             },
             saveDraft = saveDraft,
             onSearchSuggestionSelected = onSearchSuggestionSelected,
-            suggestionContent = { Text(text = it.descriptiveName) },
+            suggestionContent = {
+                Text(text = it.descriptiveName.ifBlank { it.name.name })
+            },
             placeholderContent = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name_required))
             },
@@ -131,7 +166,7 @@ fun AddProductNamePage(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun AddProductNamePagePreview() {
+private fun AddProductNamePagePreview() {
     XentlyTheme {
         AddProductNamePage(
             modifier = Modifier.fillMaxSize(),

@@ -1,6 +1,7 @@
 package ke.co.xently.products.ui.subscreens
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,6 +9,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +29,19 @@ import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+private sealed interface ShopContinueButtonLabel {
+    @get:StringRes
+    val label: Int
+
+    object Continue : ShopContinueButtonLabel {
+        override val label: Int = R.string.xently_button_label_continue
+    }
+
+    object MissingShopName : ShopContinueButtonLabel {
+        override val label: Int = R.string.xently_button_label_missing_shop_name
+    }
+}
+
 @Composable
 fun AddShopPage(
     modifier: Modifier = Modifier,
@@ -37,10 +53,24 @@ fun AddShopPage(
     onPreviousClick: () -> Unit,
     onContinueClick: (Shop) -> Unit,
 ) {
-    val nameAutoCompleteState =
-        rememberAutoCompleteTextFieldState(query = shop.name, suggestionsState = suggestionsState)
+    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
+        query = shop.name,
+        suggestionsState = suggestionsState,
+    )
     var eCommerceWebsiteUrl by remember(shop.ecommerceSiteUrl) {
         mutableStateOf(TextFieldValue(shop.ecommerceSiteUrl ?: ""))
+    }
+
+    var buttonLabel by remember {
+        mutableStateOf<ShopContinueButtonLabel>(ShopContinueButtonLabel.Continue)
+    }
+
+    LaunchedEffect(nameAutoCompleteState.query) {
+        buttonLabel = if (nameAutoCompleteState.query.isBlank()) {
+            ShopContinueButtonLabel.MissingShopName
+        } else {
+            ShopContinueButtonLabel.Continue
+        }
     }
 
     AddProductPage(
@@ -49,7 +79,13 @@ fun AddShopPage(
         subHeading = R.string.xently_add_shop_page_sub_heading,
         onBackClick = onPreviousClick,
         continueButton = {
+            val enabled by remember(buttonLabel) {
+                derivedStateOf {
+                    buttonLabel is ShopContinueButtonLabel.Continue
+                }
+            }
             Button(
+                enabled = enabled,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     shop.toLocalViewModel().copy(
@@ -58,7 +94,7 @@ fun AddShopPage(
                     ).let(onContinueClick)
                 },
             ) {
-                Text(stringResource(R.string.xently_button_label_continue))
+                Text(stringResource(buttonLabel.label))
             }
         },
     ) {
@@ -96,7 +132,7 @@ fun AddShopPage(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun AddShopPagePreview() {
+private fun AddShopPagePreview() {
     XentlyTheme {
         AddShopPage(
             modifier = Modifier.fillMaxSize(),

@@ -92,20 +92,20 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchAttribute(attribute: AttributeValue) {
-        attributeSuggestionsMutable.value = List(Random(0).nextInt(5)) {
+        attributeSuggestionsMutable.value = listOf(attribute) + List(Random(0).nextInt(5)) {
             attribute.toLocalViewModel()
                 .copy(value = buildString { append(attribute.value); append(it + 1) })
         }
     }
 
     fun searchBrand(brand: Brand) {
-        brandSuggestionsMutable.value = List(Random(0).nextInt(5)) {
+        brandSuggestionsMutable.value = listOf(brand) + List(Random(0).nextInt(5)) {
             brand.toLocalViewModel().copy(name = buildString { append(brand.name); append(it + 1) })
         }
     }
 
     fun searchStore(store: Store) {
-        storeSuggestionsMutable.value = List(Random.nextInt(0, 10)) {
+        storeSuggestionsMutable.value = listOf(store) + List(Random.nextInt(0, 10)) {
             store.toLocalViewModel().copy(
                 name = buildString { append(store.name); if (!endsWith(' ')) append(' '); append(it + 1) },
                 shop = store.shop.toLocalViewModel().copy(
@@ -120,7 +120,7 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchShop(shop: Shop) {
-        shopSuggestionsMutable.value = List(Random.nextInt(0, 10)) {
+        shopSuggestionsMutable.value = listOf(shop) + List(Random.nextInt(0, 10)) {
             shop.toLocalViewModel().copy(
                 name = buildString { append(shop.name); if (!endsWith(' ')) append(' '); append(it + 1) },
             )
@@ -132,19 +132,19 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchProductName(name: ProductName) {
-        productSuggestionsMutable.value = List(Random.nextInt(0, 10)) {
-            val productName = name.toLocalViewModel().copy(name = buildString {
-                append(name.name)
-                if (!endsWith(' ')) {
-                    append(' ')
-                }
-                append(it + 1)
-            })
-            Product.LocalViewModel.default.copy(
-                name = productName,
-                descriptiveName = productName.name,
-            )
-        }
+        productSuggestionsMutable.value =
+            listOf(Product.LocalViewModel.default.copy(name = name.toLocalViewModel())) + List(
+                Random.nextInt(0, 10)
+            ) {
+                val productName = name.toLocalViewModel().copy(name = buildString {
+                    append(name.name)
+                    if (!endsWith(' ')) {
+                        append(' ')
+                    }
+                    append(it + 1)
+                })
+                Product.LocalViewModel.default.copy(name = productName)
+            }
     }
 
     fun clearProductSearchSuggestions() {

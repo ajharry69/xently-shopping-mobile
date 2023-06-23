@@ -52,4 +52,6 @@
     <string name="xently_content_description_store_map">Click on or drag the marker on the map to select store location</string>
     <string name="xently_search_bar_placeholder_name_required">Name*</string>
     <string name="xently_checkbox_label_autofill_plural">Autofill plural</string>
+    <string name="xently_button_label_missing_product_name">Please provide a product name</string>
+    <string name="xently_button_label_missing_shop_name">Please provide a shop name</string>
 </resources>
