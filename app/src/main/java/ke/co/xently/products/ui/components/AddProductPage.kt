@@ -2,6 +2,7 @@ package ke.co.xently.products.ui.components
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -27,6 +30,7 @@ fun AddProductPage(
     heading: Int,
     @StringRes
     subHeading: Int? = null,
+    scrollState: ScrollState? = rememberScrollState(),
     showBackButton: Boolean = true,
     enableBackButton: Boolean = true,
     onBackClick: () -> Unit = {},
@@ -59,7 +63,15 @@ fun AddProductPage(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 )
             },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .then(
+                    if (scrollState == null) {
+                        Modifier
+                    } else {
+                        Modifier.verticalScroll(scrollState)
+                    }
+                ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         )
 

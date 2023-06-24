@@ -65,6 +65,7 @@ fun AddStorePage(
         heading = R.string.xently_add_store_page_title,
         subHeading = R.string.xently_add_store_page_sub_heading,
         showBackButton = false,
+        scrollState = null,
         continueButton = {
             Button(
                 modifier = Modifier.fillMaxWidth(),
