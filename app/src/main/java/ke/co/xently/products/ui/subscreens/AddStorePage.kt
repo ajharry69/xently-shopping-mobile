@@ -86,10 +86,10 @@ fun AddStorePage(
                 Store.LocalViewModel.default.copy(name = query)
                     .let(search)
             },
-            saveDraft = saveDraft,
+            onSuggestionSelected = saveDraft,
             onSearchSuggestionSelected = onSearchSuggestionSelected,
             suggestionContent = { Text(text = it.name) },
-            placeholderContent = {
+            placeholder = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
             },
         )

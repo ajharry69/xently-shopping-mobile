@@ -65,6 +65,7 @@ fun AddProductScreen(
         measurementUnitSuggestionsState = viewModel.measurementUnitSuggestions,
         searchMeasurementUnits = viewModel::searchMeasurementUnit,
         onMeasurementUnitSearchSuggestionSelected = viewModel::clearMeasurementUnitSearchSuggestions,
+        onBrandSearchSuggestionSelected = { viewModel.clearBrandSearchSuggestions() },
     )
 }
 
@@ -93,6 +94,7 @@ fun AddProductScreen(
     measurementUnitSuggestionsState: StateFlow<List<MeasurementUnit>>,
     searchMeasurementUnits: (MeasurementUnit) -> Unit,
     onMeasurementUnitSearchSuggestionSelected: () -> Unit,
+    onBrandSearchSuggestionSelected: (Brand) -> Unit,
 ) {
     val saveAsDraftOrPermanently: (Product.LocalViewModel) -> Unit by remember(addProductStep) {
         derivedStateOf {
@@ -209,7 +211,7 @@ fun AddProductScreen(
                         product = product,
                         suggestionsState = measurementUnitSuggestionsState,
                         search = searchMeasurementUnits,
-                        saveDraft = {
+                        onSuggestionSelected = {
                             saveProductDraft(product.copy(measurementUnit = it.toLocalViewModel()))
                         },
                         onSearchSuggestionSelected = onMeasurementUnitSearchSuggestionSelected,
@@ -233,19 +235,20 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.Brands -> {
+                    val saveProductDraft: (List<Brand>) -> Unit by rememberUpdatedState {
+                        product.copy(brands = it.map(Brand::toLocalViewModel))
+                            .let(saveAsDraftOrPermanently)
+                    }
                     AddBrandsPage(
                         modifier = Modifier.fillMaxSize(),
                         brands = product.brands,
                         suggestionsState = brandSuggestionsState,
                         search = searchBrands,
                         onPreviousClick = navigateToPrevious,
-                        saveDraft = {
-                            product.copy(brands = it.map(Brand::toLocalViewModel))
-                                .let(saveAsDraftOrPermanently)
-                        },
+                        saveDraft = saveProductDraft,
+                        onSearchSuggestionSelected = onBrandSearchSuggestionSelected,
                     ) { brands ->
-                        product.copy(brands = brands.map(Brand::toLocalViewModel))
-                            .let(saveAsDraftOrPermanently)
+                        saveProductDraft(brands)
                         navigateToNext()
                     }
                 }
@@ -302,6 +305,7 @@ private fun AddProductScreenPreview() {
             onProductSearchSuggestionSelected = {},
             searchMeasurementUnits = {},
             onMeasurementUnitSearchSuggestionSelected = {},
+            onBrandSearchSuggestionSelected = {},
         )
     }
 }

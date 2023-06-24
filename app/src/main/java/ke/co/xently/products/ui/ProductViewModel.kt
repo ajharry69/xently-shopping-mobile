@@ -175,4 +175,8 @@ class ProductViewModel @Inject constructor(
     fun clearMeasurementUnitSearchSuggestions() {
         measurementUnitSuggestionsMutable.value = emptyList()
     }
+
+    fun clearBrandSearchSuggestions() {
+        brandSuggestionsMutable.value = emptyList()
+    }
 }

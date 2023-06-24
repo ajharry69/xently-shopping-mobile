@@ -35,6 +35,10 @@ class AutoCompleteTextFieldState<T>(val suggestionsState: StateFlow<List<T>>) {
     fun updateQuery(query: String) {
         this.query = query
     }
+
+    fun resetQuery() {
+        this.query = ""
+    }
 }
 
 @Composable
@@ -72,9 +76,10 @@ fun <T> AutoCompleteTextField(
     modifier: Modifier = Modifier,
     state: AutoCompleteTextFieldState<T> = rememberAutoCompleteTextFieldState(emptyList()),
     onSearch: (String) -> Unit,
-    saveDraft: (T) -> Unit,
-    onSearchSuggestionSelected: () -> Unit,
-    placeholderContent: @Composable () -> Unit,
+    onSuggestionSelected: (T) -> Unit,
+    onSearchSuggestionSelected: () -> Unit = {},
+    placeholder: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     suggestionContent: @Composable (T) -> Unit,
 ) {
     val suggestions by state.suggestionsState.collectAsState()
@@ -105,7 +110,8 @@ fun <T> AutoCompleteTextField(
         onActiveChange = {},
         modifier = Modifier.then(modifier),
         shape = MaterialTheme.shapes.large.copy(CornerSize(8.dp)),
-        placeholder = placeholderContent,
+        placeholder = placeholder,
+        trailingIcon = trailingIcon,
     ) {
         for (suggestion in suggestions) {
             ListItem(
@@ -113,7 +119,7 @@ fun <T> AutoCompleteTextField(
                     suggestionContent(suggestion)
                 },
                 modifier = Modifier.clickable {
-                    saveDraft(suggestion)
+                    onSuggestionSelected(suggestion)
                     wasSuggestionSelected = true
                     nameSearchActive = false
                     onSearchSuggestionSelected()
@@ -143,9 +149,9 @@ private fun AutoCompleteTextFieldPreview() {
                 modifier = Modifier.fillMaxWidth(),
                 state = rememberAutoCompleteTextFieldState(suggestions = suggestions),
                 onSearch = {},
-                saveDraft = {},
+                onSuggestionSelected = {},
                 onSearchSuggestionSelected = {},
-                placeholderContent = {
+                placeholder = {
                     Text(text = "Search...")
                 },
                 suggestionContent = {

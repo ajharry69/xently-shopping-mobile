@@ -60,4 +60,5 @@
     <string name="xently_checkbox_label_autofill_unit_name_plural">Autofill unit name plural?</string>
     <string name="xently_checkbox_label_autofill_unit_symbol_plural">Autofill unit symbol plural?</string>
     <string name="xently_button_label_invalid_unit_quantity">Please provide a valid unit quantity</string>
+    <string name="xently_add_brands_page_sub_heading">A list of manufacturers of the product</string>
 </resources>

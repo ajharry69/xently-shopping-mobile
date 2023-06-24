@@ -54,7 +54,7 @@ fun AddMeasurementUnitPage(
     product: Product,
     suggestionsState: StateFlow<List<MeasurementUnit>>,
     search: (MeasurementUnit) -> Unit,
-    saveDraft: (MeasurementUnit) -> Unit,
+    onSuggestionSelected: (MeasurementUnit) -> Unit,
     onSearchSuggestionSelected: () -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (Product) -> Unit,
@@ -172,12 +172,12 @@ fun AddMeasurementUnitPage(
                 MeasurementUnit.LocalViewModel.default.copy(name = query)
                     .let(search)
             },
-            saveDraft = saveDraft,
+            onSuggestionSelected = onSuggestionSelected,
             onSearchSuggestionSelected = onSearchSuggestionSelected,
             suggestionContent = {
                 Text(text = it.toString())
             },
-            placeholderContent = {
+            placeholder = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
             },
         )
@@ -261,7 +261,7 @@ fun AddMeasurementUnitPagePreview() {
             product = Product.LocalViewModel.default,
             suggestionsState = MutableStateFlow(emptyList()),
             search = {},
-            saveDraft = {},
+            onSuggestionSelected = {},
             onSearchSuggestionSelected = {},
             onPreviousClick = {},
             onContinueClick = {},
