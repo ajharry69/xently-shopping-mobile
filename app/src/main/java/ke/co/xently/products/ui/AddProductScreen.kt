@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import ke.co.xently.products.models.Attribute
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
 import ke.co.xently.products.models.MeasurementUnit
@@ -48,24 +49,28 @@ fun AddProductScreen(
         brandSuggestionsState = viewModel.brandSuggestions,
         addProductState = viewModel.addProductState,
         attributeSuggestionsState = viewModel.attributeSuggestions,
+        attributeValueSuggestionsState = viewModel.attributeValueSuggestions,
         storeSuggestionsState = viewModel.storeSuggestions,
         shopSuggestionsState = viewModel.shopSuggestions,
         productSuggestionsState = viewModel.productSuggestions,
+        measurementUnitSuggestionsState = viewModel.measurementUnitSuggestions,
         savePermanently = viewModel::savePermanently,
         saveDraft = viewModel::saveDraft,
         saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
         searchBrands = viewModel::searchBrand,
         searchAttribute = viewModel::searchAttribute,
+        searchAttributeValue = viewModel::searchAttributeValue,
         searchStores = viewModel::searchStore,
         onStoreSearchSuggestionSelected = viewModel::clearStoreSearchSuggestions,
         searchShops = viewModel::searchShop,
         onShopSearchSuggestionSelected = viewModel::clearShopSearchSuggestions,
         searchProductNames = viewModel::searchProductName,
         onProductSearchSuggestionSelected = viewModel::clearProductSearchSuggestions,
-        measurementUnitSuggestionsState = viewModel.measurementUnitSuggestions,
         searchMeasurementUnits = viewModel::searchMeasurementUnit,
         onMeasurementUnitSearchSuggestionSelected = viewModel::clearMeasurementUnitSearchSuggestions,
         onBrandSearchSuggestionSelected = { viewModel.clearBrandSearchSuggestions() },
+        onAttributeValueSuggestionClicked = { viewModel.clearAttributeValueSuggestions() },
+        onAttributeSuggestionClicked = { viewModel.clearAttributeSuggestions() },
     )
 }
 
@@ -76,7 +81,8 @@ fun AddProductScreen(
     product: Product.LocalViewModel,
     brandSuggestionsState: StateFlow<List<Brand>>,
     addProductState: StateFlow<State>,
-    attributeSuggestionsState: StateFlow<List<AttributeValue>>,
+    attributeSuggestionsState: StateFlow<List<Attribute>>,
+    attributeValueSuggestionsState: StateFlow<List<AttributeValue>>,
     storeSuggestionsState: StateFlow<List<Store>>,
     shopSuggestionsState: StateFlow<List<Shop>>,
     productSuggestionsState: StateFlow<List<Product>>,
@@ -84,7 +90,8 @@ fun AddProductScreen(
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
     searchBrands: (Brand) -> Unit,
-    searchAttribute: (AttributeValue) -> Unit,
+    searchAttributeValue: (AttributeValue) -> Unit,
+    searchAttribute: (Attribute) -> Unit,
     searchStores: (Store) -> Unit,
     onStoreSearchSuggestionSelected: () -> Unit,
     searchShops: (Shop) -> Unit,
@@ -95,6 +102,8 @@ fun AddProductScreen(
     searchMeasurementUnits: (MeasurementUnit) -> Unit,
     onMeasurementUnitSearchSuggestionSelected: () -> Unit,
     onBrandSearchSuggestionSelected: (Brand) -> Unit,
+    onAttributeValueSuggestionClicked: (AttributeValue) -> Unit,
+    onAttributeSuggestionClicked: (Attribute) -> Unit,
 ) {
     val saveAsDraftOrPermanently: (Product.LocalViewModel) -> Unit by remember(addProductStep) {
         derivedStateOf {
@@ -130,28 +139,31 @@ fun AddProductScreen(
         AnimatedContent(targetState = addProductStep) { step ->
             when (step) {
                 AddProductStep.Store -> {
-                    val saveProductDraft: (Store) -> Unit by rememberUpdatedState {
+                    val productDraft: (Store) -> Product.LocalViewModel by rememberUpdatedState {
                         product.copy(store = it.toLocalViewModel())
-                            .let(saveAsDraftOrPermanently)
                     }
                     AddStorePage(
                         modifier = Modifier.fillMaxSize(),
                         store = product.store,
                         suggestionsState = storeSuggestionsState,
                         search = searchStores,
-                        saveDraft = saveProductDraft,
+                        saveDraft = {
+                            productDraft(it)
+                                .let(saveDraft)
+                        },
                         onSearchSuggestionSelected = onStoreSearchSuggestionSelected,
                     ) {
-                        saveProductDraft(it)
+                        productDraft(it)
+                            .let(saveAsDraftOrPermanently)
                         navigateToNext()
                     }
                 }
 
                 AddProductStep.Shop -> {
-                    val saveProductDraft: (Shop) -> Unit by rememberUpdatedState {
+                    val productDraft: (Shop) -> Product.LocalViewModel by rememberUpdatedState {
                         product.run {
                             copy(store = store.copy(shop = it.toLocalViewModel()))
-                        }.let(saveAsDraftOrPermanently)
+                        }
                     }
                     AddShopPage(
                         modifier = Modifier.fillMaxSize(),
@@ -159,16 +171,20 @@ fun AddProductScreen(
                         onPreviousClick = navigateToPrevious,
                         suggestionsState = shopSuggestionsState,
                         search = searchShops,
-                        saveDraft = saveProductDraft,
+                        saveDraft = {
+                            productDraft(it)
+                                .let(saveDraft)
+                        },
                         onSearchSuggestionSelected = onShopSearchSuggestionSelected,
                     ) {
-                        saveProductDraft(it)
+                        productDraft(it)
+                            .let(saveAsDraftOrPermanently)
                         navigateToNext()
                     }
                 }
 
                 AddProductStep.ProductName -> {
-                    val saveProductDraft: (Product) -> Unit by rememberUpdatedState {
+                    val productDraft: (Product) -> Product.LocalViewModel by rememberUpdatedState {
                         val productViewModel = it.toLocalViewModel()
                         product.copy(
                             name = productViewModel.name,
@@ -177,7 +193,7 @@ fun AddProductScreen(
                             measurementUnit = productViewModel.measurementUnit,
                             measurementUnitQuantity = productViewModel.measurementUnitQuantity,
                             autoFillNamePlural = productViewModel.autoFillNamePlural,
-                        ).let(saveAsDraftOrPermanently)
+                        )
                     }
                     AddProductNamePage(
                         modifier = Modifier.fillMaxSize(),
@@ -185,16 +201,20 @@ fun AddProductScreen(
                         onPreviousClick = navigateToPrevious,
                         suggestionsState = productSuggestionsState,
                         search = searchProductNames,
-                        saveDraft = saveProductDraft,
+                        saveDraft = {
+                            productDraft(it)
+                                .let(saveDraft)
+                        },
                         onSearchSuggestionSelected = onProductSearchSuggestionSelected,
                     ) {
-                        saveProductDraft(it)
+                        productDraft(it)
+                            .let(saveAsDraftOrPermanently)
                         navigateToNext()
                     }
                 }
 
                 AddProductStep.MeasurementUnit -> {
-                    val saveProductDraft: (Product) -> Unit by rememberUpdatedState {
+                    val productDraft: (Product) -> Product.LocalViewModel by rememberUpdatedState {
                         val productViewModel = it.toLocalViewModel()
                         product.copy(
                             name = productViewModel.name,
@@ -204,7 +224,7 @@ fun AddProductScreen(
                             measurementUnitQuantity = productViewModel.measurementUnitQuantity,
                             autoFillMeasurementUnitNamePlural = productViewModel.autoFillMeasurementUnitNamePlural,
                             autoFillMeasurementUnitSymbolPlural = productViewModel.autoFillMeasurementUnitSymbolPlural,
-                        ).let(saveAsDraftOrPermanently)
+                        )
                     }
                     AddMeasurementUnitPage(
                         modifier = Modifier.fillMaxSize(),
@@ -212,12 +232,14 @@ fun AddProductScreen(
                         suggestionsState = measurementUnitSuggestionsState,
                         search = searchMeasurementUnits,
                         onSuggestionSelected = {
-                            saveProductDraft(product.copy(measurementUnit = it.toLocalViewModel()))
+                            productDraft(product.copy(measurementUnit = it.toLocalViewModel()))
+                                .let(saveDraft)
                         },
                         onSearchSuggestionSelected = onMeasurementUnitSearchSuggestionSelected,
                         onPreviousClick = navigateToPrevious,
                     ) {
-                        saveProductDraft(it)
+                        productDraft(it)
+                            .let(saveAsDraftOrPermanently)
                         navigateToNext()
                     }
                 }
@@ -235,9 +257,8 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.Brands -> {
-                    val saveProductDraft: (List<Brand>) -> Unit by rememberUpdatedState {
+                    val productDraft: (List<Brand>) -> Product.LocalViewModel by rememberUpdatedState {
                         product.copy(brands = it.map(Brand::toLocalViewModel))
-                            .let(saveAsDraftOrPermanently)
                     }
                     AddBrandsPage(
                         modifier = Modifier.fillMaxSize(),
@@ -245,28 +266,39 @@ fun AddProductScreen(
                         suggestionsState = brandSuggestionsState,
                         search = searchBrands,
                         onPreviousClick = navigateToPrevious,
-                        saveDraft = saveProductDraft,
+                        saveDraft = {
+                            productDraft(it)
+                                .let(saveDraft)
+                        },
                         onSearchSuggestionSelected = onBrandSearchSuggestionSelected,
                     ) { brands ->
-                        saveProductDraft(brands)
+                        productDraft(brands)
+                            .let(saveAsDraftOrPermanently)
                         navigateToNext()
                     }
                 }
 
                 AddProductStep.Attributes -> {
+                    val productDraft: (List<AttributeValue>) -> Product.LocalViewModel by rememberUpdatedState {
+                        product.copy(attributes = it.map(AttributeValue::toLocalViewModel))
+                    }
                     AddAttributesPage(
                         stateState = addProductState,
                         modifier = Modifier.fillMaxSize(),
                         attributes = product.attributes,
-                        suggestionsState = attributeSuggestionsState,
-                        search = searchAttribute,
+                        attributeValueSuggestionsState = attributeValueSuggestionsState,
+                        attributeSuggestionsState = attributeSuggestionsState,
+                        searchAttributeValue = searchAttributeValue,
                         onPreviousClick = navigateToPrevious,
                         saveDraft = {
-                            product.copy(attributes = it.map(AttributeValue::toLocalViewModel))
-                                .let(saveAsDraftOrPermanently)
+                            productDraft(it)
+                                .let(saveDraft)
                         },
+                        onAttributeValueSuggestionClicked = onAttributeValueSuggestionClicked,
+                        searchAttribute = searchAttribute,
+                        onAttributeSuggestionClicked = onAttributeSuggestionClicked,
                     ) { attributes ->
-                        product.copy(attributes = attributes.map(AttributeValue::toLocalViewModel))
+                        productDraft(attributes)
                             .let(saveAsDraftOrPermanently)
                         navigateToNext()
                     }
@@ -288,6 +320,7 @@ private fun AddProductScreenPreview() {
             brandSuggestionsState = MutableStateFlow(emptyList()),
             addProductState = MutableStateFlow(State.Idle),
             attributeSuggestionsState = MutableStateFlow(emptyList()),
+            attributeValueSuggestionsState = MutableStateFlow(emptyList()),
             storeSuggestionsState = MutableStateFlow(emptyList()),
             shopSuggestionsState = MutableStateFlow(emptyList()),
             productSuggestionsState = MutableStateFlow(emptyList()),
@@ -297,6 +330,7 @@ private fun AddProductScreenPreview() {
             saveCurrentlyActiveStep = {},
             searchBrands = {},
             searchAttribute = {},
+            searchAttributeValue = {},
             searchStores = {},
             onStoreSearchSuggestionSelected = {},
             searchShops = {},
@@ -306,6 +340,8 @@ private fun AddProductScreenPreview() {
             searchMeasurementUnits = {},
             onMeasurementUnitSearchSuggestionSelected = {},
             onBrandSearchSuggestionSelected = {},
+            onAttributeValueSuggestionClicked = {},
+            onAttributeSuggestionClicked = {},
         )
     }
 }

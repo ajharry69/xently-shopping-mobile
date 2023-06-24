@@ -154,7 +154,7 @@ fun AddBrandsPage(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun AddBrandsPagePreview() {
+private fun AddBrandsPagePreview() {
     XentlyTheme {
         AddBrandsPage(
             modifier = Modifier.fillMaxSize(),

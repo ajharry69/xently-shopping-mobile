@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ke.co.xently.products.models.Attribute
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
 import ke.co.xently.products.models.MeasurementUnit
@@ -46,7 +47,13 @@ class ProductViewModel @Inject constructor(
 
     val brandSuggestions = brandSuggestionsMutable.asStateFlow()
 
-    private val attributeSuggestionsMutable = MutableStateFlow<List<AttributeValue>>(emptyList())
+    private val attributeValueSuggestionsMutable =
+        MutableStateFlow<List<AttributeValue>>(emptyList())
+
+    val attributeValueSuggestions = attributeValueSuggestionsMutable.asStateFlow()
+
+
+    private val attributeSuggestionsMutable = MutableStateFlow<List<Attribute>>(emptyList())
 
     val attributeSuggestions = attributeSuggestionsMutable.asStateFlow()
 
@@ -97,10 +104,17 @@ class ProductViewModel @Inject constructor(
         Log.d(TAG, "saveDraft: $product")
     }
 
-    fun searchAttribute(attribute: AttributeValue) {
-        attributeSuggestionsMutable.value = listOf(attribute) + List(Random(0).nextInt(5)) {
+    fun searchAttributeValue(attribute: AttributeValue) {
+        attributeValueSuggestionsMutable.value = listOf(attribute) + List(Random(0).nextInt(5)) {
             attribute.toLocalViewModel()
                 .copy(value = buildString { append(attribute.value); append(it + 1) })
+        }
+    }
+
+    fun searchAttribute(attribute: Attribute) {
+        attributeSuggestionsMutable.value = listOf(attribute) + List(Random(0).nextInt(5)) {
+            attribute.toLocalViewModel()
+                .copy(name = buildString { append(attribute.name); append(it + 1) })
         }
     }
 
@@ -178,5 +192,13 @@ class ProductViewModel @Inject constructor(
 
     fun clearBrandSearchSuggestions() {
         brandSuggestionsMutable.value = emptyList()
+    }
+
+    fun clearAttributeValueSuggestions() {
+        attributeValueSuggestionsMutable.value = emptyList()
+    }
+
+    fun clearAttributeSuggestions() {
+        attributeSuggestionsMutable.value = emptyList()
     }
 }

@@ -39,7 +39,7 @@ sealed interface AttributeValue {
         override val attribute: Attribute.LocalViewModel,
     ) : AttributeValue, Parcelable {
         override fun toString(): String {
-            return "${attribute.name}:$value"
+            return "$attribute:$value"
         }
 
         override fun hashCode(): Int {

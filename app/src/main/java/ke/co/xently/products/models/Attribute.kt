@@ -47,6 +47,10 @@ sealed interface Attribute {
             return true
         }
 
+        override fun toString(): String {
+            return name
+        }
+
         companion object {
             val default = LocalViewModel(
                 id = -1,
