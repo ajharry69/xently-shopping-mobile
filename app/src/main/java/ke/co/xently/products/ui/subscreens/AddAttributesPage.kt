@@ -18,7 +18,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -32,7 +31,6 @@ import ke.co.xently.R
 import ke.co.xently.products.models.Attribute
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Product
-import ke.co.xently.products.ui.State
 import ke.co.xently.products.ui.components.AddProductPage
 import ke.co.xently.products.ui.components.AutoCompleteTextField
 import ke.co.xently.products.ui.components.rememberAutoCompleteTextFieldState
@@ -44,7 +42,6 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun AddAttributesPage(
     modifier: Modifier = Modifier,
-    stateState: StateFlow<State>,
     attributes: List<AttributeValue>,
     attributeValueSuggestionsState: StateFlow<List<AttributeValue>>,
     attributeSuggestionsState: StateFlow<List<Attribute>>,
@@ -56,7 +53,6 @@ fun AddAttributesPage(
     onPreviousClick: () -> Unit,
     onContinueClick: (List<AttributeValue>) -> Unit,
 ) {
-    val state by stateState.collectAsState()
     val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
         suggestionsState = attributeSuggestionsState,
     )
@@ -76,25 +72,14 @@ fun AddAttributesPage(
         modifier = modifier,
         heading = R.string.xently_add_attributes_page_title,
         onBackClick = onPreviousClick,
-        enableBackButton = state !is State.Loading,
         continueButton = {
-            if (state is State.Loading) {
-                Button(
-                    enabled = false,
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {},
-                ) {
-                    Text(text = stringResource(R.string.xently_button_label_loading))
-                }
-            } else {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        onContinueClick(attrs)
-                    },
-                ) {
-                    Text(text = stringResource(R.string.xently_button_label_submit))
-                }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    onContinueClick(attrs)
+                },
+            ) {
+                Text(text = stringResource(R.string.xently_button_label_continue))
             }
         },
     ) {
@@ -262,16 +247,14 @@ private fun AddAttributesPagePreview() {
         AddAttributesPage(
             modifier = Modifier.fillMaxSize(),
             attributes = Product.LocalViewModel.default.attributes,
-            stateState = MutableStateFlow(State.Idle),
             attributeValueSuggestionsState = MutableStateFlow(emptyList()),
             attributeSuggestionsState = MutableStateFlow(emptyList()),
             searchAttributeValue = {},
+            onAttributeValueSuggestionClicked = {},
             searchAttribute = {},
             onAttributeSuggestionClicked = {},
-            onAttributeValueSuggestionClicked = {},
             saveDraft = {},
             onPreviousClick = {},
-            onContinueClick = {},
-        )
+        ) {}
     }
 }

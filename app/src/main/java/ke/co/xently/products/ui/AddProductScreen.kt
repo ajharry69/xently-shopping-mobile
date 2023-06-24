@@ -30,6 +30,7 @@ import ke.co.xently.products.ui.subscreens.AddMeasurementUnitPage
 import ke.co.xently.products.ui.subscreens.AddProductNamePage
 import ke.co.xently.products.ui.subscreens.AddShopPage
 import ke.co.xently.products.ui.subscreens.AddStorePage
+import ke.co.xently.products.ui.subscreens.SummaryPage
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -283,22 +284,34 @@ fun AddProductScreen(
                         product.copy(attributes = it.map(AttributeValue::toLocalViewModel))
                     }
                     AddAttributesPage(
-                        stateState = addProductState,
                         modifier = Modifier.fillMaxSize(),
                         attributes = product.attributes,
                         attributeValueSuggestionsState = attributeValueSuggestionsState,
                         attributeSuggestionsState = attributeSuggestionsState,
                         searchAttributeValue = searchAttributeValue,
-                        onPreviousClick = navigateToPrevious,
+                        onAttributeValueSuggestionClicked = onAttributeValueSuggestionClicked,
+                        searchAttribute = searchAttribute,
+                        onAttributeSuggestionClicked = onAttributeSuggestionClicked,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
                         },
-                        onAttributeValueSuggestionClicked = onAttributeValueSuggestionClicked,
-                        searchAttribute = searchAttribute,
-                        onAttributeSuggestionClicked = onAttributeSuggestionClicked,
+                        onPreviousClick = navigateToPrevious,
                     ) { attributes ->
                         productDraft(attributes)
+                            .let(saveAsDraftOrPermanently)
+                        navigateToNext()
+                    }
+                }
+
+                AddProductStep.Summary -> {
+                    SummaryPage(
+                        modifier = Modifier.fillMaxSize(),
+                        product = product,
+                        stateState = addProductState,
+                        onPreviousClick = navigateToPrevious,
+                    ) {
+                        it.toLocalViewModel()
                             .let(saveAsDraftOrPermanently)
                         navigateToNext()
                     }

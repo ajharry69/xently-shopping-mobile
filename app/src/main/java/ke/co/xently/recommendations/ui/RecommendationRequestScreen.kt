@@ -51,9 +51,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.R
 import ke.co.xently.products.ui.components.LabeledCheckbox
 import ke.co.xently.recommendations.models.Recommendation
+import ke.co.xently.ui.loadingIndicatorLabel
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun RecommendationRequestScreen(
@@ -112,28 +111,6 @@ fun RecommendationRequestScreen(
     val recommendationsLoading by remember(recommendationsState) {
         derivedStateOf {
             recommendationsState is State.Loading
-        }
-    }
-
-    val getRecommendationsButtonLabel =
-        stringResource(R.string.xently_button_label_getting_recommendations)
-
-    var gettingRecommendationsButtonLabel by remember {
-        mutableStateOf(getRecommendationsButtonLabel)
-    }
-
-    LaunchedEffect(recommendationsState, getRecommendationsButtonLabel) {
-        var count = 0
-        while (recommendationsState is State.Loading) {
-            if (count == 4) count = 0
-            count += 1
-            gettingRecommendationsButtonLabel = buildString {
-                append(getRecommendationsButtonLabel)
-                for (c in 1..count) {
-                    append('.')
-                }
-            }
-            delay(1.seconds)
         }
     }
 
@@ -335,11 +312,13 @@ fun RecommendationRequestScreen(
                 onClick = getRecommendations,
             ) {
                 Text(
-                    text = if (recommendationsLoading) {
-                        gettingRecommendationsButtonLabel
-                    } else {
-                        stringResource(R.string.xently_button_label_get_recommendations)
-                    }.toUpperCase(Locale.current),
+                    text = loadingIndicatorLabel(
+                        loading = recommendationsLoading,
+                        label = stringResource(R.string.xently_button_label_get_recommendations)
+                            .toUpperCase(Locale.current),
+                        loadingLabelPrefix = stringResource(R.string.xently_button_label_getting_recommendations),
+                        keys = arrayOf(recommendationsState),
+                    ),
                 )
             }
         }

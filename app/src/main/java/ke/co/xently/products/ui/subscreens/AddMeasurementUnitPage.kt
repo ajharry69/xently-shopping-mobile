@@ -133,7 +133,7 @@ fun AddMeasurementUnitPage(
     AddProductPage(
         modifier = modifier,
         heading = R.string.xently_measurement_unit_page_title,
-        subHeading = R.string.xently_measurement_unit_page_sub_heading,
+        subheading = R.string.xently_measurement_unit_page_sub_heading,
         onBackClick = onPreviousClick,
         continueButton = {
             Button(

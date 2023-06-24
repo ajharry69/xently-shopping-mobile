@@ -76,7 +76,7 @@ fun AddShopPage(
     AddProductPage(
         modifier = modifier,
         heading = R.string.xently_add_shop_page_title,
-        subHeading = R.string.xently_add_shop_page_sub_heading,
+        subheading = R.string.xently_add_shop_page_sub_heading,
         onBackClick = onPreviousClick,
         continueButton = {
             val enabled by remember(buttonLabel) {

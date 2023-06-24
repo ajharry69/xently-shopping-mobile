@@ -25,11 +25,36 @@ import ke.co.xently.R
 
 @Composable
 fun AddProductPage(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     @StringRes
     heading: Int,
     @StringRes
-    subHeading: Int? = null,
+    subheading: Int? = null,
+    scrollState: ScrollState? = rememberScrollState(),
+    showBackButton: Boolean = true,
+    enableBackButton: Boolean = true,
+    onBackClick: () -> Unit = {},
+    continueButton: @Composable BoxScope.() -> Unit,
+    form: @Composable ColumnScope.() -> Unit,
+) {
+    AddProductPage(
+        modifier = modifier,
+        heading = stringResource(heading),
+        subheading = subheading?.let { stringResource(it) },
+        form = form,
+        scrollState = scrollState,
+        showBackButton = showBackButton,
+        onBackClick = onBackClick,
+        enableBackButton = enableBackButton,
+        continueButton = continueButton
+    )
+}
+
+@Composable
+fun AddProductPage(
+    modifier: Modifier,
+    heading: String,
+    subheading: String? = null,
     scrollState: ScrollState? = rememberScrollState(),
     showBackButton: Boolean = true,
     enableBackButton: Boolean = true,
@@ -43,15 +68,15 @@ fun AddProductPage(
                 ListItem(
                     headlineContent = {
                         Text(
-                            text = stringResource(heading),
+                            text = heading,
                             style = MaterialTheme.typography.titleLarge,
                         )
                     },
-                    supportingContent = if (subHeading == null) {
+                    supportingContent = if (subheading == null) {
                         null
                     } else {
                         {
-                            Text(text = stringResource(subHeading))
+                            Text(text = subheading)
                         }
                     },
                 )

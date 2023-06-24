@@ -7,7 +7,8 @@ enum class AddProductStep {
     GeneralDetails,
     MeasurementUnit,
     Brands,
-    Attributes;
+    Attributes,
+    Summary;
 
     companion object {
         private val MAPPED_STAGES = values().groupBy {

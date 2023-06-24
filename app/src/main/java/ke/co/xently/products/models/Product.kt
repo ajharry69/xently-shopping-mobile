@@ -22,6 +22,34 @@ sealed interface Product {
     val brands: List<Brand>
     val attributes: List<AttributeValue>
 
+    fun buildDescriptiveName() = buildString {
+        attributes.map { it.value.lowercase() }.sorted().also { attrs ->
+            if (attrs.isEmpty()) {
+                append(name.name.replaceFirstChar { it.uppercaseChar() })
+            } else {
+                append(attrs.joinToString().replaceFirstChar { it.uppercaseChar() })
+                append(" ")
+                append(name.name.lowercase())
+            }
+        }
+        brands.map { it.name }.sorted().also {
+            when (val count = it.size) {
+                0 -> {}
+                1 -> {
+                    append(" by ")
+                    append(it[0])
+                }
+
+                else -> {
+                    append(" by ")
+                    append(it.take(count - 1).joinToString())
+                    append(" and ")
+                    append(it.last())
+                }
+            }
+        }
+    }
+
     data class RemoteRequest(
         override val id: Long,
         override val name: ProductName.RemoteRequest,
