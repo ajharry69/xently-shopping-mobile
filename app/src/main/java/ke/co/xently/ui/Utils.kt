@@ -19,7 +19,7 @@ fun loadingIndicatorLabel(
     label: String,
     loading: Boolean,
     loadingLabelPrefix: String = label,
-    loadingEvaluator: () -> Boolean = {true},
+    loadingEvaluator: () -> Boolean = { true },
     vararg keys: Any?,
 ): String = if (!loading) {
     label

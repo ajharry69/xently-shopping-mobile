@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun AddProductScreen(
     modifier: Modifier,
+    snackbarHostState: SnackbarHostState,
     viewModel: ProductViewModel = hiltViewModel(),
 ) {
     val addProductStep: AddProductStep by viewModel.currentlyActiveStep.collectAsState()
@@ -47,6 +49,7 @@ fun AddProductScreen(
         addProductStep = addProductStep,
         modifier = modifier,
         product = product,
+        snackbarHostState = snackbarHostState,
         brandSuggestionsState = viewModel.brandSuggestions,
         addProductState = viewModel.addProductState,
         attributeSuggestionsState = viewModel.attributeSuggestions,
@@ -79,6 +82,7 @@ fun AddProductScreen(
 fun AddProductScreen(
     addProductStep: AddProductStep,
     modifier: Modifier,
+    snackbarHostState: SnackbarHostState,
     product: Product.LocalViewModel,
     brandSuggestionsState: StateFlow<List<Brand>>,
     addProductState: StateFlow<State>,
@@ -87,7 +91,7 @@ fun AddProductScreen(
     storeSuggestionsState: StateFlow<List<Store>>,
     shopSuggestionsState: StateFlow<List<Shop>>,
     productSuggestionsState: StateFlow<List<Product>>,
-    savePermanently: (Product.LocalViewModel) -> Unit,
+    savePermanently: (Array<AddProductStep>) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
     searchBrands: (Brand) -> Unit,
@@ -106,16 +110,6 @@ fun AddProductScreen(
     onAttributeValueSuggestionClicked: (AttributeValue) -> Unit,
     onAttributeSuggestionClicked: (Attribute) -> Unit,
 ) {
-    val saveAsDraftOrPermanently: (Product.LocalViewModel) -> Unit by remember(addProductStep) {
-        derivedStateOf {
-            if (addProductStep.ordinal == AddProductStep.values().lastIndex) {
-                savePermanently
-            } else {
-                saveDraft
-            }
-        }
-    }
-
     val navigateToNext: () -> Unit by rememberUpdatedState {
         AddProductStep.valueOfOrdinalOrFirstByOrdinal(addProductStep.ordinal + 1)
             .also(saveCurrentlyActiveStep)
@@ -155,7 +149,7 @@ fun AddProductScreen(
                         onSearchSuggestionSelected = onStoreSearchSuggestionSelected,
                     ) {
                         productDraft(it)
-                            .let(saveAsDraftOrPermanently)
+                            .let(saveDraft)
                         navigateToNext()
                     }
                 }
@@ -179,7 +173,7 @@ fun AddProductScreen(
                         onSearchSuggestionSelected = onShopSearchSuggestionSelected,
                     ) {
                         productDraft(it)
-                            .let(saveAsDraftOrPermanently)
+                            .let(saveDraft)
                         navigateToNext()
                     }
                 }
@@ -209,7 +203,7 @@ fun AddProductScreen(
                         onSearchSuggestionSelected = onProductSearchSuggestionSelected,
                     ) {
                         productDraft(it)
-                            .let(saveAsDraftOrPermanently)
+                            .let(saveDraft)
                         navigateToNext()
                     }
                 }
@@ -240,7 +234,7 @@ fun AddProductScreen(
                         onPreviousClick = navigateToPrevious,
                     ) {
                         productDraft(it)
-                            .let(saveAsDraftOrPermanently)
+                            .let(saveDraft)
                         navigateToNext()
                     }
                 }
@@ -252,7 +246,7 @@ fun AddProductScreen(
                         onPreviousClick = navigateToPrevious,
                     ) {
                         it.toLocalViewModel()
-                            .let(saveAsDraftOrPermanently)
+                            .let(saveDraft)
                         navigateToNext()
                     }
                 }
@@ -274,7 +268,7 @@ fun AddProductScreen(
                         onSearchSuggestionSelected = onBrandSearchSuggestionSelected,
                     ) { brands ->
                         productDraft(brands)
-                            .let(saveAsDraftOrPermanently)
+                            .let(saveDraft)
                         navigateToNext()
                     }
                 }
@@ -299,7 +293,7 @@ fun AddProductScreen(
                         onPreviousClick = navigateToPrevious,
                     ) { attributes ->
                         productDraft(attributes)
-                            .let(saveAsDraftOrPermanently)
+                            .let(saveDraft)
                         navigateToNext()
                     }
                 }
@@ -308,13 +302,12 @@ fun AddProductScreen(
                     SummaryPage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
+                        snackbarHostState = snackbarHostState,
                         stateState = addProductState,
                         onPreviousClick = navigateToPrevious,
-                    ) {
-                        it.toLocalViewModel()
-                            .let(saveAsDraftOrPermanently)
-                        navigateToNext()
-                    }
+                        onSubmissionSuccess = navigateToNext,
+                        submit = savePermanently,
+                    )
                 }
             }
         }
@@ -355,6 +348,7 @@ private fun AddProductScreenPreview() {
             onBrandSearchSuggestionSelected = {},
             onAttributeValueSuggestionClicked = {},
             onAttributeSuggestionClicked = {},
+            snackbarHostState = SnackbarHostState(),
         )
     }
 }

@@ -82,9 +82,8 @@ class ProductViewModel @Inject constructor(
         stateHandle[CURRENT_ACTIVE_STEP_KEY] = step
     }
 
-    fun savePermanently(product: Product.LocalViewModel) {
-        saveDraft(product)
-
+    fun savePermanently(stepsToPersist: Array<AddProductStep>) {
+        Log.i(TAG, "savePermanently: steps to persist: $stepsToPersist")
         viewModelScope.launch {
             this@ProductViewModel.product.map(repository::addProduct).onStart {
                 addProductStateMutable.value = State.Loading

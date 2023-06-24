@@ -1,5 +1,6 @@
 package ke.co.xently.products.repositories
 
+import android.util.Log
 import ke.co.xently.products.datasource.ProductDataSource
 import ke.co.xently.products.exceptions.ProductNotFoundException
 import ke.co.xently.products.models.Product
@@ -12,6 +13,7 @@ class ProductRepository @Inject constructor(
     private val localDataSource: ProductDataSource<Product.LocalEntityRequest, Product.LocalEntityResponse>,
 ) {
     suspend fun addProduct(product: Product): Result<Product.LocalViewModel> {
+        Log.i(TAG, "addProduct: $product")
         return remoteDataSource.addProduct(product.toRemoteRequest()).let {
             localDataSource.addProduct(it.toLocalEntityRequest())
         }.let {
@@ -26,5 +28,9 @@ class ProductRepository @Inject constructor(
             }
                 )?.let { Result.success(it) }
             ?: Result.failure(ProductNotFoundException("""Product with ID "$id" could not be found!"""))
+    }
+
+    companion object {
+        private val TAG = ProductRepository::class.java.simpleName
     }
 }

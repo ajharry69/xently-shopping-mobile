@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,7 +25,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             XentlyTheme {
+                val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+
                 Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    },
                     topBar = {
                         CenterAlignedTopAppBar(
                             title = {
@@ -52,7 +58,10 @@ class MainActivity : ComponentActivity() {
 
                         when (selectedTab) {
                             HomeTab.AddProducts -> {
-                                AddProductScreen(modifier = Modifier.fillMaxSize())
+                                AddProductScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    snackbarHostState = snackbarHostState,
+                                )
                             }
 
                             HomeTab.GetRecommendations -> {

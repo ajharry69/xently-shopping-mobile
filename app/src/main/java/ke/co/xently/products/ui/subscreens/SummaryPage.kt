@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
@@ -16,11 +18,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +35,7 @@ import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
 import ke.co.xently.products.models.MeasurementUnit
 import ke.co.xently.products.models.Product
+import ke.co.xently.products.ui.AddProductStep
 import ke.co.xently.products.ui.State
 import ke.co.xently.products.ui.components.AddProductPage
 import ke.co.xently.products.ui.components.LabeledCheckbox
@@ -43,15 +48,47 @@ import kotlinx.coroutines.flow.StateFlow
 fun SummaryPage(
     modifier: Modifier,
     product: Product,
+    snackbarHostState: SnackbarHostState,
     stateState: StateFlow<State>,
     onPreviousClick: () -> Unit,
-    onContinueClick: (Product) -> Unit,
+    onSubmissionSuccess: () -> Unit,
+    submit: (Array<AddProductStep>) -> Unit,
 ) {
     val submissionState by stateState.collectAsState()
 
     val submitting by remember(submissionState) {
         derivedStateOf {
             submissionState is State.Loading
+        }
+    }
+
+    val stepsToPersist = remember {
+        mutableStateListOf<AddProductStep>()
+    }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(submissionState) {
+        when (val state = submissionState) {
+            is State.Failure -> {
+                snackbarHostState.showSnackbar(
+                    state.error.localizedMessage
+                        ?: context.getString(R.string.xently_generic_error_message),
+                    duration = SnackbarDuration.Long,
+                )
+            }
+
+            State.Idle -> {
+
+            }
+
+            State.Loading -> {
+
+            }
+
+            is State.Success -> {
+                onSubmissionSuccess()
+            }
         }
     }
 
@@ -64,8 +101,9 @@ fun SummaryPage(
         continueButton = {
             Button(
                 modifier = Modifier.fillMaxWidth(),
+                enabled = !submitting,
                 onClick = {
-                    onContinueClick(product)
+                    submit(stepsToPersist.toTypedArray())
                 },
             ) {
                 Text(
@@ -81,10 +119,23 @@ fun SummaryPage(
         Text(text = product.buildDescriptiveName(), fontWeight = FontWeight.Bold)
         Text(text = stringResource(R.string.xently_reuse_details_intro))
         val (reuseStore, onReuseStoreChange) = remember {
-            mutableStateOf(true)
+            mutableStateOf(AddProductStep.Store in stepsToPersist)
         }
         val (reuseShop, onReuseShopChange) = remember {
-            mutableStateOf(true)
+            mutableStateOf(AddProductStep.Shop in stepsToPersist)
+        }
+
+        LaunchedEffect(reuseShop, reuseStore) {
+            if (reuseShop) {
+                stepsToPersist.add(AddProductStep.Shop)
+            } else {
+                stepsToPersist.removeIf { it == AddProductStep.Shop }
+            }
+            if (reuseStore) {
+                stepsToPersist.add(AddProductStep.Store)
+            } else {
+                stepsToPersist.removeIf { it == AddProductStep.Store }
+            }
         }
 
         ReuseStoreAndOrShop(
@@ -195,8 +246,10 @@ private fun SummaryPage() {
                 )
             },
             stateState = MutableStateFlow(State.Idle),
+            snackbarHostState = SnackbarHostState(),
             onPreviousClick = {},
-            onContinueClick = {},
+            onSubmissionSuccess = {},
+            submit = {},
         )
     }
 }
