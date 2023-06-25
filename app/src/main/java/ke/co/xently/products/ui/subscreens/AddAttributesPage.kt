@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
@@ -34,6 +35,7 @@ import ke.co.xently.products.models.Product
 import ke.co.xently.products.ui.components.AddProductPage
 import ke.co.xently.products.ui.components.AutoCompleteTextField
 import ke.co.xently.products.ui.components.rememberAutoCompleteTextFieldState
+import ke.co.xently.ui.javaLocale
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -99,8 +101,12 @@ fun AddAttributesPage(
             val savableAttribute: (AttributeValue) -> AttributeValue.LocalViewModel by rememberUpdatedState {
                 it.toLocalViewModel().run {
                     copy(
-                        value = valueAutoCompleteState.query.trim(),
-                        attribute = attribute.copy(name = nameAutoCompleteState.query.trim()),
+                        value = valueAutoCompleteState.query.trim()
+                            .lowercase(Locale.current.javaLocale),
+                        attribute = attribute.copy(
+                            name = nameAutoCompleteState.query.trim()
+                                .lowercase(Locale.current.javaLocale),
+                        ),
                     )
                 }.also {
                     nameAutoCompleteState.resetQuery()

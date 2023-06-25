@@ -1,9 +1,14 @@
 package ke.co.xently.products.models
 
+import android.content.Context
+import android.icu.text.NumberFormat
+import android.icu.util.Currency
 import android.os.Parcelable
+import ke.co.xently.R
 import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.Locale
 
 sealed interface Product {
     val id: Long
@@ -22,30 +27,66 @@ sealed interface Product {
     val brands: List<Brand>
     val attributes: List<AttributeValue>
 
-    fun buildDescriptiveName() = buildString {
-        attributes.map { it.value.lowercase() }.sorted().also { attrs ->
-            if (attrs.isEmpty()) {
-                append(name.name.replaceFirstChar { it.uppercaseChar() })
-            } else {
-                append(attrs.joinToString().replaceFirstChar { it.uppercaseChar() })
-                append(" ")
-                append(name.name.lowercase())
+    fun buildDescriptiveName(context: Context, locale: Locale): String {
+        val descriptiveName = buildString {
+            attributes.map { it.value.lowercase(locale) }.sorted().also { attrs ->
+                if (attrs.isEmpty()) {
+                    append(name.name.replaceFirstChar { it.uppercaseChar() })
+                } else {
+                    append(attrs.joinToString().replaceFirstChar { it.uppercaseChar() })
+                    append(" ")
+                    append(name.name.lowercase(locale))
+                }
+            }
+            brands.map { it.name }.sorted().also {
+                when (val count = it.size) {
+                    0 -> {}
+                    1 -> {
+                        append(' ')
+                        append(context.getString(R.string.xently_description_by))
+                        append(' ')
+                        append(it[0])
+                    }
+
+                    else -> {
+                        append(' ')
+                        append(context.getString(R.string.xently_description_by))
+                        append(' ')
+                        append(it.take(count - 1).joinToString())
+                        append(' ')
+                        append(context.getString(R.string.xently_description_and))
+                        append(' ')
+                        append(it.last())
+                    }
+                }
             }
         }
-        brands.map { it.name }.sorted().also {
-            when (val count = it.size) {
-                0 -> {}
-                1 -> {
-                    append(" by ")
-                    append(it[0])
-                }
 
-                else -> {
-                    append(" by ")
-                    append(it.take(count - 1).joinToString())
-                    append(" and ")
-                    append(it.last())
+        return buildString {
+            append(packCount)
+            append(' ')
+            append(context.getString(R.string.xently_description_pack_of))
+            append(' ')
+            append(descriptiveName.replaceFirstChar { it.lowercase(locale) })
+            append(", ")
+            append(context.getString(R.string.xently_description_purchased_at))
+            append(' ')
+            NumberFormat.getCurrencyInstance(locale)
+                .apply {
+                    currency =
+                        Currency.getInstance(context.getString(R.string.xently_iso_currency_code))
+                    isGroupingUsed = true
                 }
+                .format(unitPrice)
+                .let(::append)
+            append("/=")
+            if (measurementUnit != null) {
+                append(' ')
+                append(context.getString(R.string.xently_description_per))
+                append(' ')
+                append(measurementUnitQuantity)
+                append("-")
+                append(measurementUnit!!.name.lowercase(locale))
             }
         }
     }

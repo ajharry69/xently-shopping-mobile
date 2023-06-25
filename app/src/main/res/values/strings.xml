@@ -69,4 +69,10 @@
     <string name="xently_button_label_submitting">Submitting…</string>
     <string name="xently_summary_page_subtitle">This is what we have captured so far.</string>
     <string name="xently_generic_error_message">Sorry, an unknown error was encountered.</string>
+    <string name="xently_iso_currency_code">KES</string>
+    <string name="xently_description_purchased_at">purchased at</string>
+    <string name="xently_description_pack_of">pack of</string>
+    <string name="xently_description_per">per</string>
+    <string name="xently_description_and">and</string>
+    <string name="xently_description_by">by</string>
 </resources>

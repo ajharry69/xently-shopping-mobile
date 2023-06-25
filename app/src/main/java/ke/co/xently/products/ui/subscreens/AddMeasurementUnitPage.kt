@@ -20,6 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.products.models.MeasurementUnit
@@ -153,9 +155,12 @@ fun AddMeasurementUnitPage(
                                 .cleansedForNumberParsing()
                                 .toFloatOrNull() ?: 1f,
                             measurementUnit = unit?.copy(
-                                namePlural = namePlural.text.takeIf { it.isNotBlank() },
-                                symbol = symbol.text.takeIf { it.isNotBlank() },
-                                symbolPlural = symbolPlural.text.takeIf { it.isNotBlank() },
+                                namePlural = namePlural.text.trim().toLowerCase(Locale.current)
+                                    .takeIf { it.isNotBlank() },
+                                symbol = symbol.text.trim().toLowerCase(Locale.current)
+                                    .takeIf { it.isNotBlank() },
+                                symbolPlural = symbolPlural.text.trim().toLowerCase(Locale.current)
+                                    .takeIf { it.isNotBlank() },
                             ),
                         )
                     }.let(onContinueClick)

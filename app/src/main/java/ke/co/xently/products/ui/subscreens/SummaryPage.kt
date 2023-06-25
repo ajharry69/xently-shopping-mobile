@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
@@ -39,10 +40,12 @@ import ke.co.xently.products.ui.AddProductStep
 import ke.co.xently.products.ui.State
 import ke.co.xently.products.ui.components.AddProductPage
 import ke.co.xently.products.ui.components.LabeledCheckbox
+import ke.co.xently.ui.javaLocale
 import ke.co.xently.ui.loadingIndicatorLabel
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.math.BigDecimal
 
 @Composable
 fun SummaryPage(
@@ -116,7 +119,13 @@ fun SummaryPage(
             }
         },
     ) {
-        Text(text = product.buildDescriptiveName(), fontWeight = FontWeight.Bold)
+        Text(
+            text = product.buildDescriptiveName(
+                context = context,
+                locale = Locale.current.javaLocale,
+            ),
+            fontWeight = FontWeight.Bold,
+        )
         Text(text = stringResource(R.string.xently_reuse_details_intro))
         val (reuseStore, onReuseStoreChange) = remember {
             mutableStateOf(AddProductStep.Store in stepsToPersist)
@@ -232,6 +241,7 @@ private fun SummaryPage() {
                     measurementUnit = MeasurementUnit.LocalViewModel.default.copy(
                         name = "Kilogram",
                     ),
+                    unitPrice = BigDecimal("420"),
                     measurementUnitQuantity = 2f,
                     brands = listOf(
                         Brand.LocalViewModel.default.copy(name = "Kabras"),
