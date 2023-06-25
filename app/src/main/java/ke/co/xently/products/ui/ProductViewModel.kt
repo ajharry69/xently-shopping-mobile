@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
@@ -87,9 +88,55 @@ class ProductViewModel @Inject constructor(
         viewModelScope.launch {
             this@ProductViewModel.product.map(repository::addProduct).onStart {
                 addProductStateMutable.value = State.Loading
-                delay(5000)
+                delay(30.seconds)
             }.collectLatest { result ->
                 result.onSuccess {
+                    var newDraftProduct = Product.LocalViewModel.default
+                    for (step in stepsToPersist) {
+                        when (step) {
+                            AddProductStep.Store -> {
+                                newDraftProduct = newDraftProduct.copy(store = it.store)
+                            }
+
+                            AddProductStep.Shop -> {
+                                newDraftProduct = newDraftProduct.run {
+                                    copy(store = store.copy(shop = it.store.shop))
+                                }
+                            }
+
+                            AddProductStep.ProductName -> {
+                                newDraftProduct = newDraftProduct.copy(name = it.name)
+                            }
+
+                            AddProductStep.GeneralDetails -> {
+                                newDraftProduct = newDraftProduct.copy(
+                                    unitPrice = it.unitPrice,
+                                    packCount = it.packCount,
+                                    datePurchased = it.datePurchased,
+                                )
+                            }
+
+                            AddProductStep.MeasurementUnit -> {
+                                newDraftProduct = newDraftProduct.copy(
+                                    measurementUnit = it.measurementUnit,
+                                    measurementUnitQuantity = it.measurementUnitQuantity,
+                                )
+                            }
+
+                            AddProductStep.Brands -> {
+                                newDraftProduct = newDraftProduct.copy(brands = it.brands)
+                            }
+
+                            AddProductStep.Attributes -> {
+                                newDraftProduct = newDraftProduct.copy(attributes = it.attributes)
+                            }
+
+                            AddProductStep.Summary -> {
+
+                            }
+                        }
+                    }
+                    saveDraft(newDraftProduct)
                     addProductStateMutable.value = State.Success(it)
                 }.onFailure {
                     addProductStateMutable.value = State.Failure(it)
@@ -98,8 +145,8 @@ class ProductViewModel @Inject constructor(
         }
     }
 
-    fun saveDraft(product: Product.LocalViewModel) {
-        stateHandle[CURRENT_PRODUCT_KEY] = product
+    fun saveDraft(product: Product) {
+        stateHandle[CURRENT_PRODUCT_KEY] = product.toLocalViewModel()
         Log.d(TAG, "saveDraft: $product")
     }
 
