@@ -1,20 +1,31 @@
 package ke.co.xently.products.di
 
-import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ke.co.xently.products.datasource.LocalProductDataSource
 import ke.co.xently.products.datasource.ProductDataSource
 import ke.co.xently.products.datasource.RemoteProductDataSource
+import ke.co.xently.products.datasource.remoteservices.ProductService
 import ke.co.xently.products.models.Product
+import retrofit2.Retrofit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DatasourceModule {
-    @Binds
-    abstract fun bindRemoteDataSource(dataSource: RemoteProductDataSource): ProductDataSource<Product.RemoteRequest, Product.RemoteResponse>
+object DatasourceModule {
+    @Provides
+    @Singleton
+    fun provideRemoteDataSource(retrofit: Retrofit): ProductDataSource<Product.RemoteRequest, Product.RemoteResponse> {
+        return RemoteProductDataSource(
+            service = retrofit.create(ProductService::class.java),
+        )
+    }
 
-    @Binds
-    abstract fun bindLocalDataSource(dataSource: LocalProductDataSource): ProductDataSource<Product.LocalEntityRequest, Product.LocalEntityResponse>
+    @Provides
+    @Singleton
+    fun provideLocalDataSource(): ProductDataSource<Product.LocalEntityRequest, Product.LocalEntityResponse> {
+        return LocalProductDataSource()
+    }
 }

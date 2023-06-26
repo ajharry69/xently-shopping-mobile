@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package ke.co.xently.products.ui
 
+import android.Manifest
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
@@ -16,6 +19,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import ke.co.xently.locationtracker.ComposePreviewMultiplePermissionsState
+import ke.co.xently.locationtracker.LocationTrackerViewModel
+import ke.co.xently.locationtracker.LocationTrackingState
 import ke.co.xently.products.models.Attribute
 import ke.co.xently.products.models.AttributeValue
 import ke.co.xently.products.models.Brand
@@ -41,15 +50,24 @@ fun AddProductScreen(
     modifier: Modifier,
     snackbarHostState: SnackbarHostState,
     viewModel: ProductViewModel = hiltViewModel(),
+    locationTrackerViewModel: LocationTrackerViewModel = hiltViewModel(),
 ) {
     val addProductStep: AddProductStep by viewModel.currentlyActiveStep.collectAsState()
     val product: Product.LocalViewModel by viewModel.product.collectAsState()
 
+    val locationPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    )
+
     AddProductScreen(
         addProductStep = addProductStep,
         modifier = modifier,
-        product = product,
+        locationPermissions = locationPermissions,
         snackbarHostState = snackbarHostState,
+        product = product,
         brandSuggestionsState = viewModel.brandSuggestions,
         addProductState = viewModel.addProductState,
         attributeSuggestionsState = viewModel.attributeSuggestions,
@@ -57,31 +75,34 @@ fun AddProductScreen(
         storeSuggestionsState = viewModel.storeSuggestions,
         shopSuggestionsState = viewModel.shopSuggestions,
         productSuggestionsState = viewModel.productSuggestions,
-        measurementUnitSuggestionsState = viewModel.measurementUnitSuggestions,
+        locationTrackingState = locationTrackerViewModel.locationTrackingState,
+        isGPSEnabledState = locationTrackerViewModel.isGPSEnabled,
+        getCurrentLocation = locationTrackerViewModel::getCurrentLocation,
         savePermanently = viewModel::savePermanently,
         saveDraft = viewModel::saveDraft,
         saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
         searchBrands = viewModel::searchBrand,
-        searchAttribute = viewModel::searchAttribute,
         searchAttributeValue = viewModel::searchAttributeValue,
+        searchAttribute = viewModel::searchAttribute,
         searchStores = viewModel::searchStore,
         onStoreSearchSuggestionSelected = viewModel::clearStoreSearchSuggestions,
         searchShops = viewModel::searchShop,
         onShopSearchSuggestionSelected = viewModel::clearShopSearchSuggestions,
         searchProductNames = viewModel::searchProductName,
         onProductSearchSuggestionSelected = viewModel::clearProductSearchSuggestions,
+        measurementUnitSuggestionsState = viewModel.measurementUnitSuggestions,
         searchMeasurementUnits = viewModel::searchMeasurementUnit,
         onMeasurementUnitSearchSuggestionSelected = viewModel::clearMeasurementUnitSearchSuggestions,
         onBrandSearchSuggestionSelected = { viewModel.clearBrandSearchSuggestions() },
         onAttributeValueSuggestionClicked = { viewModel.clearAttributeValueSuggestions() },
-        onAttributeSuggestionClicked = { viewModel.clearAttributeSuggestions() },
-    )
+    ) { viewModel.clearAttributeSuggestions() }
 }
 
 @Composable
 fun AddProductScreen(
     addProductStep: AddProductStep,
     modifier: Modifier,
+    locationPermissions: MultiplePermissionsState,
     snackbarHostState: SnackbarHostState,
     product: Product.LocalViewModel,
     brandSuggestionsState: StateFlow<List<Brand>>,
@@ -91,6 +112,9 @@ fun AddProductScreen(
     storeSuggestionsState: StateFlow<List<Store>>,
     shopSuggestionsState: StateFlow<List<Shop>>,
     productSuggestionsState: StateFlow<List<Product>>,
+    locationTrackingState: StateFlow<LocationTrackingState>,
+    isGPSEnabledState: StateFlow<Boolean>,
+    getCurrentLocation: () -> Unit,
     savePermanently: (Array<AddProductStep>) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
@@ -140,18 +164,24 @@ fun AddProductScreen(
                     AddStorePage(
                         modifier = Modifier.fillMaxSize(),
                         store = product.store,
+                        snackbarHostState = snackbarHostState,
                         suggestionsState = storeSuggestionsState,
+                        locationTrackingState = locationTrackingState,
+                        isGPSEnabledState = isGPSEnabledState,
+                        locationPermissions = locationPermissions,
                         search = searchStores,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
                         },
                         onSearchSuggestionSelected = onStoreSearchSuggestionSelected,
-                    ) {
-                        productDraft(it)
-                            .let(saveDraft)
-                        navigateToNext()
-                    }
+                        onContinueClick = {
+                            productDraft(it)
+                                .let(saveDraft)
+                            navigateToNext()
+                        },
+                        getCurrentLocation = getCurrentLocation,
+                    )
                 }
 
                 AddProductStep.Shop -> {
@@ -322,6 +352,8 @@ private fun AddProductScreenPreview() {
         AddProductScreen(
             addProductStep = AddProductStep.valueOfOrdinalOrFirstByOrdinal(0),
             modifier = Modifier.fillMaxSize(),
+            locationPermissions = ComposePreviewMultiplePermissionsState,
+            snackbarHostState = SnackbarHostState(),
             product = Product.LocalViewModel.default,
             brandSuggestionsState = MutableStateFlow(emptyList()),
             addProductState = MutableStateFlow(State.Idle),
@@ -330,25 +362,26 @@ private fun AddProductScreenPreview() {
             storeSuggestionsState = MutableStateFlow(emptyList()),
             shopSuggestionsState = MutableStateFlow(emptyList()),
             productSuggestionsState = MutableStateFlow(emptyList()),
-            measurementUnitSuggestionsState = MutableStateFlow(emptyList()),
+            locationTrackingState = MutableStateFlow(LocationTrackingState.Idle),
+            isGPSEnabledState = MutableStateFlow(false),
+            getCurrentLocation = {},
             savePermanently = {},
             saveDraft = {},
             saveCurrentlyActiveStep = {},
             searchBrands = {},
-            searchAttribute = {},
             searchAttributeValue = {},
+            searchAttribute = {},
             searchStores = {},
             onStoreSearchSuggestionSelected = {},
             searchShops = {},
             onShopSearchSuggestionSelected = {},
             searchProductNames = {},
             onProductSearchSuggestionSelected = {},
+            measurementUnitSuggestionsState = MutableStateFlow(emptyList()),
             searchMeasurementUnits = {},
             onMeasurementUnitSearchSuggestionSelected = {},
             onBrandSearchSuggestionSelected = {},
             onAttributeValueSuggestionClicked = {},
-            onAttributeSuggestionClicked = {},
-            snackbarHostState = SnackbarHostState(),
-        )
+        ) {}
     }
 }

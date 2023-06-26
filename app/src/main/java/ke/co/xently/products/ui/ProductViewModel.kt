@@ -1,6 +1,5 @@
 package ke.co.xently.products.ui
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +13,6 @@ import ke.co.xently.products.models.ProductName
 import ke.co.xently.products.models.Shop
 import ke.co.xently.products.models.Store
 import ke.co.xently.products.repositories.ProductRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -23,7 +21,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
@@ -52,7 +49,6 @@ class ProductViewModel @Inject constructor(
         MutableStateFlow<List<AttributeValue>>(emptyList())
 
     val attributeValueSuggestions = attributeValueSuggestionsMutable.asStateFlow()
-
 
     private val attributeSuggestionsMutable = MutableStateFlow<List<Attribute>>(emptyList())
 
@@ -84,11 +80,9 @@ class ProductViewModel @Inject constructor(
     }
 
     fun savePermanently(stepsToPersist: Array<AddProductStep>) {
-        Log.i(TAG, "savePermanently: steps to persist: $stepsToPersist")
         viewModelScope.launch {
             this@ProductViewModel.product.map(repository::addProduct).onStart {
                 addProductStateMutable.value = State.Loading
-                delay(30.seconds)
             }.collectLatest { result ->
                 result.onSuccess {
                     var newDraftProduct = Product.LocalViewModel.default
@@ -147,7 +141,6 @@ class ProductViewModel @Inject constructor(
 
     fun saveDraft(product: Product) {
         stateHandle[CURRENT_PRODUCT_KEY] = product.toLocalViewModel()
-        Log.d(TAG, "saveDraft: $product")
     }
 
     fun searchAttributeValue(attribute: AttributeValue) {
@@ -175,7 +168,7 @@ class ProductViewModel @Inject constructor(
             store.toLocalViewModel().copy(
                 name = buildString { append(store.name); if (!endsWith(' ')) append(' '); append(it + 1) },
                 shop = store.shop.toLocalViewModel().copy(
-                    name = "Shop name ${Random.nextInt()}"
+                    name = "Shop name${Random.nextInt()}"
                 ),
             )
         }

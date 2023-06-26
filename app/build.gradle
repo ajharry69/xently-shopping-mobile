@@ -67,6 +67,19 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
     kapt 'com.google.dagger:hilt-compiler:2.46.1'
 
+    implementation "com.google.android.gms:play-services-location:21.0.1"
+
+    // Permissions
+    implementation "com.google.accompanist:accompanist-permissions:0.31.1-alpha"
+
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    // https://square.github.io/okhttp/
+    implementation(platform('com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.10'))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation 'com.squareup.okio:okio:3.2.0'
+
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
