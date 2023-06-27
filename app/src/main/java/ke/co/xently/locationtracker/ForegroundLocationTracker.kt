@@ -136,13 +136,12 @@ fun isGPSEnabled(context: Context): Boolean {
 @SuppressLint("MissingPermission")
 @Composable
 fun ForegroundLocationTracker(
-    permissionsState: LocationPermissionsState,
     /**
      * Will be used to show a prompt for enabling GPS if it is disabled
      * or requesting location permissions if non has been granted.
      */
     snackbarHostState: SnackbarHostState,
-    vararg keys: Any?,
+    permissionsState: LocationPermissionsState = LocationPermissionsState.CoarseAndFine,
     onLocationUpdates: (Location) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -169,7 +168,6 @@ fun ForegroundLocationTracker(
         isGPSEnabled,
         permissions.shouldShowRationale,
         permissions.allPermissionsGranted,
-        *keys,
     ) {
         if (!permissions.allPermissionsGranted || permissions.shouldShowRationale) {
             scope.launch {

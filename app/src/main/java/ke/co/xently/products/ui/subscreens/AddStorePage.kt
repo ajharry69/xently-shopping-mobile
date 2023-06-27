@@ -21,11 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.PointOfInterest
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.DragState
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -41,6 +44,7 @@ import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AddStorePage(
     modifier: Modifier,
@@ -170,8 +174,17 @@ fun AddStorePage(
                 }
             }
 
+            val locationPermissions = permissionsState()
+
+            val (mapUiSettings, mapProperties) = remember(locationPermissions.allPermissionsGranted) {
+                MapUiSettings(myLocationButtonEnabled = locationPermissions.allPermissionsGranted) to
+                        MapProperties(isMyLocationEnabled = locationPermissions.allPermissionsGranted)
+            }
+
             GoogleMap(
                 modifier = Modifier.matchParentSize(),
+                uiSettings = mapUiSettings,
+                properties = mapProperties,
                 cameraPositionState = cameraPositionState,
                 contentDescription = stringResource(R.string.xently_content_description_store_map),
                 onMapLoaded = {
