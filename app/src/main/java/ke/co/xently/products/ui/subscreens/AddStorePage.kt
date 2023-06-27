@@ -1,9 +1,6 @@
 package ke.co.xently.products.ui.subscreens
 
-import android.content.Intent
 import android.content.res.Configuration
-import android.provider.Settings
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,13 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,13 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.PointOfInterest
 import com.google.maps.android.compose.CameraPositionState
@@ -41,10 +30,8 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import ke.co.xently.R
-import ke.co.xently.locationtracker.ComposePreviewMultiplePermissionsState
-import ke.co.xently.locationtracker.LocationTrackingState
-import ke.co.xently.locationtracker.exceptions.GPSNotEnabledException
-import ke.co.xently.locationtracker.exceptions.MissingLocationTrackingPermissionsException
+import ke.co.xently.locationtracker.ForegroundLocationTracker
+import ke.co.xently.locationtracker.LocationPermissionsState
 import ke.co.xently.products.models.Store
 import ke.co.xently.products.models.toLocation
 import ke.co.xently.products.ui.components.AddProductPage
@@ -54,21 +41,17 @@ import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AddStorePage(
     modifier: Modifier,
     store: Store,
     snackbarHostState: SnackbarHostState,
     suggestionsState: StateFlow<List<Store>>,
-    locationTrackingState: StateFlow<LocationTrackingState>,
-    isGPSEnabledState: StateFlow<Boolean>,
-    locationPermissions: MultiplePermissionsState,
+    permissionsState: LocationPermissionsState,
     search: (Store) -> Unit,
     saveDraft: (Store) -> Unit,
     onSearchSuggestionSelected: () -> Unit,
     onContinueClick: (Store) -> Unit,
-    getCurrentLocation: () -> Unit,
 ) {
     val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
         query = store.name,
@@ -84,101 +67,12 @@ fun AddStorePage(
         }
     }
 
-    val isGPSEnabled by isGPSEnabledState.collectAsState()
-
-    val currentLocationTrackingState by locationTrackingState.collectAsState()
-
-    LaunchedEffect(locationPermissions.allPermissionsGranted, locationTrackingState, isGPSEnabled) {
-        if (locationPermissions.allPermissionsGranted) {
-            getCurrentLocation()
-        } else {
-            locationPermissions.launchMultiplePermissionRequest()
-        }
-    }
-
-    val context = LocalContext.current
-    LaunchedEffect(
-        isLocationUsable,
-        locationPermissions.shouldShowRationale,
-        currentLocationTrackingState,
+    ForegroundLocationTracker(
+        permissionsState = permissionsState,
+        snackbarHostState = snackbarHostState,
     ) {
-        if (isLocationUsable) return@LaunchedEffect
-
-        suspend fun showLocationRequestRationale() {
-            val result = snackbarHostState.showSnackbar(
-                context.getString(R.string.xently_missing_required_location_permissions),
-                context.getString(R.string.xently_snackbar_action_label_grant)
-                    .toUpperCase(Locale.current),
-                withDismissAction = true,
-                duration = SnackbarDuration.Indefinite,
-            )
-
-            when (result) {
-                SnackbarResult.Dismissed -> {
-
-                }
-
-                SnackbarResult.ActionPerformed -> {
-                    locationPermissions.launchMultiplePermissionRequest()
-                }
-            }
-        }
-
-        if (locationPermissions.shouldShowRationale) {
-            showLocationRequestRationale()
-            return@LaunchedEffect
-        }
-
-        when (val state = currentLocationTrackingState) {
-            is LocationTrackingState.Failure -> {
-                when (state.throwable) {
-                    is GPSNotEnabledException -> {
-                        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                        val canNavigateToGPSSettings =
-                            intent.resolveActivity(context.packageManager) != null
-
-                        val result = snackbarHostState.showSnackbar(
-                            message = context.getString(R.string.xently_gps_tracking_disabled),
-                            actionLabel = if (!canNavigateToGPSSettings) {
-                                null
-                            } else {
-                                context.getString(R.string.xently_snackbar_action_label_enable)
-                                    .toUpperCase(Locale.current)
-                            },
-                            withDismissAction = true,
-                            duration = SnackbarDuration.Indefinite,
-                        )
-
-                        when (result) {
-                            SnackbarResult.Dismissed -> {
-
-                            }
-
-                            SnackbarResult.ActionPerformed -> {
-                                if (canNavigateToGPSSettings) {
-                                    context.startActivity(intent)
-                                }
-                            }
-                        }
-                    }
-
-                    is MissingLocationTrackingPermissionsException -> {
-                        showLocationRequestRationale()
-                    }
-
-                    else -> {
-                        Log.d("AddStorePage", "An unexpected error occurred", state.throwable)
-                    }
-                }
-            }
-
-            LocationTrackingState.Idle -> {
-
-            }
-
-            is LocationTrackingState.Success -> {
-                location = state.data.toLocation()
-            }
+        if (!isLocationUsable) {
+            location = it.toLocation()
         }
     }
 
@@ -327,7 +221,6 @@ fun AddStorePage(
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
@@ -338,13 +231,10 @@ private fun AddStorePagePreview() {
             store = Store.LocalViewModel.default,
             snackbarHostState = SnackbarHostState(),
             suggestionsState = MutableStateFlow(emptyList()),
-            locationTrackingState = MutableStateFlow(LocationTrackingState.Idle),
-            isGPSEnabledState = MutableStateFlow(false),
-            locationPermissions = ComposePreviewMultiplePermissionsState,
+            permissionsState = LocationPermissionsState.Simulated,
             search = {},
             saveDraft = {},
             onSearchSuggestionSelected = {},
-            onContinueClick = {},
         ) {}
     }
 }

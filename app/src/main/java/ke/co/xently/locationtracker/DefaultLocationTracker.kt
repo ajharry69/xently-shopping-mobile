@@ -2,10 +2,9 @@ package ke.co.xently.locationtracker
 
 import android.Manifest
 import android.app.Application
-import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import ke.co.xently.locationtracker.exceptions.GPSNotEnabledException
@@ -22,14 +21,8 @@ class DefaultLocationTracker @Inject constructor(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
     private val application: Application,
 ) : LocationTracker {
-    override fun isGPSEnabled(): Boolean {
-        val locationManager = application.getSystemService(
-            Context.LOCATION_SERVICE
-        ) as LocationManager
-
-        return locationManager
-            .isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
-                locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    companion object {
+        private val TAG = DefaultLocationTracker::class.java.simpleName
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,13 +37,14 @@ class DefaultLocationTracker @Inject constructor(
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
 
-        if (!isGPSEnabled()) {
+        if (!isGPSEnabled(application)) {
             if (!(hasAccessCoarseLocationPermission || hasAccessFineLocationPermission)) {
                 return Result.failure(MissingLocationTrackingPermissionsException())
             }
             return Result.failure(GPSNotEnabledException())
         }
 
+        Log.i(TAG, "Getting current device location...")
         return suspendCancellableCoroutine { cont ->
             fusedLocationProviderClient.lastLocation.apply {
                 addOnSuccessListener {
