@@ -12,7 +12,10 @@ import ke.co.xently.products.models.Product
 import ke.co.xently.products.models.ProductName
 import ke.co.xently.products.models.Shop
 import ke.co.xently.products.models.Store
+import ke.co.xently.products.repositories.MeasurementUnitRepository
 import ke.co.xently.products.repositories.ProductRepository
+import ke.co.xently.products.repositories.ShopRepository
+import ke.co.xently.products.repositories.StoreRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -24,8 +27,11 @@ import kotlin.random.Random
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
-    private val repository: ProductRepository,
     private val stateHandle: SavedStateHandle,
+    private val productRepository: ProductRepository,
+    private val storeRepository: StoreRepository,
+    private val shopRepository: ShopRepository,
+    private val measurementUnitRepository: MeasurementUnitRepository,
 ) : ViewModel() {
     companion object {
         private val TAG = ProductViewModel::class.java.simpleName
@@ -81,7 +87,7 @@ class ProductViewModel @Inject constructor(
 
     fun savePermanently(stepsToPersist: Array<AddProductStep>) {
         viewModelScope.launch {
-            this@ProductViewModel.product.map(repository::addProduct).onStart {
+            this@ProductViewModel.product.map(productRepository::addProduct).onStart {
                 addProductStateMutable.value = State.Loading
             }.collectLatest { result ->
                 result.onSuccess {
@@ -164,13 +170,11 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchStore(store: Store) {
-        storeSuggestionsMutable.value = listOf(store) + List(Random.nextInt(0, 10)) {
-            store.toLocalViewModel().copy(
-                name = buildString { append(store.name); if (!endsWith(' ')) append(' '); append(it + 1) },
-                shop = store.shop.toLocalViewModel().copy(
-                    name = "Shop name${Random.nextInt()}"
-                ),
-            )
+        viewModelScope.launch {
+            storeRepository.getStoreSearchSuggestions(query = store)
+                .onSuccess {
+                    storeSuggestionsMutable.value = listOf(store) + it
+                }
         }
     }
 
@@ -179,10 +183,11 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchShop(shop: Shop) {
-        shopSuggestionsMutable.value = listOf(shop) + List(Random.nextInt(0, 10)) {
-            shop.toLocalViewModel().copy(
-                name = buildString { append(shop.name); if (!endsWith(' ')) append(' '); append(it + 1) },
-            )
+        viewModelScope.launch {
+            shopRepository.getShopSearchSuggestions(query = shop)
+                .onSuccess {
+                    shopSuggestionsMutable.value = listOf(shop) + it
+                }
         }
     }
 
@@ -191,19 +196,13 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchProductName(name: ProductName) {
-        productSuggestionsMutable.value =
-            listOf(Product.LocalViewModel.default.copy(name = name.toLocalViewModel())) + List(
-                Random.nextInt(0, 10)
-            ) {
-                val productName = name.toLocalViewModel().copy(name = buildString {
-                    append(name.name)
-                    if (!endsWith(' ')) {
-                        append(' ')
-                    }
-                    append(it + 1)
-                })
-                Product.LocalViewModel.default.copy(name = productName)
-            }
+        viewModelScope.launch {
+            val query = Product.LocalViewModel.default.copy(name = name.toLocalViewModel())
+            productRepository.getProductSearchSuggestions(query = query)
+                .onSuccess {
+                    productSuggestionsMutable.value = listOf(query) + it
+                }
+        }
     }
 
     fun clearProductSearchSuggestions() {
@@ -211,17 +210,11 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchMeasurementUnit(unit: MeasurementUnit) {
-        measurementUnitSuggestionsMutable.value = listOf(unit) + List(
-            Random.nextInt(0, 10)
-        ) {
-            val name = buildString {
-                append(unit.name)
-                if (!endsWith(' ')) {
-                    append(' ')
+        viewModelScope.launch {
+            measurementUnitRepository.getMeasurementUnitSearchSuggestions(query = unit)
+                .onSuccess {
+                    measurementUnitSuggestionsMutable.value = listOf(unit) + it
                 }
-                append(it + 1)
-            }
-            unit.toLocalViewModel().copy(name = name)
         }
     }
 

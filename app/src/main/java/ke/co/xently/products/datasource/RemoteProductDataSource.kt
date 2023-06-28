@@ -5,6 +5,7 @@ import ke.co.xently.products.models.Product
 import ke.co.xently.remotedatasource.Http.sendRequest
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.random.Random
 
 @Singleton
 class RemoteProductDataSource @Inject constructor(
@@ -16,7 +17,16 @@ class RemoteProductDataSource @Inject constructor(
         }.getOrThrow()
     }
 
-    override suspend fun getProductById(id: Long): Product.RemoteResponse? {
-        TODO("Not yet implemented")
+    override suspend fun getProductSearchSuggestions(query: Product.RemoteRequest): List<Product.RemoteResponse> {
+        return List(Random.nextInt(0, 10)) {
+            query.toRemoteResponse().run {
+                copy(name = name.run {
+                    copy(name = name.plus(it + 1))
+                })
+            }
+        }
+        return sendRequest {
+            service.searchSuggestions(query = query.name.name)
+        }.getOrThrow()
     }
 }

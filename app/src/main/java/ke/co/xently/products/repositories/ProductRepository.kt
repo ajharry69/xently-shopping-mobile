@@ -2,7 +2,6 @@ package ke.co.xently.products.repositories
 
 import android.util.Log
 import ke.co.xently.products.datasource.ProductDataSource
-import ke.co.xently.products.exceptions.ProductNotFoundException
 import ke.co.xently.products.models.Product
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,20 +13,23 @@ class ProductRepository @Inject constructor(
 ) {
     suspend fun addProduct(product: Product): Result<Product.LocalViewModel> {
         Log.i(TAG, "addProduct: $product")
-        return remoteDataSource.addProduct(product.toRemoteRequest()).let {
-            localDataSource.addProduct(it.toLocalEntityRequest())
-        }.let {
-            Result.success(it.toLocalViewModel())
+        return try {
+            remoteDataSource.addProduct(product.toRemoteRequest()).let {
+                localDataSource.addProduct(it.toLocalEntityRequest())
+            }.let {
+                Result.success(it.toLocalViewModel())
+            }
+        } catch (ex: Exception) {
+            Result.failure(ex)
         }
     }
 
-    suspend fun getProductById(id: Long): Result<Product.LocalViewModel> {
-        return (localDataSource.getProductById(id)?.toLocalViewModel()
-            ?: remoteDataSource.getProductById(id)?.let {
-                localDataSource.addProduct(it.toLocalEntityRequest()).toLocalViewModel()
-            }
-                )?.let { Result.success(it) }
-            ?: Result.failure(ProductNotFoundException("""Product with ID "$id" could not be found!"""))
+    suspend fun getProductSearchSuggestions(query: Product): Result<List<Product.LocalViewModel>> {
+        return localDataSource.getProductSearchSuggestions(query.toLocalEntityRequest()).ifEmpty {
+            remoteDataSource.getProductSearchSuggestions(query.toRemoteRequest())
+        }.map { it.toLocalViewModel() }.let {
+            Result.success(it)
+        }
     }
 
     companion object {

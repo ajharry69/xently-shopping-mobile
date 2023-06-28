@@ -11,7 +11,7 @@ class LocalProductDataSource @Inject constructor() :
         return product.toLocalEntityResponse()
     }
 
-    override suspend fun getProductById(id: Long): Product.LocalEntityResponse? {
-        TODO("Not yet implemented")
+    override suspend fun getProductSearchSuggestions(query: Product.LocalEntityRequest): List<Product.LocalEntityResponse> {
+        return emptyList()
     }
 }
