@@ -6,16 +6,16 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Location(
-    val lat: Double,
-    val lon: Double,
+    val latitude: Double,
+    val longitude: Double,
 ) : Parcelable {
     fun isUsable(): Boolean {
-        return !(lat.isNaN() && lon.isNaN())
+        return !(latitude.isNaN() && longitude.isNaN())
     }
 
     override fun hashCode(): Int {
-        var result = lat.hashCode()
-        result = 31 * result + lon.hashCode()
+        var result = latitude.hashCode()
+        result = 31 * result + longitude.hashCode()
         return result
     }
 
@@ -25,28 +25,28 @@ data class Location(
 
         other as Location
 
-        if (lat != other.lat) return false
-        if (lon != other.lon) return false
+        if (latitude != other.latitude) return false
+        if (longitude != other.longitude) return false
 
         return true
     }
 
     fun toLatLng(): LatLng {
-        return LatLng(lat, lon)
+        return LatLng(latitude, longitude)
     }
 
     companion object {
         val default = Location(
-            lat = Double.NaN,
-            lon = Double.NaN,
+            latitude = Double.NaN,
+            longitude = Double.NaN,
         )
     }
 }
 
 fun android.location.Location.toLocation(): Location {
-    return Location(lat = latitude, lon = longitude)
+    return Location(latitude = latitude, longitude = longitude)
 }
 
 fun LatLng.toLocation(): Location {
-    return Location(lat = latitude, lon = longitude)
+    return Location(latitude = latitude, longitude = longitude)
 }

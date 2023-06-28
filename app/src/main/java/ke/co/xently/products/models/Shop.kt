@@ -38,6 +38,10 @@ sealed interface Shop {
         override val name: String,
         override val ecommerceSiteUrl: String?,
     ) : Shop, Parcelable {
+        override fun toString(): String {
+            return name
+        }
+
         companion object {
             val default = LocalViewModel(
                 id = -1,

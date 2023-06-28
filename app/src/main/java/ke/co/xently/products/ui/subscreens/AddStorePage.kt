@@ -62,7 +62,7 @@ fun AddStorePage(
         suggestionsState = suggestionsState,
     )
 
-    var location by remember {
+    var location by remember(store.location) {
         mutableStateOf(store.location)
     }
     val isLocationUsable by remember(location) {
@@ -109,7 +109,7 @@ fun AddStorePage(
             },
             onSuggestionSelected = saveDraft,
             onSearchSuggestionSelected = onSearchSuggestionSelected,
-            suggestionContent = { Text(text = it.name) },
+            suggestionContent = { Text(text = it.toString()) },
             placeholder = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
             },

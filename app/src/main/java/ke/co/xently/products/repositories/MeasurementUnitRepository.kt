@@ -11,10 +11,15 @@ class MeasurementUnitRepository @Inject constructor(
     private val localDataSource: MeasurementUnitDataSource<MeasurementUnit.LocalEntityRequest, MeasurementUnit.LocalEntityResponse>,
 ) {
     suspend fun getMeasurementUnitSearchSuggestions(query: MeasurementUnit): Result<List<MeasurementUnit.LocalViewModel>> {
-        return localDataSource.getMeasurementUnitSearchSuggestions(query.toLocalEntityRequest()).ifEmpty {
-            remoteDataSource.getMeasurementUnitSearchSuggestions(query.toRemoteRequest())
-        }.map { it.toLocalViewModel() }.let {
-            Result.success(it)
+        return try {
+            localDataSource.getMeasurementUnitSearchSuggestions(query.toLocalEntityRequest())
+                .ifEmpty {
+                    remoteDataSource.getMeasurementUnitSearchSuggestions(query.toRemoteRequest())
+                }.map { it.toLocalViewModel() }.let {
+                    Result.success(it)
+                }
+        } catch (ex: Exception) {
+            Result.failure(ex)
         }
     }
 }

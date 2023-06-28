@@ -48,6 +48,19 @@ sealed interface Store {
          */
         val distance: Double?,
     ) : Store, Parcelable {
+        override fun toString(): String {
+            return buildString {
+                append(name)
+
+                shop.toString().takeIf {
+                    it.isNotBlank()
+                }?.let {
+                    append(", ")
+                    append(it)
+                }
+            }
+        }
+
         companion object {
             val default = LocalViewModel(
                 id = -1,

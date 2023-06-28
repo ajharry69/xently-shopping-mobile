@@ -1,5 +1,6 @@
 package ke.co.xently.products.ui
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -47,39 +48,39 @@ class ProductViewModel @Inject constructor(
         CURRENT_PRODUCT_KEY,
         Product.LocalViewModel.default,
     )
-    private val brandSuggestionsMutable = MutableStateFlow<List<Brand>>(emptyList())
+    private val mutableBrandSuggestionsState = MutableStateFlow<List<Brand>>(emptyList())
 
-    val brandSuggestions = brandSuggestionsMutable.asStateFlow()
+    val brandSuggestions = mutableBrandSuggestionsState.asStateFlow()
 
-    private val attributeValueSuggestionsMutable =
+    private val mutableAttributeValueSuggestionsState =
         MutableStateFlow<List<AttributeValue>>(emptyList())
 
-    val attributeValueSuggestions = attributeValueSuggestionsMutable.asStateFlow()
+    val attributeValueSuggestions = mutableAttributeValueSuggestionsState.asStateFlow()
 
-    private val attributeSuggestionsMutable = MutableStateFlow<List<Attribute>>(emptyList())
+    private val mutableAttributeSuggestionsState = MutableStateFlow<List<Attribute>>(emptyList())
 
-    val attributeSuggestions = attributeSuggestionsMutable.asStateFlow()
+    val attributeSuggestions = mutableAttributeSuggestionsState.asStateFlow()
 
-    private val storeSuggestionsMutable = MutableStateFlow<List<Store>>(emptyList())
+    private val mutableStoreSuggestionsState = MutableStateFlow<List<Store>>(emptyList())
 
-    val storeSuggestions = storeSuggestionsMutable.asStateFlow()
+    val storeSuggestions = mutableStoreSuggestionsState.asStateFlow()
 
-    private val shopSuggestionsMutable = MutableStateFlow<List<Shop>>(emptyList())
+    private val mutableShopSuggestionsState = MutableStateFlow<List<Shop>>(emptyList())
 
-    val shopSuggestions = shopSuggestionsMutable.asStateFlow()
+    val shopSuggestions = mutableShopSuggestionsState.asStateFlow()
 
-    private val productSuggestionsMutable = MutableStateFlow<List<Product>>(emptyList())
+    private val mutableProductSuggestionsState = MutableStateFlow<List<Product>>(emptyList())
 
-    val productSuggestions = productSuggestionsMutable.asStateFlow()
+    val productSuggestions = mutableProductSuggestionsState.asStateFlow()
 
-    private val measurementUnitSuggestionsMutable =
+    private val mutableMeasurementUnitSuggestionsState =
         MutableStateFlow<List<MeasurementUnit>>(emptyList())
 
-    val measurementUnitSuggestions = measurementUnitSuggestionsMutable.asStateFlow()
+    val measurementUnitSuggestions = mutableMeasurementUnitSuggestionsState.asStateFlow()
 
-    private val addProductStateMutable = MutableStateFlow<State>(State.Idle)
+    private val mutableSaveProductState = MutableStateFlow<State>(State.Idle)
 
-    val addProductState = addProductStateMutable.asStateFlow()
+    val saveProductState = mutableSaveProductState.asStateFlow()
 
     fun saveCurrentlyActiveStep(step: AddProductStep) {
         stateHandle[CURRENT_ACTIVE_STEP_KEY] = step
@@ -88,7 +89,7 @@ class ProductViewModel @Inject constructor(
     fun savePermanently(stepsToPersist: Array<AddProductStep>) {
         viewModelScope.launch {
             this@ProductViewModel.product.map(productRepository::addProduct).onStart {
-                addProductStateMutable.value = State.Loading
+                mutableSaveProductState.value = State.Loading
             }.collectLatest { result ->
                 result.onSuccess {
                     var newDraftProduct = Product.LocalViewModel.default
@@ -137,9 +138,9 @@ class ProductViewModel @Inject constructor(
                         }
                     }
                     saveDraft(newDraftProduct)
-                    addProductStateMutable.value = State.Success(it)
+                    mutableSaveProductState.value = State.Success(it)
                 }.onFailure {
-                    addProductStateMutable.value = State.Failure(it)
+                    mutableSaveProductState.value = State.Failure(it)
                 }
             }
         }
@@ -150,21 +151,21 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchAttributeValue(attribute: AttributeValue) {
-        attributeValueSuggestionsMutable.value = listOf(attribute) + List(Random(0).nextInt(5)) {
+        mutableAttributeValueSuggestionsState.value = listOf(attribute) + List(Random(0).nextInt(5)) {
             attribute.toLocalViewModel()
                 .copy(value = buildString { append(attribute.value); append(it + 1) })
         }
     }
 
     fun searchAttribute(attribute: Attribute) {
-        attributeSuggestionsMutable.value = listOf(attribute) + List(Random(0).nextInt(5)) {
+        mutableAttributeSuggestionsState.value = listOf(attribute) + List(Random(0).nextInt(5)) {
             attribute.toLocalViewModel()
                 .copy(name = buildString { append(attribute.name); append(it + 1) })
         }
     }
 
     fun searchBrand(brand: Brand) {
-        brandSuggestionsMutable.value = listOf(brand) + List(Random(0).nextInt(5)) {
+        mutableBrandSuggestionsState.value = listOf(brand) + List(Random(0).nextInt(5)) {
             brand.toLocalViewModel().copy(name = buildString { append(brand.name); append(it + 1) })
         }
     }
@@ -173,26 +174,24 @@ class ProductViewModel @Inject constructor(
         viewModelScope.launch {
             storeRepository.getStoreSearchSuggestions(query = store)
                 .onSuccess {
-                    storeSuggestionsMutable.value = listOf(store) + it
+                    mutableStoreSuggestionsState.value = listOf(store) + it
+                }.onFailure {
+                    Log.e(TAG, "searchStore: ${it.localizedMessage}", it)
+                    mutableStoreSuggestionsState.value = listOf(store)
                 }
         }
-    }
-
-    fun clearStoreSearchSuggestions() {
-        storeSuggestionsMutable.value = emptyList()
     }
 
     fun searchShop(shop: Shop) {
         viewModelScope.launch {
             shopRepository.getShopSearchSuggestions(query = shop)
                 .onSuccess {
-                    shopSuggestionsMutable.value = listOf(shop) + it
+                    mutableShopSuggestionsState.value = listOf(shop) + it
+                }.onFailure {
+                    Log.e(TAG, "searchShop: ${it.localizedMessage}", it)
+                    mutableShopSuggestionsState.value = listOf(shop)
                 }
         }
-    }
-
-    fun clearShopSearchSuggestions() {
-        shopSuggestionsMutable.value = emptyList()
     }
 
     fun searchProductName(name: ProductName) {
@@ -200,37 +199,61 @@ class ProductViewModel @Inject constructor(
             val query = Product.LocalViewModel.default.copy(name = name.toLocalViewModel())
             productRepository.getProductSearchSuggestions(query = query)
                 .onSuccess {
-                    productSuggestionsMutable.value = listOf(query) + it
+                    mutableProductSuggestionsState.value = listOf(query) + it
+                }.onFailure {
+                    Log.e(TAG, "searchProductName: ${it.localizedMessage}", it)
+                    mutableProductSuggestionsState.value = listOf(query)
                 }
         }
-    }
-
-    fun clearProductSearchSuggestions() {
-        productSuggestionsMutable.value = emptyList()
     }
 
     fun searchMeasurementUnit(unit: MeasurementUnit) {
         viewModelScope.launch {
             measurementUnitRepository.getMeasurementUnitSearchSuggestions(query = unit)
                 .onSuccess {
-                    measurementUnitSuggestionsMutable.value = listOf(unit) + it
+                    mutableMeasurementUnitSuggestionsState.value = listOf(unit) + it
+                }.onFailure {
+                    Log.e(TAG, "searchMeasurementUnit: ${it.localizedMessage}", it)
+                    mutableMeasurementUnitSuggestionsState.value = listOf(unit)
                 }
         }
     }
 
+    fun clearShopSearchSuggestions() {
+        mutableShopSuggestionsState.value = emptyList()
+    }
+
+    fun clearStoreSearchSuggestions() {
+        mutableStoreSuggestionsState.value = emptyList()
+    }
+
+    fun clearProductSearchSuggestions() {
+        mutableProductSuggestionsState.value = emptyList()
+    }
+
     fun clearMeasurementUnitSearchSuggestions() {
-        measurementUnitSuggestionsMutable.value = emptyList()
+        mutableMeasurementUnitSuggestionsState.value = emptyList()
     }
 
     fun clearBrandSearchSuggestions() {
-        brandSuggestionsMutable.value = emptyList()
+        mutableBrandSuggestionsState.value = emptyList()
     }
 
     fun clearAttributeValueSuggestions() {
-        attributeValueSuggestionsMutable.value = emptyList()
+        mutableAttributeValueSuggestionsState.value = emptyList()
     }
 
     fun clearAttributeSuggestions() {
-        attributeSuggestionsMutable.value = emptyList()
+        mutableAttributeSuggestionsState.value = emptyList()
+    }
+
+    override fun onCleared() {
+        clearShopSearchSuggestions()
+        clearShopSearchSuggestions()
+        clearProductSearchSuggestions()
+        clearMeasurementUnitSearchSuggestions()
+        clearAttributeSuggestions()
+        clearAttributeValueSuggestions()
+        super.onCleared()
     }
 }

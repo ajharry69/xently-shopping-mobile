@@ -53,7 +53,7 @@ fun AddProductScreen(
         locationPermissionsState = LocationPermissionsState.CoarseAndFine,
         snackbarHostState = snackbarHostState,
         brandSuggestionsState = viewModel.brandSuggestions,
-        addProductState = viewModel.addProductState,
+        addProductState = viewModel.saveProductState,
         attributeSuggestionsState = viewModel.attributeSuggestions,
         attributeValueSuggestionsState = viewModel.attributeValueSuggestions,
         storeSuggestionsState = viewModel.storeSuggestions,

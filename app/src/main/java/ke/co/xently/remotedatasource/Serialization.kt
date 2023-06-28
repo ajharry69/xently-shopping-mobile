@@ -38,7 +38,7 @@ object Serialization {
         .setExclusionStrategies(getExclusionStrategy())
         .serializeNulls()
         .setDateFormat("yyyy-MM-dd'T'HH:mmZ")
-        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
         // https://www.javadoc.io/doc/com.google.code.gson/gson/2.8.0/com/google/gson/TypeAdapter.html
         .registerTypeAdapter(Uri::class.java, object : TypeAdapter<Uri>() {
             override fun write(out: JsonWriter?, value: Uri?) {

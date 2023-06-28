@@ -11,10 +11,14 @@ class StoreRepository @Inject constructor(
     private val localDataSource: StoreDataSource<Store.LocalEntityRequest, Store.LocalEntityResponse>,
 ) {
     suspend fun getStoreSearchSuggestions(query: Store): Result<List<Store.LocalViewModel>> {
-        return localDataSource.getStoreSearchSuggestions(query.toLocalEntityRequest()).ifEmpty {
-            remoteDataSource.getStoreSearchSuggestions(query.toRemoteRequest())
-        }.map { it.toLocalViewModel() }.let {
-            Result.success(it)
+        return try {
+            localDataSource.getStoreSearchSuggestions(query.toLocalEntityRequest()).ifEmpty {
+                remoteDataSource.getStoreSearchSuggestions(query.toRemoteRequest())
+            }.map { it.toLocalViewModel() }.let {
+                Result.success(it)
+            }
+        } catch (ex: Exception) {
+            Result.failure(ex)
         }
     }
 }
