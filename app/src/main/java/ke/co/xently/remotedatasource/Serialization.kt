@@ -37,7 +37,7 @@ object Serialization {
         .addDeserializationExclusionStrategy(getExclusionStrategy(DESERIALIZATION))
         .setExclusionStrategies(getExclusionStrategy())
         .serializeNulls()
-        .setDateFormat("yyyy-MM-dd'T'HH:mmZ")
+        .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
         // https://www.javadoc.io/doc/com.google.code.gson/gson/2.8.0/com/google/gson/TypeAdapter.html
         .registerTypeAdapter(Uri::class.java, object : TypeAdapter<Uri>() {

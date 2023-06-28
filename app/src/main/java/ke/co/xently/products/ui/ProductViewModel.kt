@@ -151,10 +151,11 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchAttributeValue(attribute: AttributeValue) {
-        mutableAttributeValueSuggestionsState.value = listOf(attribute) + List(Random(0).nextInt(5)) {
-            attribute.toLocalViewModel()
-                .copy(value = buildString { append(attribute.value); append(it + 1) })
-        }
+        mutableAttributeValueSuggestionsState.value =
+            listOf(attribute) + List(Random(0).nextInt(5)) {
+                attribute.toLocalViewModel()
+                    .copy(value = buildString { append(attribute.value); append(it + 1) })
+            }
     }
 
     fun searchAttribute(attribute: Attribute) {

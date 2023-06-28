@@ -25,10 +25,14 @@ class ProductRepository @Inject constructor(
     }
 
     suspend fun getProductSearchSuggestions(query: Product): Result<List<Product.LocalViewModel>> {
-        return localDataSource.getProductSearchSuggestions(query.toLocalEntityRequest()).ifEmpty {
-            remoteDataSource.getProductSearchSuggestions(query.toRemoteRequest())
-        }.map { it.toLocalViewModel() }.let {
-            Result.success(it)
+        return try {
+            localDataSource.getProductSearchSuggestions(query.toLocalEntityRequest()).ifEmpty {
+                remoteDataSource.getProductSearchSuggestions(query.toRemoteRequest())
+            }.map { it.toLocalViewModel() }.let {
+                Result.success(it)
+            }
+        } catch (ex: Exception) {
+            Result.failure(ex)
         }
     }
 

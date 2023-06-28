@@ -86,7 +86,7 @@ private sealed interface GeneralDetailUIState {
 @Composable
 fun AddGeneralDetailsPage(
     modifier: Modifier,
-    product: Product,
+    product: Product.LocalViewModel,
     onPreviousClick: () -> Unit,
     onContinueClick: (Product) -> Unit,
 ) {

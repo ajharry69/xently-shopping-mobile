@@ -5,7 +5,7 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface MeasurementUnitService {
-    @GET("stores/")
+    @GET("measurement-units")
     suspend fun searchSuggestions(
         @Query("q")
         query: String,
@@ -15,5 +15,5 @@ interface MeasurementUnitService {
         cacheControl: String = "only-if-cached",
         @QueryMap
         queries: Map<String, String> = emptyMap(),
-    ): Response<List<MeasurementUnit.RemoteResponse>>
+    ): Response<RemoteSearchResponse<MeasurementUnit.RemoteResponse>>
 }

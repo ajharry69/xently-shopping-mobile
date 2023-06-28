@@ -1,12 +1,11 @@
 package ke.co.xently.products.datasource.remoteservices
 
-import ke.co.xently.products.models.Product
 import ke.co.xently.products.models.Shop
 import retrofit2.Response
 import retrofit2.http.*
 
 interface ShopService {
-    @GET("shops/")
+    @GET("shops")
     suspend fun searchSuggestions(
         @Query("q")
         query: String,
@@ -16,5 +15,5 @@ interface ShopService {
         cacheControl: String = "only-if-cached",
         @QueryMap
         queries: Map<String, String> = emptyMap(),
-    ): Response<List<Shop.RemoteResponse>>
+    ): Response<RemoteSearchResponse<Shop.RemoteResponse>>
 }

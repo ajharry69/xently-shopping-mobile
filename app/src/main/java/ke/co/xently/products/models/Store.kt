@@ -50,7 +50,9 @@ sealed interface Store {
     ) : Store, Parcelable {
         override fun toString(): String {
             return buildString {
-                append(name)
+                if (name.isNotBlank()) {
+                    append(name)
+                }
 
                 shop.toString().takeIf {
                     it.isNotBlank()
