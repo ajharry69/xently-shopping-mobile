@@ -8,6 +8,8 @@ import ke.co.xently.R
 import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -114,7 +116,7 @@ sealed interface Product {
     ) : Product {
         companion object {
             val DATE_TIME_PURCHASED_FORMAT: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
         }
     }
 
@@ -211,7 +213,9 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
+                        .withZoneSameInstant(ZoneOffset.UTC)
+                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
                     attributes = attributes.map { it.toRemoteRequest() },
                 )
@@ -227,7 +231,9 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
+                        .withZoneSameInstant(ZoneOffset.UTC)
+                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
                     attributes = attributes.map { it.toRemoteRequest() },
                 )
@@ -243,7 +249,9 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
+                        .withZoneSameInstant(ZoneOffset.UTC)
+                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
                     attributes = attributes.map { it.toRemoteRequest() },
                 )

@@ -8,22 +8,4 @@ sealed class CacheControl(private val name: String) {
     object NoCache : CacheControl("no-cache")
 
     object OnlyIfCached : CacheControl("only-if-cached")
-
-    companion object {
-        fun getOrThrow(lookup: String): CacheControl {
-            return when (lookup) {
-                NoCache.toString() -> {
-                    NoCache
-                }
-
-                OnlyIfCached.toString() -> {
-                    OnlyIfCached
-                }
-
-                else -> {
-                    throw NotImplementedError()
-                }
-            }
-        }
-    }
 }
