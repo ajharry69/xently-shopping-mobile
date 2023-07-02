@@ -13,6 +13,9 @@ import ke.co.xently.products.models.Product
 import ke.co.xently.products.models.ProductName
 import ke.co.xently.products.models.Shop
 import ke.co.xently.products.models.Store
+import ke.co.xently.products.repositories.AttributeRepository
+import ke.co.xently.products.repositories.AttributeValueRepository
+import ke.co.xently.products.repositories.BrandRepository
 import ke.co.xently.products.repositories.MeasurementUnitRepository
 import ke.co.xently.products.repositories.ProductRepository
 import ke.co.xently.products.repositories.ShopRepository
@@ -24,7 +27,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
@@ -32,6 +34,9 @@ class ProductViewModel @Inject constructor(
     private val productRepository: ProductRepository,
     private val storeRepository: StoreRepository,
     private val shopRepository: ShopRepository,
+    private val brandRepository: BrandRepository,
+    private val attributeRepository: AttributeRepository,
+    private val attributeValueRepository: AttributeValueRepository,
     private val measurementUnitRepository: MeasurementUnitRepository,
 ) : ViewModel() {
     companion object {
@@ -151,23 +156,38 @@ class ProductViewModel @Inject constructor(
     }
 
     fun searchAttributeValue(attribute: AttributeValue) {
-        mutableAttributeValueSuggestionsState.value =
-            listOf(attribute) + List(Random(0).nextInt(5)) {
-                attribute.toLocalViewModel()
-                    .copy(value = buildString { append(attribute.value); append(it + 1) })
-            }
+        viewModelScope.launch {
+            attributeValueRepository.getAttributeValueSearchSuggestions(query = attribute)
+                .onSuccess {
+                    mutableAttributeValueSuggestionsState.value = listOf(attribute) + it
+                }.onFailure {
+                    Log.e(TAG, "searchAttributeValue: ${it.localizedMessage}", it)
+                    mutableAttributeValueSuggestionsState.value = listOf(attribute)
+                }
+        }
     }
 
     fun searchAttribute(attribute: Attribute) {
-        mutableAttributeSuggestionsState.value = listOf(attribute) + List(Random(0).nextInt(5)) {
-            attribute.toLocalViewModel()
-                .copy(name = buildString { append(attribute.name); append(it + 1) })
+        viewModelScope.launch {
+            attributeRepository.getAttributeSearchSuggestions(query = attribute)
+                .onSuccess {
+                    mutableAttributeSuggestionsState.value = listOf(attribute) + it
+                }.onFailure {
+                    Log.e(TAG, "searchAttribute: ${it.localizedMessage}", it)
+                    mutableAttributeSuggestionsState.value = listOf(attribute)
+                }
         }
     }
 
     fun searchBrand(brand: Brand) {
-        mutableBrandSuggestionsState.value = listOf(brand) + List(Random(0).nextInt(5)) {
-            brand.toLocalViewModel().copy(name = buildString { append(brand.name); append(it + 1) })
+        viewModelScope.launch {
+            brandRepository.getBrandSearchSuggestions(query = brand)
+                .onSuccess {
+                    mutableBrandSuggestionsState.value = listOf(brand) + it
+                }.onFailure {
+                    Log.e(TAG, "searchBrand: ${it.localizedMessage}", it)
+                    mutableBrandSuggestionsState.value = listOf(brand)
+                }
         }
     }
 
