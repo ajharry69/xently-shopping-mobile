@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import ke.co.xently.products.ui.AddProductScreen
-import ke.co.xently.recommendations.ui.RecommendationRequestScreen
+import ke.co.xently.features.products.ui.AddProductScreen
+import ke.co.xently.features.recommendations.ui.RecommendationRequestScreen
 import ke.co.xently.ui.theme.XentlyTheme
 
 @AndroidEntryPoint
