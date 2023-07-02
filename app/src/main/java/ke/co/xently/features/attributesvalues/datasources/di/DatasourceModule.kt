@@ -7,8 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import ke.co.xently.features.attributesvalues.datasources.AttributeValueDataSource
 import ke.co.xently.features.attributesvalues.datasources.LocalAttributeValueDataSource
 import ke.co.xently.features.attributesvalues.datasources.RemoteAttributeValueDataSource
+import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueService
 import ke.co.xently.features.attributesvalues.models.AttributeValue
-import ke.co.xently.features.products.datasources.remoteservices.AttributeValueService
 import retrofit2.Retrofit
 import javax.inject.Singleton
 

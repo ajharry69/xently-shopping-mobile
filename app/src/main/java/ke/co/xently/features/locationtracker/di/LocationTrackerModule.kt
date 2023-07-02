@@ -1,4 +1,4 @@
-package ke.co.xently.locationtracker.di
+package ke.co.xently.features.locationtracker.di
 
 import android.app.Application
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -7,8 +7,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ke.co.xently.locationtracker.DefaultLocationTracker
-import ke.co.xently.locationtracker.LocationTracker
+import ke.co.xently.features.locationtracker.DefaultLocationTracker
+import ke.co.xently.features.locationtracker.LocationTracker
 import javax.inject.Singleton
 
 @Module

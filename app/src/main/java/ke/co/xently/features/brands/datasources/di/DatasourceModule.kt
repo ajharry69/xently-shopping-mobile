@@ -7,8 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import ke.co.xently.features.brands.datasources.BrandDataSource
 import ke.co.xently.features.brands.datasources.LocalBrandDataSource
 import ke.co.xently.features.brands.datasources.RemoteBrandDataSource
+import ke.co.xently.features.brands.datasources.remoteservices.BrandService
 import ke.co.xently.features.brands.models.Brand
-import ke.co.xently.features.products.datasources.remoteservices.BrandService
 import retrofit2.Retrofit
 import javax.inject.Singleton
 

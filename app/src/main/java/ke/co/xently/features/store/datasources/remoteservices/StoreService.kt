@@ -1,5 +1,6 @@
-package ke.co.xently.features.products.datasources.remoteservices
+package ke.co.xently.features.store.datasources.remoteservices
 
+import ke.co.xently.features.core.models.RemoteSearchResponse
 import ke.co.xently.features.store.models.Store
 import ke.co.xently.remotedatasource.CacheControl
 import retrofit2.Response

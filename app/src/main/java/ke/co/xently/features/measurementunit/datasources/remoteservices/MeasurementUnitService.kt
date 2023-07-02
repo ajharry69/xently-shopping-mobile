@@ -1,5 +1,6 @@
-package ke.co.xently.features.products.datasources.remoteservices
+package ke.co.xently.features.measurementunit.datasources.remoteservices
 
+import ke.co.xently.features.core.models.RemoteSearchResponse
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import retrofit2.Response
 import retrofit2.http.*

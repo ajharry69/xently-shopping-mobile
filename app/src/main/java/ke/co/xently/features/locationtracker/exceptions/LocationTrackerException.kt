@@ -1,4 +1,4 @@
-package ke.co.xently.locationtracker.exceptions
+package ke.co.xently.features.locationtracker.exceptions
 
 
 open class LocationTrackerException : RuntimeException {

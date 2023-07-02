@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.datasources.remoteservices
+package ke.co.xently.features.core.models
 
 data class RemoteSearchResponse<T>(
     val _embedded: Embedded<T> = Embedded(),

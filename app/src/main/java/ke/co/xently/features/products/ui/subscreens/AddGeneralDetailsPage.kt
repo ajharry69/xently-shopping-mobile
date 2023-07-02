@@ -44,8 +44,8 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
+import ke.co.xently.features.core.cleansedForNumberParsing
 import ke.co.xently.features.products.models.Product
-import ke.co.xently.features.products.ui.cleansedForNumberParsing
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.javaLocale
 import ke.co.xently.ui.theme.XentlyTheme

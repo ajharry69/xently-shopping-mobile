@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.ui.components
+package ke.co.xently.features.core.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable

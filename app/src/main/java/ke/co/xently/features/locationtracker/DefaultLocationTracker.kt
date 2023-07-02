@@ -1,4 +1,4 @@
-package ke.co.xently.locationtracker
+package ke.co.xently.features.locationtracker
 
 import android.Manifest
 import android.app.Application
@@ -7,10 +7,10 @@ import android.location.Location
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
-import ke.co.xently.locationtracker.exceptions.GPSNotEnabledException
-import ke.co.xently.locationtracker.exceptions.LocationTrackerException
-import ke.co.xently.locationtracker.exceptions.MissingLocationTrackingPermissionsException
-import ke.co.xently.locationtracker.exceptions.NullLocationResultsException
+import ke.co.xently.features.locationtracker.exceptions.GPSNotEnabledException
+import ke.co.xently.features.locationtracker.exceptions.LocationTrackerException
+import ke.co.xently.features.locationtracker.exceptions.MissingLocationTrackingPermissionsException
+import ke.co.xently.features.locationtracker.exceptions.NullLocationResultsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject

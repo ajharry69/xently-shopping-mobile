@@ -34,12 +34,12 @@ import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.brands.models.Brand
+import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.AddProductStep
 import ke.co.xently.features.products.ui.State
 import ke.co.xently.features.products.ui.components.AddProductPage
-import ke.co.xently.features.products.ui.components.LabeledCheckbox
 import ke.co.xently.ui.javaLocale
 import ke.co.xently.ui.loadingIndicatorLabel
 import ke.co.xently.ui.theme.XentlyTheme

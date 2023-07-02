@@ -3,9 +3,9 @@ package ke.co.xently.remotedatasource
 import retrofit2.Response
 import kotlin.reflect.KClass
 
-object Http {
+object SendHttpRequest {
     @Suppress("UNCHECKED_CAST")
-    suspend fun <T, E : HttpException> sendRequest(
+    suspend operator fun <T, E : HttpException> invoke(
         errorClass: KClass<E>,
         request: suspend () -> Response<T>,
     ): Result<T> {
@@ -43,6 +43,6 @@ object Http {
         }
     }
 
-    suspend fun <T> sendRequest(request: suspend () -> Response<T>) =
-        sendRequest(errorClass = HttpException::class, request = request)
+    suspend operator fun <T> invoke(request: suspend () -> Response<T>) =
+        invoke(errorClass = HttpException::class, request = request)
 }

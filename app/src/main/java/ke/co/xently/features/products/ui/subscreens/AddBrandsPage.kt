@@ -28,10 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.features.brands.models.Brand
+import ke.co.xently.features.core.ui.AutoCompleteTextField
+import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.components.AddProductPage
-import ke.co.xently.features.products.ui.components.AutoCompleteTextField
-import ke.co.xently.features.products.ui.components.rememberAutoCompleteTextFieldState
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -34,12 +34,12 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import ke.co.xently.R
 import ke.co.xently.features.core.models.toLocation
+import ke.co.xently.features.core.ui.AutoCompleteTextField
+import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
+import ke.co.xently.features.locationtracker.ForegroundLocationTracker
+import ke.co.xently.features.locationtracker.LocationPermissionsState
 import ke.co.xently.features.products.ui.components.AddProductPage
-import ke.co.xently.features.products.ui.components.AutoCompleteTextField
-import ke.co.xently.features.products.ui.components.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.store.models.Store
-import ke.co.xently.locationtracker.ForegroundLocationTracker
-import ke.co.xently.locationtracker.LocationPermissionsState
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

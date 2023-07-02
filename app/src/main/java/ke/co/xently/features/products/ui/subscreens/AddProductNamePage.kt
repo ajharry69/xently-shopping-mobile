@@ -21,12 +21,12 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
+import ke.co.xently.features.core.ui.AutoCompleteTextField
+import ke.co.xently.features.core.ui.LabeledCheckbox
+import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.models.ProductName
 import ke.co.xently.features.products.ui.components.AddProductPage
-import ke.co.xently.features.products.ui.components.AutoCompleteTextField
-import ke.co.xently.features.products.ui.components.LabeledCheckbox
-import ke.co.xently.features.products.ui.components.rememberAutoCompleteTextFieldState
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

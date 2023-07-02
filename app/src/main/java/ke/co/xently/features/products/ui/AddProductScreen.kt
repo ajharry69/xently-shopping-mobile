@@ -19,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.features.attributes.models.Attribute
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.brands.models.Brand
+import ke.co.xently.features.locationtracker.LocationPermissionsState
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.models.ProductName
@@ -32,7 +33,6 @@ import ke.co.xently.features.products.ui.subscreens.AddStorePage
 import ke.co.xently.features.products.ui.subscreens.SummaryPage
 import ke.co.xently.features.shop.models.Shop
 import ke.co.xently.features.store.models.Store
-import ke.co.xently.locationtracker.LocationPermissionsState
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,8 +1,8 @@
 package ke.co.xently.features.attributes.datasources
 
+import ke.co.xently.features.attributes.datasources.remoteservices.AttributeService
 import ke.co.xently.features.attributes.models.Attribute
-import ke.co.xently.features.products.datasources.remoteservices.AttributeService
-import ke.co.xently.remotedatasource.Http.sendRequest
+import ke.co.xently.remotedatasource.SendHttpRequest
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -16,7 +16,7 @@ class RemoteAttributeDataSource @Inject constructor(
             query.toRemoteResponse()
                 .copy(name = buildString { append(query.name); append(it + 1) })
         }
-        return sendRequest {
+        return SendHttpRequest {
             service.searchSuggestions(query = query.name)
         }.getOrThrow()._embedded.viewModels
     }

@@ -1,12 +1,13 @@
-package ke.co.xently.features.products.datasources.remoteservices
+package ke.co.xently.features.brands.datasources.remoteservices
 
-import ke.co.xently.features.attributes.models.Attribute
+import ke.co.xently.features.brands.models.Brand
+import ke.co.xently.features.core.models.RemoteSearchResponse
 import ke.co.xently.remotedatasource.CacheControl
 import retrofit2.Response
 import retrofit2.http.*
 
-interface AttributeService {
-    @GET("attributes")
+interface BrandService {
+    @GET("brands")
     suspend fun searchSuggestions(
         @Query("q")
         query: String,
@@ -16,5 +17,5 @@ interface AttributeService {
         cacheControl: String = CacheControl.NoCache.toString(),
         @QueryMap
         queries: Map<String, String> = emptyMap(),
-    ): Response<RemoteSearchResponse<Attribute.RemoteResponse>>
+    ): Response<RemoteSearchResponse<Brand.RemoteResponse>>
 }

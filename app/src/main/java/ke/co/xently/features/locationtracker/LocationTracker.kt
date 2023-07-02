@@ -1,4 +1,4 @@
-package ke.co.xently.locationtracker
+package ke.co.xently.features.locationtracker
 
 import android.location.Location
 

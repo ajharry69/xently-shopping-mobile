@@ -4,10 +4,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ke.co.xently.features.products.datasources.remoteservices.StoreService
 import ke.co.xently.features.store.datasources.LocalStoreDataSource
 import ke.co.xently.features.store.datasources.RemoteStoreDataSource
 import ke.co.xently.features.store.datasources.StoreDataSource
+import ke.co.xently.features.store.datasources.remoteservices.StoreService
 import ke.co.xently.features.store.models.Store
 import retrofit2.Retrofit
 import javax.inject.Singleton
