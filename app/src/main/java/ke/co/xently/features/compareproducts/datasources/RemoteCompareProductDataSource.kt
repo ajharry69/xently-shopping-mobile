@@ -11,7 +11,7 @@ class RemoteCompareProductDataSource @Inject constructor(
     private val service: CompareProductService,
 ) :
     CompareProductDataSource<CompareProduct.Request, CompareProduct.Response> {
-    override suspend fun getCompareProducts(request: CompareProduct.Request): CompareProduct.Response {
+    override suspend fun compareProducts(request: CompareProduct.Request): CompareProduct.Response {
         return SendHttpRequest {
             service.get(request)
         }.getOrThrow()

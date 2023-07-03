@@ -37,16 +37,16 @@ import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.javaLocale
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddAttributesPage(
     modifier: Modifier = Modifier,
     attributes: List<AttributeValue>,
-    attributeValueSuggestionsState: StateFlow<List<AttributeValue>>,
-    attributeSuggestionsState: StateFlow<List<Attribute>>,
+    attributeValueSuggestionsState: Flow<List<AttributeValue>>,
+    attributeSuggestionsState: Flow<List<Attribute>>,
     searchAttributeValue: (AttributeValue) -> Unit,
     onAttributeValueSuggestionClicked: (AttributeValue) -> Unit,
     searchAttribute: (Attribute) -> Unit,

@@ -41,8 +41,8 @@ import ke.co.xently.features.locationtracker.LocationPermissionsState
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.features.store.models.Store
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -50,7 +50,7 @@ fun AddStorePage(
     modifier: Modifier,
     store: Store,
     snackbarHostState: SnackbarHostState,
-    suggestionsState: StateFlow<List<Store>>,
+    suggestionsState: Flow<List<Store>>,
     permissionsState: LocationPermissionsState,
     search: (Store) -> Unit,
     saveDraft: (Store) -> Unit,

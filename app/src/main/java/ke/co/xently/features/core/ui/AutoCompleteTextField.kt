@@ -23,12 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlin.random.Random
 
 
-class AutoCompleteTextFieldState<T>(val suggestionsState: StateFlow<List<T>>) {
+class AutoCompleteTextFieldState<T>(val suggestionsState: Flow<List<T>>) {
     var query by mutableStateOf("")
         private set
 
@@ -43,7 +43,7 @@ class AutoCompleteTextFieldState<T>(val suggestionsState: StateFlow<List<T>>) {
 
 @Composable
 fun <T> rememberAutoCompleteTextFieldState(
-    suggestionsState: StateFlow<List<T>>,
+    suggestionsState: Flow<List<T>>,
     query: String = "",
     vararg key: Any?,
 ): AutoCompleteTextFieldState<T> {
@@ -82,7 +82,7 @@ fun <T> AutoCompleteTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     suggestionContent: @Composable (T) -> Unit,
 ) {
-    val suggestions by state.suggestionsState.collectAsState()
+    val suggestions by state.suggestionsState.collectAsState(emptyList())
     var nameSearchActive by remember {
         mutableStateOf(false)
     }

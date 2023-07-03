@@ -24,6 +24,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -38,6 +41,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -49,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.R
+import ke.co.xently.features.core.isRetryable
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.recommendations.models.Recommendation
 import ke.co.xently.ui.loadingIndicatorLabel
@@ -57,10 +62,11 @@ import ke.co.xently.ui.theme.XentlyTheme
 @Composable
 fun RecommendationRequestScreen(
     modifier: Modifier,
+    snackbarHostState: SnackbarHostState,
     viewModel: RecommendationViewModel = hiltViewModel(),
 ) {
     val draftShoppingListItemIndex: Int by viewModel.draftShoppingListItemIndex.collectAsState()
-    val recommendationsState: State by viewModel.recommendationsState.collectAsState()
+    val recommendationsState: State by viewModel.recommendationsStateFlow.collectAsState(State.Idle)
     val request: Recommendation.Request by viewModel.recommendationRequest.collectAsState()
     val draftShoppingListItem: Recommendation.Request.ShoppingListItem by viewModel.draftShoppingListItem.collectAsState()
 
@@ -69,6 +75,7 @@ fun RecommendationRequestScreen(
         request = request,
         recommendationsState = recommendationsState,
         modifier = modifier,
+        snackbarHostState = snackbarHostState,
         saveIndexedDraftShoppingListItem = viewModel::saveDraftShoppingListItem,
         draftShoppingListItemIndex = draftShoppingListItemIndex,
         saveDraftRecommendationRequest = viewModel::saveDraftRecommendationRequest,
@@ -84,6 +91,7 @@ fun RecommendationRequestScreen(
     recommendationsState: State,
     modifier: Modifier,
     draftShoppingListItemIndex: Int,
+    snackbarHostState: SnackbarHostState,
     saveDraftRecommendationRequest: (request: Recommendation.Request) -> Unit,
     clearDraftShoppingListItem: () -> Unit,
     getRecommendations: () -> Unit,
@@ -111,6 +119,35 @@ fun RecommendationRequestScreen(
     val recommendationsLoading by remember(recommendationsState) {
         derivedStateOf {
             recommendationsState is State.Loading
+        }
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(recommendationsState) {
+        if (recommendationsState is State.Success) {
+            snackbarHostState.showSnackbar("Success")
+        } else if (recommendationsState is State.Failure) {
+            val message = recommendationsState.error.localizedMessage
+                ?: context.getString(R.string.xently_generic_error_message)
+            val actionLabel = if (recommendationsState.error.isRetryable) {
+                context.getString(R.string.xently_retry).toUpperCase(Locale.current)
+            } else {
+                null
+            }
+            val result: SnackbarResult = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = actionLabel,
+                withDismissAction = recommendationsState.error.isRetryable,
+                duration = if (actionLabel == null) {
+                    SnackbarDuration.Long
+                } else {
+                    SnackbarDuration.Indefinite
+                },
+            )
+
+            if (result == SnackbarResult.ActionPerformed) {
+                getRecommendations()
+            }
         }
     }
 
@@ -337,6 +374,7 @@ private fun RecommendationRequestScreenPreview() {
             request = Recommendation.Request.default,
             recommendationsState = State.Idle,
             draftShoppingListItemIndex = RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX,
+            snackbarHostState = SnackbarHostState(),
             saveDraftRecommendationRequest = {},
             clearDraftShoppingListItem = {},
             getRecommendations = {},

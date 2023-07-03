@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
@@ -29,11 +30,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.brands.models.Brand
+import ke.co.xently.features.core.isRetryable
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
@@ -43,8 +46,8 @@ import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.javaLocale
 import ke.co.xently.ui.loadingIndicatorLabel
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
 
 @Composable
@@ -52,12 +55,12 @@ fun SummaryPage(
     modifier: Modifier,
     product: Product,
     snackbarHostState: SnackbarHostState,
-    stateState: StateFlow<State>,
+    stateFlow: Flow<State>,
     onPreviousClick: () -> Unit,
     onSubmissionSuccess: () -> Unit,
     submit: (Array<AddProductStep>) -> Unit,
 ) {
-    val submissionState by stateState.collectAsState()
+    val submissionState by stateFlow.collectAsState(State.Idle)
 
     val submitting by remember(submissionState) {
         derivedStateOf {
@@ -69,16 +72,36 @@ fun SummaryPage(
         mutableStateListOf<AddProductStep>()
     }
 
+    val onSubmitClick by rememberUpdatedState {
+        submit(stepsToPersist.toTypedArray())
+    }
+
     val context = LocalContext.current
 
     LaunchedEffect(submissionState) {
         when (val state = submissionState) {
             is State.Failure -> {
-                snackbarHostState.showSnackbar(
-                    state.error.localizedMessage
-                        ?: context.getString(R.string.xently_generic_error_message),
-                    duration = SnackbarDuration.Long,
+                val message = state.error.localizedMessage
+                    ?: context.getString(R.string.xently_generic_error_message)
+                val actionLabel = if (state.error.isRetryable) {
+                    context.getString(R.string.xently_retry).toUpperCase(Locale.current)
+                } else {
+                    null
+                }
+                val result: SnackbarResult = snackbarHostState.showSnackbar(
+                    message = message,
+                    actionLabel = actionLabel,
+                    withDismissAction = state.error.isRetryable,
+                    duration = if (actionLabel == null) {
+                        SnackbarDuration.Long
+                    } else {
+                        SnackbarDuration.Indefinite
+                    },
                 )
+
+                if (result == SnackbarResult.ActionPerformed) {
+                    onSubmitClick()
+                }
             }
 
             State.Idle -> {
@@ -105,9 +128,7 @@ fun SummaryPage(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !submitting,
-                onClick = {
-                    submit(stepsToPersist.toTypedArray())
-                },
+                onClick = onSubmitClick,
             ) {
                 Text(
                     text = loadingIndicatorLabel(
@@ -255,11 +276,10 @@ private fun SummaryPage() {
                     }),
                 )
             },
-            stateState = MutableStateFlow(State.Idle),
+            stateFlow = flowOf(State.Idle),
             snackbarHostState = SnackbarHostState(),
             onPreviousClick = {},
             onSubmissionSuccess = {},
-            submit = {},
-        )
+        ) {}
     }
 }

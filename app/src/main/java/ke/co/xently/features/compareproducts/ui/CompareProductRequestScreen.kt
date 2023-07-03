@@ -24,6 +24,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -51,6 +54,7 @@ import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
 import ke.co.xently.features.compareproducts.models.ComparisonListItem
 import ke.co.xently.features.core.cleansedForNumberParsing
+import ke.co.xently.features.core.isRetryable
 import ke.co.xently.ui.currencyNumberFormat
 import ke.co.xently.ui.loadingIndicatorLabel
 import ke.co.xently.ui.theme.XentlyTheme
@@ -58,10 +62,11 @@ import ke.co.xently.ui.theme.XentlyTheme
 @Composable
 fun CompareProductsRequestScreen(
     modifier: Modifier,
+    snackbarHostState: SnackbarHostState,
     viewModel: CompareProductViewModel = hiltViewModel(),
 ) {
     val draftComparisonListItemIndex: Int by viewModel.draftComparisonListItemIndex.collectAsState()
-    val comparisonsState: State by viewModel.comparisonsState.collectAsState()
+    val comparisonsState: State by viewModel.comparisonsStateFlow.collectAsState(State.Idle)
     val request: CompareProduct.Request by viewModel.comparisonRequest.collectAsState()
     val draftComparisonListItem: ComparisonListItem by viewModel.draftComparisonListItem.collectAsState()
 
@@ -70,11 +75,12 @@ fun CompareProductsRequestScreen(
         request = request,
         comparisonsState = comparisonsState,
         modifier = modifier,
+        snackbarHostState = snackbarHostState,
         saveIndexedDraftComparisonListItem = viewModel::saveDraftComparisonListItem,
         draftComparisonListItemIndex = draftComparisonListItemIndex,
         saveDraftCompareProductsRequest = viewModel::saveDraftCompareProductsRequest,
         clearDraftComparisonListItem = viewModel::clearDraftComparisonListItem,
-        getCompareProducts = viewModel::getCompareProducts,
+        compareProducts = viewModel::compareProducts,
     )
 }
 
@@ -85,9 +91,10 @@ internal fun CompareProductsRequestScreen(
     comparisonsState: State,
     modifier: Modifier,
     draftComparisonListItemIndex: Int,
+    snackbarHostState: SnackbarHostState,
     saveDraftCompareProductsRequest: (request: CompareProduct.Request) -> Unit,
     clearDraftComparisonListItem: () -> Unit,
-    getCompareProducts: () -> Unit,
+    compareProducts: () -> Unit,
     saveIndexedDraftComparisonListItem: (ComparisonListItem, Int) -> Unit = { _, _ -> },
 ) {
     var comparisonListItemNameValue by remember(draftComparisonListItem.name) {
@@ -134,6 +141,35 @@ internal fun CompareProductsRequestScreen(
 
             else -> {
                 CompareProductRequestUIState.OK
+            }
+        }
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(comparisonsState) {
+        if (comparisonsState is State.Success) {
+            snackbarHostState.showSnackbar("Success")
+        } else if (comparisonsState is State.Failure) {
+            val message = comparisonsState.error.localizedMessage
+                ?: context.getString(R.string.xently_generic_error_message)
+            val actionLabel = if (comparisonsState.error.isRetryable) {
+                context.getString(R.string.xently_retry).toUpperCase(Locale.current)
+            } else {
+                null
+            }
+            val result: SnackbarResult = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = actionLabel,
+                withDismissAction = comparisonsState.error.isRetryable,
+                duration = if (actionLabel == null) {
+                    SnackbarDuration.Long
+                } else {
+                    SnackbarDuration.Indefinite
+                },
+            )
+
+            if (result == SnackbarResult.ActionPerformed) {
+                compareProducts()
             }
         }
     }
@@ -325,7 +361,7 @@ internal fun CompareProductsRequestScreen(
             Button(
                 enabled = enableGetCompareProductsButton,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = getCompareProducts,
+                onClick = compareProducts,
             ) {
                 Text(
                     text = loadingIndicatorLabel(
@@ -356,9 +392,10 @@ private fun CompareProductsRequestScreenPreview() {
             request = CompareProduct.Request.default,
             comparisonsState = State.Idle,
             draftComparisonListItemIndex = CompareProductViewModel.DEFAULT_COMPARISON_LIST_ITEM_INDEX,
+            snackbarHostState = SnackbarHostState(),
             saveDraftCompareProductsRequest = {},
             clearDraftComparisonListItem = {},
-            getCompareProducts = {},
+            compareProducts = {},
         )
     }
 }

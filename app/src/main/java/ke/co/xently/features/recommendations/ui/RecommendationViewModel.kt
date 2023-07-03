@@ -6,12 +6,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ke.co.xently.features.recommendations.models.Recommendation
 import ke.co.xently.features.recommendations.repositories.RecommendationRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,12 +24,8 @@ class RecommendationViewModel @Inject constructor(
         private val SHOPPING_LIST_ITEM_INDEX_KEY = TAG.plus("SHOPPING_LIST_ITEM_INDEX_KEY")
     }
 
-    private val mutableRecommendationsState = MutableStateFlow<State>(State.Idle)
-    val recommendationsState = mutableRecommendationsState.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = State.Idle,
-    )
+    private val recommendationsStateChannel = Channel<State>()
+    val recommendationsStateFlow = recommendationsStateChannel.receiveAsFlow()
     val recommendationRequest = stateHandle.getStateFlow(
         REQUEST_KEY,
         Recommendation.Request.default,
@@ -66,16 +58,15 @@ class RecommendationViewModel @Inject constructor(
 
     fun getRecommendations() {
         viewModelScope.launch {
-            recommendationRequest.onStart {
-                mutableRecommendationsState.value = State.Loading
-            }.map(repository::getRecommendations)
-                .collectLatest { result ->
-                    result.onSuccess {
-                        mutableRecommendationsState.value = State.Success(it)
-                    }.onFailure {
-                        mutableRecommendationsState.value = State.Failure(it)
-                    }
+            recommendationsStateChannel.send(State.Loading)
+
+            repository.getRecommendations(recommendationRequest.value).also { result ->
+                result.onSuccess {
+                    recommendationsStateChannel.send(State.Success(it))
+                }.onFailure {
+                    recommendationsStateChannel.send(State.Failure(it))
                 }
+            }
         }
     }
 }

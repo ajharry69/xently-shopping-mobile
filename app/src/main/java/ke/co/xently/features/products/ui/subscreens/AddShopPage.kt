@@ -26,8 +26,8 @@ import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.features.shop.models.Shop
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 private sealed interface ShopContinueButtonLabel {
     @get:StringRes
@@ -46,7 +46,7 @@ private sealed interface ShopContinueButtonLabel {
 fun AddShopPage(
     modifier: Modifier = Modifier,
     shop: Shop,
-    suggestionsState: StateFlow<List<Shop>>,
+    suggestionsState: Flow<List<Shop>>,
     search: (Shop) -> Unit,
     saveDraft: (Shop) -> Unit,
     onSearchSuggestionSelected: () -> Unit,

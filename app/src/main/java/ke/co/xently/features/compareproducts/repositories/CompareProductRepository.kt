@@ -9,9 +9,9 @@ import javax.inject.Singleton
 class CompareProductRepository @Inject constructor(
     private val remoteDataSource: CompareProductDataSource<CompareProduct.Request, CompareProduct.Response>,
 ) {
-    suspend fun getCompareProducts(request: CompareProduct.Request): Result<CompareProduct.Response> {
+    suspend fun compareProducts(request: CompareProduct.Request): Result<CompareProduct.Response> {
         return try {
-            remoteDataSource.getCompareProducts(request).let {
+            remoteDataSource.compareProducts(request).let {
                 Result.success(it)
             }
         } catch (ex: Exception) {

@@ -32,8 +32,8 @@ import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 private sealed interface MeasurementUIState {
     @get:StringRes
@@ -54,7 +54,7 @@ private sealed interface MeasurementUIState {
 fun AddMeasurementUnitPage(
     modifier: Modifier,
     product: Product,
-    suggestionsState: StateFlow<List<MeasurementUnit>>,
+    suggestionsState: Flow<List<MeasurementUnit>>,
     search: (MeasurementUnit) -> Unit,
     onSuggestionSelected: (MeasurementUnit) -> Unit,
     onSearchSuggestionSelected: () -> Unit,

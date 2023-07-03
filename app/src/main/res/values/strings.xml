@@ -91,4 +91,5 @@
     <string name="xently_error_invalid_unit_price">Invalid unit price</string>
     <string name="xently_error_missing_name">Name is required</string>
     <string name="xently_button_label_add_another_item">Please add another item to compare with</string>
+    <string name="xently_retry">Retry</string>
 </resources>

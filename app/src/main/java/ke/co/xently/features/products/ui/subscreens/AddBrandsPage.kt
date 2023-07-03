@@ -33,15 +33,15 @@ import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddBrandsPage(
     modifier: Modifier,
     brands: List<Brand>,
-    suggestionsState: StateFlow<List<Brand>>,
+    suggestionsState: Flow<List<Brand>>,
     onSearchSuggestionSelected: (Brand) -> Unit,
     search: (Brand) -> Unit,
     saveDraft: (List<Brand>) -> Unit,

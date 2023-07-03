@@ -66,11 +66,17 @@ class MainActivity : ComponentActivity() {
                             }
 
                             HomeTab.Recommendations -> {
-                                RecommendationRequestScreen(modifier = Modifier.fillMaxSize())
+                                RecommendationRequestScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    snackbarHostState = snackbarHostState,
+                                )
                             }
 
                             HomeTab.Compare -> {
-                                CompareProductsRequestScreen(modifier = Modifier.fillMaxSize())
+                                CompareProductsRequestScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    snackbarHostState = snackbarHostState,
+                                )
                             }
                         }
                     }

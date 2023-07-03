@@ -34,8 +34,9 @@ import ke.co.xently.features.products.ui.subscreens.SummaryPage
 import ke.co.xently.features.shop.models.Shop
 import ke.co.xently.features.store.models.Store
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun AddProductScreen(
@@ -52,13 +53,13 @@ fun AddProductScreen(
         addProductStep = addProductStep,
         locationPermissionsState = LocationPermissionsState.CoarseAndFine,
         snackbarHostState = snackbarHostState,
-        brandSuggestionsState = viewModel.brandSuggestions,
-        addProductState = viewModel.saveProductState,
-        attributeSuggestionsState = viewModel.attributeSuggestions,
-        attributeValueSuggestionsState = viewModel.attributeValueSuggestions,
-        storeSuggestionsState = viewModel.storeSuggestions,
-        shopSuggestionsState = viewModel.shopSuggestions,
-        productSuggestionsState = viewModel.productSuggestions,
+        brandSuggestionsState = viewModel.brandSuggestionsFlow,
+        addProductState = viewModel.saveProductStateFlow,
+        attributeSuggestionsState = viewModel.attributeSuggestionsFlow,
+        attributeValueSuggestionsState = viewModel.attributeValueSuggestionsFlow,
+        storeSuggestionsState = viewModel.storeSuggestionsFlow,
+        shopSuggestionsState = viewModel.shopSuggestionsFlow,
+        productSuggestionsState = viewModel.productSuggestionsFlow,
         savePermanently = viewModel::savePermanently,
         saveDraft = viewModel::saveDraft,
         saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
@@ -71,13 +72,12 @@ fun AddProductScreen(
         onShopSearchSuggestionSelected = viewModel::clearShopSearchSuggestions,
         searchProductNames = viewModel::searchProductName,
         onProductSearchSuggestionSelected = viewModel::clearProductSearchSuggestions,
-        measurementUnitSuggestionsState = viewModel.measurementUnitSuggestions,
+        measurementUnitSuggestionsState = viewModel.measurementUnitSuggestionsFlow,
         searchMeasurementUnits = viewModel::searchMeasurementUnit,
         onMeasurementUnitSearchSuggestionSelected = viewModel::clearMeasurementUnitSearchSuggestions,
         onBrandSearchSuggestionSelected = { viewModel.clearBrandSearchSuggestions() },
         onAttributeValueSuggestionClicked = { viewModel.clearAttributeValueSuggestions() },
-        onAttributeSuggestionClicked = { viewModel.clearAttributeSuggestions() },
-    )
+    ) { viewModel.clearAttributeSuggestions() }
 }
 
 @Composable
@@ -88,14 +88,14 @@ fun AddProductScreen(
     snackbarHostState: SnackbarHostState,
     product: Product.LocalViewModel,
 
-    brandSuggestionsState: StateFlow<List<Brand>>,
-    addProductState: StateFlow<State>,
-    attributeSuggestionsState: StateFlow<List<Attribute>>,
-    attributeValueSuggestionsState: StateFlow<List<AttributeValue>>,
-    storeSuggestionsState: StateFlow<List<Store>>,
-    shopSuggestionsState: StateFlow<List<Shop>>,
-    productSuggestionsState: StateFlow<List<Product>>,
-    measurementUnitSuggestionsState: StateFlow<List<MeasurementUnit>>,
+    brandSuggestionsState: Flow<List<Brand>>,
+    addProductState: Flow<State>,
+    attributeSuggestionsState: Flow<List<Attribute>>,
+    attributeValueSuggestionsState: Flow<List<AttributeValue>>,
+    storeSuggestionsState: Flow<List<Store>>,
+    shopSuggestionsState: Flow<List<Shop>>,
+    productSuggestionsState: Flow<List<Product>>,
+    measurementUnitSuggestionsState: Flow<List<MeasurementUnit>>,
 
     savePermanently: (Array<AddProductStep>) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
@@ -310,7 +310,7 @@ fun AddProductScreen(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
                         snackbarHostState = snackbarHostState,
-                        stateState = addProductState,
+                        stateFlow = addProductState,
                         onPreviousClick = navigateToPrevious,
                         onSubmissionSuccess = navigateToNext,
                         submit = savePermanently,
@@ -334,7 +334,7 @@ private fun AddProductScreenPreview() {
             product = Product.LocalViewModel.default,
 
             brandSuggestionsState = MutableStateFlow(emptyList()),
-            addProductState = MutableStateFlow(State.Idle),
+            addProductState = flowOf(State.Idle),
             attributeSuggestionsState = MutableStateFlow(emptyList()),
             attributeValueSuggestionsState = MutableStateFlow(emptyList()),
             storeSuggestionsState = MutableStateFlow(emptyList()),
@@ -358,7 +358,6 @@ private fun AddProductScreenPreview() {
             onMeasurementUnitSearchSuggestionSelected = {},
             onBrandSearchSuggestionSelected = {},
             onAttributeValueSuggestionClicked = {},
-            onAttributeSuggestionClicked = {},
-        )
+        ) {}
     }
 }

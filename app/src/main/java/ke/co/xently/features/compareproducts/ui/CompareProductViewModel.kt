@@ -7,12 +7,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ke.co.xently.features.compareproducts.models.CompareProduct
 import ke.co.xently.features.compareproducts.models.ComparisonListItem
 import ke.co.xently.features.compareproducts.repositories.CompareProductRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,12 +25,8 @@ class CompareProductViewModel @Inject constructor(
         private val COMPARISON_LIST_ITEM_INDEX_KEY = TAG.plus("COMPARISON_LIST_ITEM_INDEX_KEY")
     }
 
-    private val mutableCompareProductsState = MutableStateFlow<State>(State.Idle)
-    val comparisonsState = mutableCompareProductsState.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = State.Idle,
-    )
+    private val compareProductsStateChannel = Channel<State>()
+    val comparisonsStateFlow = compareProductsStateChannel.receiveAsFlow()
     val comparisonRequest = stateHandle.getStateFlow(
         REQUEST_KEY,
         CompareProduct.Request.default,
@@ -65,18 +57,17 @@ class CompareProductViewModel @Inject constructor(
         stateHandle[COMPARISON_LIST_ITEM_INDEX_KEY] = DEFAULT_COMPARISON_LIST_ITEM_INDEX
     }
 
-    fun getCompareProducts() {
+    fun compareProducts() {
         viewModelScope.launch {
-            comparisonRequest.onStart {
-                mutableCompareProductsState.value = State.Loading
-            }.map(repository::getCompareProducts)
-                .collectLatest { result ->
-                    result.onSuccess {
-                        mutableCompareProductsState.value = State.Success(it)
-                    }.onFailure {
-                        mutableCompareProductsState.value = State.Failure(it)
-                    }
+            compareProductsStateChannel.send(State.Loading)
+
+            repository.compareProducts(comparisonRequest.value).also { result ->
+                result.onSuccess {
+                    compareProductsStateChannel.send(State.Success(it))
+                }.onFailure {
+                    compareProductsStateChannel.send(State.Failure(it))
                 }
+            }
         }
     }
 }

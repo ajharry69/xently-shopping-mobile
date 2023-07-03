@@ -28,8 +28,8 @@ import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.models.ProductName
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 private sealed interface ProductNameContinueButtonLabel {
     @get:StringRes
@@ -48,7 +48,7 @@ private sealed interface ProductNameContinueButtonLabel {
 fun AddProductNamePage(
     modifier: Modifier,
     product: Product,
-    suggestionsState: StateFlow<List<Product>>,
+    suggestionsState: Flow<List<Product>>,
     search: (ProductName) -> Unit,
     saveDraft: (Product) -> Unit,
     onSearchSuggestionSelected: () -> Unit,
