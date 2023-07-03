@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ke.co.xently.features.recommendations.models.Recommendation
 import ke.co.xently.features.recommendations.repositories.RecommendationRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
@@ -69,7 +68,6 @@ class RecommendationViewModel @Inject constructor(
         viewModelScope.launch {
             recommendationRequest.onStart {
                 mutableRecommendationsState.value = State.Loading
-                delay(60_000)
             }.map(repository::getRecommendations)
                 .collectLatest { result ->
                     result.onSuccess {

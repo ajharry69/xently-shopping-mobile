@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import ke.co.xently.features.compareproducts.ui.CompareProductsRequestScreen
 import ke.co.xently.features.products.ui.AddProductScreen
 import ke.co.xently.features.recommendations.ui.RecommendationRequestScreen
 import ke.co.xently.ui.theme.XentlyTheme
@@ -64,8 +65,12 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
-                            HomeTab.GetRecommendations -> {
+                            HomeTab.Recommendations -> {
                                 RecommendationRequestScreen(modifier = Modifier.fillMaxSize())
+                            }
+
+                            HomeTab.Compare -> {
+                                CompareProductsRequestScreen(modifier = Modifier.fillMaxSize())
                             }
                         }
                     }

@@ -215,7 +215,8 @@ fun RecommendationRequestScreen(
                 } else {
                     val lazyListState = rememberLazyListState()
                     LaunchedEffect(request.shoppingList) {
-                        lazyListState.animateScrollToItem(request.shoppingList.lastIndex)
+                        val index = maxOf(0, request.shoppingList.lastIndex)
+                        lazyListState.animateScrollToItem(index)
                     }
 
                     LazyColumn(
@@ -328,7 +329,7 @@ fun RecommendationRequestScreen(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun RecommendationRequestScreenPreview() {
+private fun RecommendationRequestScreenPreview() {
     XentlyTheme {
         RecommendationRequestScreen(
             modifier = Modifier.fillMaxSize(),

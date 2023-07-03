@@ -10,8 +10,12 @@ class RecommendationRepository @Inject constructor(
     private val remoteDataSource: RecommendationDataSource<Recommendation.Request, Recommendation.Response>,
 ) {
     suspend fun getRecommendations(request: Recommendation.Request): Result<List<Recommendation.Response>> {
-        return remoteDataSource.getRecommendations(request).let {
-            Result.success(it)
+        return try {
+            remoteDataSource.getRecommendations(request).let {
+                Result.success(it)
+            }
+        } catch (ex: Exception) {
+            Result.failure(ex)
         }
     }
 }

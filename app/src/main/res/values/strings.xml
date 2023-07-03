@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Xently</string>
     <string name="xently_home_tab_title_products">Add products</string>
-    <string name="xently_home_tab_title_recommendations">Get Recommendations</string>
+    <string name="xently_home_tab_title_recommendations">Recommendations</string>
+    <string name="xently_home_tab_title_compare">Compare</string>
     <string name="xently_button_label_continue">Continue</string>
     <string name="xently_button_label_select_store_location">Please select store location on the map</string>
     <string name="xently_button_label_back">Back</string>
@@ -42,8 +43,11 @@
     <string name="xently_empty_shopping_list_message">You have an empty shopping list. Please fill in the form above to get started adding items to your shopping list.</string>
     <string name="xently_text_field_label_shopping_list_item_name">Descriptive item name</string>
     <string name="xently_text_field_help_text_shopping_list_item_name">For example, (2packs of) 400g (brown) bread (by eliot). Descriptions in brackets are optional.</string>
+    <string name="xently_text_field_help_text_comparison_list_item_name">For example, 400g bread</string>
     <string name="xently_button_label_get_recommendations">Get recommendations</string>
     <string name="xently_button_label_getting_recommendations">Getting recommendations</string>
+    <string name="xently_button_label_compare_products">Compare products</string>
+    <string name="xently_button_label_comparing_products">Comparing products</string>
     <string name="xently_add_shop_page_title">Shop</string>
     <string name="xently_add_shop_page_sub_heading">Details of the shop where the store belongs. For example, Hotpoint has a store at Sarit centre. The shop name will be Hotpoint in this case.</string>
     <string name="xently_text_field_label_ecommerce_website_url">e-Commerce website URL</string>
@@ -80,4 +84,11 @@
     <string name="xently_gps_tracking_disabled">GPS disabled</string>
     <string name="xently_snackbar_action_label_enable">Enable</string>
     <string name="xently_description_from">from</string>
+    <string name="xently_empty_comparison_list_message">You have an empty comparison list. Please fill in the form above to get started adding items to your comparison list.</string>
+    <string name="xently_text_field_label_unit_price_required">Unit price*</string>
+    <string name="xently_button_label_add_to_comparison_list">Add to comparison list</string>
+    <string name="xently_error_missing_unit_price">Unit price is required</string>
+    <string name="xently_error_invalid_unit_price">Invalid unit price</string>
+    <string name="xently_error_missing_name">Name is required</string>
+    <string name="xently_button_label_add_another_item">Please add another item to compare with</string>
 </resources>

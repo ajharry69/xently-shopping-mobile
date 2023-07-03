@@ -16,7 +16,7 @@ class MainViewModel @Inject constructor(
 
     val currentlyActiveTab = stateHandle.getStateFlow(
         CURRENT_ACTIVE_TAB_KEY,
-        HomeTab.GetRecommendations,
+        HomeTab.Recommendations,
     )
 
     fun saveCurrentlyActiveTab(tab: HomeTab) {
