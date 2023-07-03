@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
+import ke.co.xently.features.compareproducts.models.ComparisonListItem
 import ke.co.xently.features.core.cleansedForNumberParsing
 import ke.co.xently.ui.currencyNumberFormat
 import ke.co.xently.ui.loadingIndicatorLabel
@@ -62,7 +63,7 @@ fun CompareProductsRequestScreen(
     val draftComparisonListItemIndex: Int by viewModel.draftComparisonListItemIndex.collectAsState()
     val comparisonsState: State by viewModel.comparisonsState.collectAsState()
     val request: CompareProduct.Request by viewModel.comparisonRequest.collectAsState()
-    val draftComparisonListItem: CompareProduct.Request.ComparisonListItem by viewModel.draftComparisonListItem.collectAsState()
+    val draftComparisonListItem: ComparisonListItem by viewModel.draftComparisonListItem.collectAsState()
 
     CompareProductsRequestScreen(
         draftComparisonListItem = draftComparisonListItem,
@@ -79,7 +80,7 @@ fun CompareProductsRequestScreen(
 
 @Composable
 internal fun CompareProductsRequestScreen(
-    draftComparisonListItem: CompareProduct.Request.ComparisonListItem,
+    draftComparisonListItem: ComparisonListItem,
     request: CompareProduct.Request,
     comparisonsState: State,
     modifier: Modifier,
@@ -87,7 +88,7 @@ internal fun CompareProductsRequestScreen(
     saveDraftCompareProductsRequest: (request: CompareProduct.Request) -> Unit,
     clearDraftComparisonListItem: () -> Unit,
     getCompareProducts: () -> Unit,
-    saveIndexedDraftComparisonListItem: (CompareProduct.Request.ComparisonListItem, Int) -> Unit = { _, _ -> },
+    saveIndexedDraftComparisonListItem: (ComparisonListItem, Int) -> Unit = { _, _ -> },
 ) {
     var comparisonListItemNameValue by remember(draftComparisonListItem.name) {
         mutableStateOf(TextFieldValue(draftComparisonListItem.name))
@@ -241,7 +242,7 @@ internal fun CompareProductsRequestScreen(
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        itemsIndexed(request.comparisonList) { index, item: CompareProduct.Request.ComparisonListItem ->
+                        itemsIndexed(request.comparisonList) { index, item: ComparisonListItem ->
                             ListItem(
                                 headlineContent = {
                                     Text(
@@ -351,7 +352,7 @@ private fun CompareProductsRequestScreenPreview() {
     XentlyTheme {
         CompareProductsRequestScreen(
             modifier = Modifier.fillMaxSize(),
-            draftComparisonListItem = CompareProduct.Request.ComparisonListItem.default,
+            draftComparisonListItem = ComparisonListItem.default,
             request = CompareProduct.Request.default,
             comparisonsState = State.Idle,
             draftComparisonListItemIndex = CompareProductViewModel.DEFAULT_COMPARISON_LIST_ITEM_INDEX,

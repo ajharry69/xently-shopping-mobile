@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ke.co.xently.features.compareproducts.models.CompareProduct
+import ke.co.xently.features.compareproducts.models.ComparisonListItem
 import ke.co.xently.features.compareproducts.repositories.CompareProductRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,7 +41,7 @@ class CompareProductViewModel @Inject constructor(
     )
     val draftComparisonListItem = stateHandle.getStateFlow(
         COMPARISON_LIST_ITEM_KEY,
-        CompareProduct.Request.ComparisonListItem.default,
+        ComparisonListItem.default,
     )
     val draftComparisonListItemIndex = stateHandle.getStateFlow(
         COMPARISON_LIST_ITEM_INDEX_KEY,
@@ -52,7 +53,7 @@ class CompareProductViewModel @Inject constructor(
     }
 
     fun saveDraftComparisonListItem(
-        item: CompareProduct.Request.ComparisonListItem,
+        item: ComparisonListItem,
         index: Int = DEFAULT_COMPARISON_LIST_ITEM_INDEX,
     ) {
         stateHandle[COMPARISON_LIST_ITEM_KEY] = item
@@ -60,7 +61,7 @@ class CompareProductViewModel @Inject constructor(
     }
 
     fun clearDraftComparisonListItem() {
-        stateHandle[COMPARISON_LIST_ITEM_KEY] = CompareProduct.Request.ComparisonListItem.default
+        stateHandle[COMPARISON_LIST_ITEM_KEY] = ComparisonListItem.default
         stateHandle[COMPARISON_LIST_ITEM_INDEX_KEY] = DEFAULT_COMPARISON_LIST_ITEM_INDEX
     }
 

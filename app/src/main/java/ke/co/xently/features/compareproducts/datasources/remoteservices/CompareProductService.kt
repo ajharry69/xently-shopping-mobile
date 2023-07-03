@@ -6,5 +6,5 @@ import retrofit2.http.*
 
 interface CompareProductService {
     @POST("recommendations/compare-products")
-    suspend fun get(@Body request: CompareProduct.Request): Response<List<CompareProduct.Response>>
+    suspend fun get(@Body request: CompareProduct.Request): Response<CompareProduct.Response>
 }
