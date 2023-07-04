@@ -54,9 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.R
 import ke.co.xently.features.core.isRetryable
+import ke.co.xently.features.core.loadingIndicatorLabel
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.recommendations.models.Recommendation
-import ke.co.xently.ui.loadingIndicatorLabel
 import ke.co.xently.ui.theme.XentlyTheme
 
 @Composable

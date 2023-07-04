@@ -5,9 +5,9 @@ import android.os.Parcelable
 import ke.co.xently.R
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.brands.models.Brand
+import ke.co.xently.features.core.currencyNumberFormat
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.store.models.Store
-import ke.co.xently.ui.currencyNumberFormat
 import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.time.LocalDateTime

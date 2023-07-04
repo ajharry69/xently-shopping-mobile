@@ -54,9 +54,9 @@ import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
 import ke.co.xently.features.compareproducts.models.ComparisonListItem
 import ke.co.xently.features.core.cleansedForNumberParsing
+import ke.co.xently.features.core.currencyNumberFormat
 import ke.co.xently.features.core.isRetryable
-import ke.co.xently.ui.currencyNumberFormat
-import ke.co.xently.ui.loadingIndicatorLabel
+import ke.co.xently.features.core.loadingIndicatorLabel
 import ke.co.xently.ui.theme.XentlyTheme
 
 @Composable
