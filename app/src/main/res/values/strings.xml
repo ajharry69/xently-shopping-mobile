@@ -92,4 +92,5 @@
     <string name="xently_error_missing_name">Name is required</string>
     <string name="xently_button_label_add_another_item">Please add another item to compare with</string>
     <string name="xently_retry">Retry</string>
+    <string name="xently_compare_product_response_title">Products are ordered by the cheapest first</string>
 </resources>
