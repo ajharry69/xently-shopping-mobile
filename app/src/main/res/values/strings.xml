@@ -36,6 +36,7 @@
     <string name="xently_edit">Edit</string>
     <string name="xently_content_description_remove_item">Remove \"%1$s\"</string>
     <string name="xently_content_description_options_for_item">Options for \"%1$s\"</string>
+    <string name="xently_content_description_options_for_item_reversed">Hide options for \"%1$s\"</string>
     <string name="xently_strict_measurement_unit">With strict measurement unit</string>
     <string name="xently_optional_measurement_unit">With optional measurement unit</string>
     <string name="xently_checkbox_label_enforce_strict_measurement_unit">Enforce strict measurement unit?</string>
@@ -93,4 +94,9 @@
     <string name="xently_button_label_add_another_item">Please add another item to compare with</string>
     <string name="xently_retry">Retry</string>
     <string name="xently_compare_product_response_title">Products are ordered by the cheapest first</string>
+    <string name="xently_recommendation_response_title">Title</string>
+    <string name="xently_recommendation_response_approximate_store_distance">Approximately, %1$s away</string>
+    <string name="xently_recommendation_response_summary">Found %1$d out of %2$d products with an estimated total expenditure of %3$s.</string>
+    <string name="xently_navigate">Navigate to store</string>
+    <string name="xently_view_product">View product details</string>
 </resources>

@@ -93,10 +93,26 @@ sealed interface Recommendation {
         val hit: Hit,
         val miss: Miss,
     ) : Recommendation {
-        data class EstimatedExpenditure(val unit: Number = 0, val total: Number = 0)
+        data class EstimatedExpenditure(val unit: Number = 0, val total: Number = 0) {
+            companion object {
+                val default = EstimatedExpenditure()
+            }
+        }
+
         data class Miss(val count: Int, val items: List<Item>) {
             @JvmInline
-            value class Item(val value: String)
+            value class Item(val value: String) {
+                companion object {
+                    val default = Item(value = "")
+                }
+            }
+
+            companion object {
+                val default = Miss(
+                    count = 0,
+                    items = emptyList(),
+                )
+            }
         }
 
         data class Hit(val count: Int, val items: List<Item>) {
@@ -104,7 +120,12 @@ sealed interface Recommendation {
                 val bestMatched: BestMatched,
                 val shoppingList: ShoppingList,
             ) {
-                data class ShoppingList(val name: String, val quantityToPurchase: Number = 1)
+                data class ShoppingList(val name: String, val quantityToPurchase: Number = 1) {
+                    companion object {
+                        val default = ShoppingList(name = "")
+                    }
+                }
+
                 data class BestMatched(
                     val name: String,
                     val unitPrice: BigDecimal,
@@ -113,8 +134,40 @@ sealed interface Recommendation {
                      */
                     val totalPrice: BigDecimal,
                     val pricePerBaseMeasurementUnitQuantity: BigDecimal,
+                ) {
+                    companion object {
+                        val default = BestMatched(
+                            name = "",
+                            unitPrice = BigDecimal.ZERO,
+                            totalPrice = BigDecimal.ZERO,
+                            pricePerBaseMeasurementUnitQuantity = BigDecimal.ZERO,
+                        )
+                    }
+                }
+
+                companion object {
+                    val default = Item(
+                        bestMatched = BestMatched.default,
+                        shoppingList = ShoppingList.default,
+                    )
+                }
+            }
+
+            companion object {
+                val default = Hit(
+                    count = 0,
+                    items = emptyList(),
                 )
             }
+        }
+
+        companion object {
+            val default = Response(
+                estimatedExpenditure = EstimatedExpenditure.default,
+                store = Store.LocalViewModel.default,
+                hit = Hit.default,
+                miss = Miss.default,
+            )
         }
     }
 }

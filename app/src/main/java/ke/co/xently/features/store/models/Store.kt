@@ -1,9 +1,12 @@
 package ke.co.xently.features.store.models
 
+import android.content.Context
 import android.os.Parcelable
 import ke.co.xently.features.core.models.Location
+import ke.co.xently.features.core.numberFormat
 import ke.co.xently.features.shop.models.Shop
 import kotlinx.parcelize.Parcelize
+import kotlin.math.roundToInt
 
 sealed interface Store {
     val id: Long
@@ -50,6 +53,15 @@ sealed interface Store {
          */
         val distance: Double?,
     ) : Store, Parcelable {
+        fun getDistanceForDisplay(context: Context): String? {
+            return distance?.let {
+                buildString {
+                    append(context.numberFormat.format(it.roundToInt()))
+                    append('m')
+                }
+            }
+        }
+
         override fun toString(): String {
             return buildString {
                 if (name.isNotBlank()) {

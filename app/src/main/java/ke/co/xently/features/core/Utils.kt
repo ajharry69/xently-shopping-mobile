@@ -32,6 +32,12 @@ private val RETRYABLE_ERRORS = arrayOf(
 val Throwable.isRetryable: Boolean
     get() = this::class in RETRYABLE_ERRORS
 
+@Suppress("UnusedReceiverParameter")
+val Context.numberFormat: NumberFormat
+    get() = NumberFormat.getNumberInstance(Locale.current.javaLocale).apply {
+        isGroupingUsed = true
+    }
+
 val Context.currencyNumberFormat: NumberFormat
     get() = NumberFormat.getCurrencyInstance(Locale.current.javaLocale).apply {
         currency = Currency.getInstance(getString(R.string.xently_iso_currency_code))
