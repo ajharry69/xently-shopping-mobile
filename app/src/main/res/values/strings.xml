@@ -97,6 +97,9 @@
     <string name="xently_recommendation_response_title">Title</string>
     <string name="xently_recommendation_response_approximate_store_distance">Approximately, %1$s away</string>
     <string name="xently_recommendation_response_summary">Found %1$d out of %2$d products with an estimated total expenditure of %3$s.</string>
-    <string name="xently_navigate">Navigate to store</string>
-    <string name="xently_view_product">View product details</string>
+    <string name="xently_navigate_to_store">Navigate to store</string>
+    <string name="xently_view_details">View details</string>
+    <string name="xently_hits_title">Items found</string>
+    <string name="xently_misses_title">Items not found</string>
+    <string name="xently_empty_recommendation_details">Empty recommendation details</string>
 </resources>
