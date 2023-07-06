@@ -109,7 +109,7 @@ fun RecommendationResponseDetailsScreen(
 }
 
 @Composable
-fun HitItem(item: Recommendation.Response.Hit.Item) {
+private fun HitItem(item: Recommendation.Response.Hit.Item) {
     ListItem(
         headlineContent = {
             Text(text = item.shoppingList.name)
@@ -130,7 +130,7 @@ fun HitItem(item: Recommendation.Response.Hit.Item) {
 }
 
 @Composable
-fun MissItem(item: Recommendation.Response.Miss.Item) {
+private fun MissItem(item: Recommendation.Response.Miss.Item) {
     ListItem(
         headlineContent = {
             Text(text = item.value)
@@ -144,7 +144,7 @@ fun MissItem(item: Recommendation.Response.Miss.Item) {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun RecommendationResponseDetailsScreenPreview() {
+private fun RecommendationResponseDetailsScreenPreview() {
     XentlyTheme {
         val response = Recommendation.Response.default.run {
             copy(

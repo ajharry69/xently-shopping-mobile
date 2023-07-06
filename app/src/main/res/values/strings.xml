@@ -74,7 +74,7 @@
     <string name="xently_button_label_submitting">Submitting…</string>
     <string name="xently_summary_page_subtitle">This is what we have captured so far.</string>
     <string name="xently_generic_error_message">Sorry, an unknown error was encountered.</string>
-    <string name="xently_iso_currency_code">KES</string>
+    <string name="xently_iso_currency_code" translatable="true">KES</string>
     <string name="xently_description_purchased_at">purchased at</string>
     <string name="xently_description_pack_of">pack of</string>
     <string name="xently_description_per">per</string>
@@ -102,4 +102,6 @@
     <string name="xently_hits_title">Items found</string>
     <string name="xently_misses_title">Items not found</string>
     <string name="xently_empty_recommendation_details">Empty recommendation details</string>
+    <string name="xently_error_navigation_app_not_found">Sorry, an app for handling directions was not found.</string>
+    <string name="xently_install">Install</string>
 </resources>

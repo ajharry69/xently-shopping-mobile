@@ -50,6 +50,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ke.co.xently.BottomSheetPeek
 import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
 import ke.co.xently.features.compareproducts.models.ComparisonListItem
@@ -63,6 +64,7 @@ import ke.co.xently.ui.theme.XentlyTheme
 fun CompareProductsRequestScreen(
     modifier: Modifier,
     snackbarHostState: SnackbarHostState,
+    bottomSheetPeek: (BottomSheetPeek) -> Unit,
     viewModel: CompareProductViewModel = hiltViewModel(),
 ) {
     val draftComparisonListItemIndex: Int by viewModel.draftComparisonListItemIndex.collectAsState()
@@ -76,6 +78,7 @@ fun CompareProductsRequestScreen(
         comparisonsState = comparisonsState,
         modifier = modifier,
         snackbarHostState = snackbarHostState,
+        bottomSheetPeek = bottomSheetPeek,
         saveIndexedDraftComparisonListItem = viewModel::saveDraftComparisonListItem,
         draftComparisonListItemIndex = draftComparisonListItemIndex,
         saveDraftCompareProductsRequest = viewModel::saveDraftCompareProductsRequest,
@@ -92,6 +95,7 @@ internal fun CompareProductsRequestScreen(
     modifier: Modifier,
     draftComparisonListItemIndex: Int,
     snackbarHostState: SnackbarHostState,
+    bottomSheetPeek: (BottomSheetPeek) -> Unit,
     saveDraftCompareProductsRequest: (request: CompareProduct.Request) -> Unit,
     clearDraftComparisonListItem: () -> Unit,
     compareProducts: () -> Unit,
@@ -148,7 +152,7 @@ internal fun CompareProductsRequestScreen(
     val context = LocalContext.current
     LaunchedEffect(comparisonsState) {
         if (comparisonsState is State.Success) {
-            snackbarHostState.showSnackbar("Success")
+            bottomSheetPeek(BottomSheetPeek.CompareProductResponse(comparisonsState.data))
         } else if (comparisonsState is State.Failure) {
             val message = comparisonsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)
@@ -393,6 +397,7 @@ private fun CompareProductsRequestScreenPreview() {
             comparisonsState = State.Idle,
             draftComparisonListItemIndex = CompareProductViewModel.DEFAULT_COMPARISON_LIST_ITEM_INDEX,
             snackbarHostState = SnackbarHostState(),
+            bottomSheetPeek = {},
             saveDraftCompareProductsRequest = {},
             clearDraftComparisonListItem = {},
             compareProducts = {},

@@ -52,6 +52,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ke.co.xently.BottomSheetPeek
 import ke.co.xently.R
 import ke.co.xently.features.core.isRetryable
 import ke.co.xently.features.core.loadingIndicatorLabel
@@ -63,6 +64,7 @@ import ke.co.xently.ui.theme.XentlyTheme
 fun RecommendationRequestScreen(
     modifier: Modifier,
     snackbarHostState: SnackbarHostState,
+    bottomSheetPeek: (BottomSheetPeek) -> Unit,
     viewModel: RecommendationViewModel = hiltViewModel(),
 ) {
     val draftShoppingListItemIndex: Int by viewModel.draftShoppingListItemIndex.collectAsState()
@@ -76,6 +78,7 @@ fun RecommendationRequestScreen(
         recommendationsState = recommendationsState,
         modifier = modifier,
         snackbarHostState = snackbarHostState,
+        bottomSheetPeek = bottomSheetPeek,
         saveIndexedDraftShoppingListItem = viewModel::saveDraftShoppingListItem,
         draftShoppingListItemIndex = draftShoppingListItemIndex,
         saveDraftRecommendationRequest = viewModel::saveDraftRecommendationRequest,
@@ -92,6 +95,7 @@ fun RecommendationRequestScreen(
     modifier: Modifier,
     draftShoppingListItemIndex: Int,
     snackbarHostState: SnackbarHostState,
+    bottomSheetPeek: (BottomSheetPeek) -> Unit,
     saveDraftRecommendationRequest: (request: Recommendation.Request) -> Unit,
     clearDraftShoppingListItem: () -> Unit,
     getRecommendations: () -> Unit,
@@ -125,7 +129,7 @@ fun RecommendationRequestScreen(
     val context = LocalContext.current
     LaunchedEffect(recommendationsState) {
         if (recommendationsState is State.Success) {
-            snackbarHostState.showSnackbar("Success")
+            bottomSheetPeek(BottomSheetPeek.RecommendationResponse.Many(recommendationsState.data))
         } else if (recommendationsState is State.Failure) {
             val message = recommendationsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)
@@ -375,6 +379,7 @@ private fun RecommendationRequestScreenPreview() {
             recommendationsState = State.Idle,
             draftShoppingListItemIndex = RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX,
             snackbarHostState = SnackbarHostState(),
+            bottomSheetPeek = {},
             saveDraftRecommendationRequest = {},
             clearDraftShoppingListItem = {},
             getRecommendations = {},
