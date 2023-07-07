@@ -5,13 +5,21 @@ import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class MeasurementUnitRepository @Inject constructor(
-    private val remoteDataSource: MeasurementUnitDataSource<MeasurementUnit.RemoteRequest, MeasurementUnit.RemoteResponse>,
-    private val localDataSource: MeasurementUnitDataSource<MeasurementUnit.LocalEntityRequest, MeasurementUnit.LocalEntityResponse>,
-) {
-    suspend fun getMeasurementUnitSearchSuggestions(query: MeasurementUnit): Result<List<MeasurementUnit.LocalViewModel>> {
-        return try {
+sealed interface MeasurementUnitRepository {
+    suspend fun getMeasurementUnitSearchSuggestions(query: MeasurementUnit): Result<List<MeasurementUnit.LocalViewModel>>
+
+    object Fake : MeasurementUnitRepository {
+        override suspend fun getMeasurementUnitSearchSuggestions(query: MeasurementUnit): Result<List<MeasurementUnit.LocalViewModel>> {
+            return Result.success(emptyList())
+        }
+    }
+
+    @Singleton
+    class Actual @Inject constructor(
+        private val remoteDataSource: MeasurementUnitDataSource<MeasurementUnit.RemoteRequest, MeasurementUnit.RemoteResponse>,
+        private val localDataSource: MeasurementUnitDataSource<MeasurementUnit.LocalEntityRequest, MeasurementUnit.LocalEntityResponse>,
+    ) : MeasurementUnitRepository {
+        override suspend fun getMeasurementUnitSearchSuggestions(query: MeasurementUnit) = try {
             localDataSource.getMeasurementUnitSearchSuggestions(query.toLocalEntityRequest())
                 .ifEmpty {
                     remoteDataSource.getMeasurementUnitSearchSuggestions(query.toRemoteRequest())

@@ -49,7 +49,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.BottomSheetPeek
 import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
@@ -63,9 +62,9 @@ import ke.co.xently.ui.theme.XentlyTheme
 @Composable
 fun CompareProductsRequestScreen(
     modifier: Modifier,
+    viewModel: CompareProductViewModel,
     snackbarHostState: SnackbarHostState,
     bottomSheetPeek: (BottomSheetPeek) -> Unit,
-    viewModel: CompareProductViewModel = hiltViewModel(),
 ) {
     val draftComparisonListItemIndex: Int by viewModel.draftComparisonListItemIndex.collectAsState()
     val comparisonsState: State by viewModel.comparisonsStateFlow.collectAsState(State.Idle)

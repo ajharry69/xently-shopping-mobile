@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.BottomSheetPeek
 import ke.co.xently.R
 import ke.co.xently.features.core.isRetryable
@@ -63,9 +62,9 @@ import ke.co.xently.ui.theme.XentlyTheme
 @Composable
 fun RecommendationRequestScreen(
     modifier: Modifier,
+    viewModel: RecommendationViewModel,
     snackbarHostState: SnackbarHostState,
     bottomSheetPeek: (BottomSheetPeek) -> Unit,
-    viewModel: RecommendationViewModel = hiltViewModel(),
 ) {
     val draftShoppingListItemIndex: Int by viewModel.draftShoppingListItemIndex.collectAsState()
     val recommendationsState: State by viewModel.recommendationsStateFlow.collectAsState(State.Idle)

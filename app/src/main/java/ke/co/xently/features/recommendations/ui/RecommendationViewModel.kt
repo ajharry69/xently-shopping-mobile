@@ -13,8 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecommendationViewModel @Inject constructor(
-    private val repository: RecommendationRepository,
     private val stateHandle: SavedStateHandle,
+    private val repository: RecommendationRepository,
 ) : ViewModel() {
     companion object {
         const val DEFAULT_SHOPPING_LIST_ITEM_INDEX = -1

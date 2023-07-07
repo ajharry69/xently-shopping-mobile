@@ -6,37 +6,52 @@ import ke.co.xently.features.products.models.Product
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class ProductRepository @Inject constructor(
-    private val remoteDataSource: ProductDataSource<Product.RemoteRequest, Product.RemoteResponse>,
-    private val localDataSource: ProductDataSource<Product.LocalEntityRequest, Product.LocalEntityResponse>,
-) {
-    suspend fun addProduct(product: Product): Result<Product.LocalViewModel> {
-        Log.i(TAG, "addProduct: $product")
-        return try {
-            remoteDataSource.addProduct(product.toRemoteRequest()).let {
-                localDataSource.addProduct(it.toLocalEntityRequest())
-            }.let {
-                Result.success(it.toLocalViewModel())
-            }
-        } catch (ex: Exception) {
-            Result.failure(ex)
+sealed interface ProductRepository {
+    suspend fun addProduct(product: Product): Result<Product.LocalViewModel>
+    suspend fun getProductSearchSuggestions(query: Product): Result<List<Product.LocalViewModel>>
+
+    object Fake : ProductRepository {
+        override suspend fun addProduct(product: Product): Result<Product.LocalViewModel> {
+            return Result.success(product.toLocalViewModel())
+        }
+
+        override suspend fun getProductSearchSuggestions(query: Product): Result<List<Product.LocalViewModel>> {
+            return Result.success(emptyList())
         }
     }
 
-    suspend fun getProductSearchSuggestions(query: Product): Result<List<Product.LocalViewModel>> {
-        return try {
-            localDataSource.getProductSearchSuggestions(query.toLocalEntityRequest()).ifEmpty {
-                remoteDataSource.getProductSearchSuggestions(query.toRemoteRequest())
-            }.map { it.toLocalViewModel() }.let {
-                Result.success(it)
+    @Singleton
+    class Actual @Inject constructor(
+        private val remoteDataSource: ProductDataSource<Product.RemoteRequest, Product.RemoteResponse>,
+        private val localDataSource: ProductDataSource<Product.LocalEntityRequest, Product.LocalEntityResponse>,
+    ) : ProductRepository {
+        override suspend fun addProduct(product: Product): Result<Product.LocalViewModel> {
+            Log.i(TAG, "addProduct: $product")
+            return try {
+                remoteDataSource.addProduct(product.toRemoteRequest()).let {
+                    localDataSource.addProduct(it.toLocalEntityRequest())
+                }.let {
+                    Result.success(it.toLocalViewModel())
+                }
+            } catch (ex: Exception) {
+                Result.failure(ex)
             }
-        } catch (ex: Exception) {
-            Result.failure(ex)
         }
-    }
 
-    companion object {
-        private val TAG = ProductRepository::class.java.simpleName
+        override suspend fun getProductSearchSuggestions(query: Product): Result<List<Product.LocalViewModel>> {
+            return try {
+                localDataSource.getProductSearchSuggestions(query.toLocalEntityRequest()).ifEmpty {
+                    remoteDataSource.getProductSearchSuggestions(query.toRemoteRequest())
+                }.map { it.toLocalViewModel() }.let {
+                    Result.success(it)
+                }
+            } catch (ex: Exception) {
+                Result.failure(ex)
+            }
+        }
+
+        companion object {
+            private val TAG = ProductRepository::class.java.simpleName
+        }
     }
 }

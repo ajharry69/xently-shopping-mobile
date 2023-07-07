@@ -14,8 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CompareProductViewModel @Inject constructor(
-    private val repository: CompareProductRepository,
     private val stateHandle: SavedStateHandle,
+    private val repository: CompareProductRepository,
 ) : ViewModel() {
     companion object {
         const val DEFAULT_COMPARISON_LIST_ITEM_INDEX = -1

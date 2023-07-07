@@ -5,12 +5,20 @@ import ke.co.xently.features.recommendations.models.Recommendation
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class RecommendationRepository @Inject constructor(
-    private val remoteDataSource: RecommendationDataSource<Recommendation.Request, Recommendation.Response>,
-) {
-    suspend fun getRecommendations(request: Recommendation.Request): Result<List<Recommendation.Response>> {
-        return try {
+sealed interface RecommendationRepository {
+    suspend fun getRecommendations(request: Recommendation.Request): Result<List<Recommendation.Response>>
+
+    object Fake : RecommendationRepository {
+        override suspend fun getRecommendations(request: Recommendation.Request): Result<List<Recommendation.Response>> {
+            return Result.success(emptyList())
+        }
+    }
+
+    @Singleton
+    class Actual @Inject constructor(
+        private val remoteDataSource: RecommendationDataSource<Recommendation.Request, Recommendation.Response>,
+    ) : RecommendationRepository {
+        override suspend fun getRecommendations(request: Recommendation.Request) = try {
             remoteDataSource.getRecommendations(request).let {
                 Result.success(it)
             }

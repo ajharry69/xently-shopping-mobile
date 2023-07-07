@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.features.attributes.models.Attribute
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.brands.models.Brand
@@ -41,8 +40,8 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun AddProductScreen(
     modifier: Modifier,
+    viewModel: ProductViewModel,
     snackbarHostState: SnackbarHostState,
-    viewModel: ProductViewModel = hiltViewModel()
 ) {
     val addProductStep: AddProductStep by viewModel.currentlyActiveStep.collectAsState()
     val product: Product.LocalViewModel by viewModel.product.collectAsState()
