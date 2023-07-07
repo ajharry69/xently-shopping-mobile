@@ -104,4 +104,5 @@
     <string name="xently_empty_recommendation_details">Empty recommendation details</string>
     <string name="xently_error_navigation_app_not_found">Sorry, an app for handling directions was not found.</string>
     <string name="xently_install">Install</string>
+    <string name="xently_button_label_getting_current_location">Getting your current location…</string>
 </resources>

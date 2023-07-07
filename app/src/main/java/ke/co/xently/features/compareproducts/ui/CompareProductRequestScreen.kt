@@ -163,12 +163,7 @@ internal fun CompareProductsRequestScreen(
             val result: SnackbarResult = snackbarHostState.showSnackbar(
                 message = message,
                 actionLabel = actionLabel,
-                withDismissAction = comparisonsState.error.isRetryable,
-                duration = if (actionLabel == null) {
-                    SnackbarDuration.Long
-                } else {
-                    SnackbarDuration.Indefinite
-                },
+                duration = SnackbarDuration.Long,
             )
 
             if (result == SnackbarResult.ActionPerformed) {

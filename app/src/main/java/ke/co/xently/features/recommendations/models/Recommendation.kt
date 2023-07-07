@@ -1,8 +1,8 @@
 package ke.co.xently.features.recommendations.models
 
 import android.icu.math.BigDecimal
-import android.location.Location
 import android.os.Parcelable
+import ke.co.xently.features.core.models.Location
 import ke.co.xently.features.store.models.Store
 import kotlinx.parcelize.Parcelize
 
@@ -80,7 +80,7 @@ sealed interface Recommendation {
 
         companion object {
             val default = Request(
-                currentLocation = Location(null),
+                currentLocation = Location.default,
                 storeDistanceMeters = 50,
                 shoppingList = emptyList(),
             )

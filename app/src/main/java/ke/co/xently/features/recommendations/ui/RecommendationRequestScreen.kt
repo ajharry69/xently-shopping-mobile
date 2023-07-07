@@ -55,7 +55,9 @@ import ke.co.xently.BottomSheetPeek
 import ke.co.xently.R
 import ke.co.xently.features.core.isRetryable
 import ke.co.xently.features.core.loadingIndicatorLabel
+import ke.co.xently.features.core.models.toLocation
 import ke.co.xently.features.core.ui.LabeledCheckbox
+import ke.co.xently.features.locationtracker.ForegroundLocationTracker
 import ke.co.xently.features.recommendations.models.Recommendation
 import ke.co.xently.ui.theme.XentlyTheme
 
@@ -71,6 +73,15 @@ fun RecommendationRequestScreen(
     val request: Recommendation.Request by viewModel.recommendationRequest.collectAsState()
     val draftShoppingListItem: Recommendation.Request.ShoppingListItem by viewModel.draftShoppingListItem.collectAsState()
 
+    if (recommendationsState is State.GettingCurrentLocation) {
+        ForegroundLocationTracker(
+            snackbarHostState = snackbarHostState,
+            onLocationUpdates = {
+                viewModel.getRecommendations(it.toLocation())
+            },
+        )
+    }
+
     RecommendationRequestScreen(
         draftShoppingListItem = draftShoppingListItem,
         request = request,
@@ -82,7 +93,7 @@ fun RecommendationRequestScreen(
         draftShoppingListItemIndex = draftShoppingListItemIndex,
         saveDraftRecommendationRequest = viewModel::saveDraftRecommendationRequest,
         clearDraftShoppingListItem = viewModel::clearDraftShoppingListItem,
-        getRecommendations = viewModel::getRecommendations,
+        getRecommendations = viewModel::flagGettingCurrentLocation,
     )
 }
 
@@ -140,12 +151,7 @@ fun RecommendationRequestScreen(
             val result: SnackbarResult = snackbarHostState.showSnackbar(
                 message = message,
                 actionLabel = actionLabel,
-                withDismissAction = recommendationsState.error.isRetryable,
-                duration = if (actionLabel == null) {
-                    SnackbarDuration.Long
-                } else {
-                    SnackbarDuration.Indefinite
-                },
+                duration = SnackbarDuration.Long,
             )
 
             if (result == SnackbarResult.ActionPerformed) {
@@ -342,9 +348,20 @@ fun RecommendationRequestScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Divider()
-            val enableGetRecommendationsButton by remember(recommendationsLoading, request) {
+            val isGettingCurrentLocation by remember(recommendationsState) {
                 derivedStateOf {
-                    !recommendationsLoading && request.shoppingList.isNotEmpty()
+                    recommendationsState is State.GettingCurrentLocation
+                }
+            }
+            val enableGetRecommendationsButton by remember(
+                recommendationsLoading,
+                isGettingCurrentLocation,
+                request,
+            ) {
+                derivedStateOf {
+                    !recommendationsLoading
+                            && !isGettingCurrentLocation
+                            && request.shoppingList.isNotEmpty()
                 }
             }
             Button(
@@ -353,13 +370,19 @@ fun RecommendationRequestScreen(
                 onClick = getRecommendations,
             ) {
                 Text(
-                    text = loadingIndicatorLabel(
-                        loading = recommendationsLoading,
-                        label = stringResource(R.string.xently_button_label_get_recommendations)
-                            .toUpperCase(Locale.current),
-                        loadingLabelPrefix = stringResource(R.string.xently_button_label_getting_recommendations),
-                        keys = arrayOf(recommendationsState),
-                    ),
+                    text = if (isGettingCurrentLocation) {
+                        stringResource(
+                            R.string.xently_button_label_getting_current_location
+                        )
+                    } else {
+                        loadingIndicatorLabel(
+                            loading = recommendationsLoading,
+                            label = stringResource(R.string.xently_button_label_get_recommendations)
+                                .toUpperCase(Locale.current),
+                            loadingLabelPrefix = stringResource(R.string.xently_button_label_getting_recommendations),
+                            keys = arrayOf(recommendationsState),
+                        )
+                    },
                 )
             }
         }

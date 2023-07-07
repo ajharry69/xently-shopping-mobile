@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ke.co.xently.features.core.models.Location
 import ke.co.xently.features.recommendations.models.Recommendation
 import ke.co.xently.features.recommendations.repositories.RecommendationRepository
 import kotlinx.coroutines.channels.Channel
@@ -56,17 +57,24 @@ class RecommendationViewModel @Inject constructor(
         stateHandle[SHOPPING_LIST_ITEM_INDEX_KEY] = DEFAULT_SHOPPING_LIST_ITEM_INDEX
     }
 
-    fun getRecommendations() {
+    fun getRecommendations(location: Location) {
         viewModelScope.launch {
             recommendationsStateChannel.send(State.Loading)
 
-            repository.getRecommendations(recommendationRequest.value).also { result ->
-                result.onSuccess {
-                    recommendationsStateChannel.send(State.Success(it))
-                }.onFailure {
-                    recommendationsStateChannel.send(State.Failure(it))
+            repository.getRecommendations(recommendationRequest.value.copy(currentLocation = location))
+                .also { result ->
+                    result.onSuccess {
+                        recommendationsStateChannel.send(State.Success(it))
+                    }.onFailure {
+                        recommendationsStateChannel.send(State.Failure(it))
+                    }
                 }
-            }
+        }
+    }
+
+    fun flagGettingCurrentLocation() {
+        viewModelScope.launch {
+            recommendationsStateChannel.send(State.GettingCurrentLocation)
         }
     }
 }
