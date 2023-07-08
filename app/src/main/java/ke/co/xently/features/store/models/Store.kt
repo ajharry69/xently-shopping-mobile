@@ -13,6 +13,7 @@ sealed interface Store {
     val name: String
     val location: Location
     val shop: Shop
+    fun hasAnOnlineStore() = shop.hasAnOnlineStore()
 
     data class RemoteRequest(
         override val id: Long,

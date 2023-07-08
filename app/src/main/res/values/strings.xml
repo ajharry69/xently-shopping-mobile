@@ -105,4 +105,6 @@
     <string name="xently_error_navigation_app_not_found">Sorry, an app for handling directions was not found.</string>
     <string name="xently_install">Install</string>
     <string name="xently_button_label_getting_current_location">Getting your current location…</string>
+    <string name="xently_recommendation_response_approximate_unit_selling_price">Last purchased on %2$s at %1$s per unit.</string>
+    <string name="xently_visit_online_store">Visit the online store</string>
 </resources>

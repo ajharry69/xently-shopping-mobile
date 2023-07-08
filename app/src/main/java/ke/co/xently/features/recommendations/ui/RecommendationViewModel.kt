@@ -1,5 +1,6 @@
 package ke.co.xently.features.recommendations.ui
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -66,6 +67,7 @@ class RecommendationViewModel @Inject constructor(
                     result.onSuccess {
                         recommendationsStateChannel.send(State.Success(it))
                     }.onFailure {
+                        Log.e(TAG, "getRecommendations: ${it.localizedMessage}", it)
                         recommendationsStateChannel.send(State.Failure(it))
                     }
                 }

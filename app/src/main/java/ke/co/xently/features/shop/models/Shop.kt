@@ -8,6 +8,10 @@ sealed interface Shop {
     val name: String
     val ecommerceSiteUrl: String?
 
+    fun hasAnOnlineStore(): Boolean {
+        return !ecommerceSiteUrl.isNullOrBlank()
+    }
+
     data class RemoteRequest(
         override val id: Long,
         override val name: String,

@@ -1,9 +1,13 @@
 package ke.co.xently.features.core
 
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.icu.text.NumberFormat
 import android.icu.util.Currency
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +47,20 @@ val Context.currencyNumberFormat: NumberFormat
         currency = Currency.getInstance(getString(R.string.xently_iso_currency_code))
         isGroupingUsed = true
     }
+
+inline fun Context.visitUriPage(
+    uriString: String,
+    logTag: String = "Utils",
+    onActivityNotFound: () -> Unit = {},
+) {
+    val uri = Uri.parse(uriString)
+    try {
+        startActivity(Intent(Intent.ACTION_VIEW, uri))
+    } catch (ex: ActivityNotFoundException) {
+        Log.e(logTag, "An error was encountered when visiting: $uri", ex)
+        onActivityNotFound()
+    }
+}
 
 @Composable
 fun loadingIndicatorLabel(

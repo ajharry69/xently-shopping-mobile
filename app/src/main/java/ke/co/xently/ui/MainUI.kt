@@ -1,12 +1,13 @@
 package ke.co.xently.ui
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import ke.co.xently.BottomSheetPeek
@@ -50,6 +52,7 @@ import ke.co.xently.features.compareproducts.repositories.CompareProductReposito
 import ke.co.xently.features.compareproducts.ui.CompareProductResponseScreen
 import ke.co.xently.features.compareproducts.ui.CompareProductViewModel
 import ke.co.xently.features.compareproducts.ui.CompareProductsRequestScreen
+import ke.co.xently.features.core.visitUriPage
 import ke.co.xently.features.measurementunit.repositories.MeasurementUnitRepository
 import ke.co.xently.features.products.repositories.ProductRepository
 import ke.co.xently.features.products.ui.AddProductScreen
@@ -65,6 +68,7 @@ import ke.co.xently.features.store.repositories.StoreRepository
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.launch
 
+private const val TAG = "MainUI"
 
 @Composable
 fun MainUI() {
@@ -95,13 +99,16 @@ fun MainUI() {
                 )
 
                 if (result == SnackbarResult.ActionPerformed) {
-                    try {
-                        Uri.parse("market://details?id=$googleMapsPackageName")
-                    } catch (ex: ActivityNotFoundException) {
-                        Uri.parse("https://play.google.com/store/apps/details?id=$googleMapsPackageName")
-                    }.also {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, it))
-                    }
+                    context.visitUriPage(
+                        "market://details?id=$googleMapsPackageName",
+                        logTag = TAG,
+                        onActivityNotFound = {
+                            context.visitUriPage(
+                                "https://play.google.com/store/apps/details?id=$googleMapsPackageName",
+                                logTag = TAG,
+                            )
+                        },
+                    )
                 }
             }
         } else {
@@ -122,6 +129,11 @@ fun MainUI() {
         snackbarHostState = snackbarHostState,
         navigateToStore = navigateToStore,
         onTabClicked = viewModel::saveCurrentlyActiveTab,
+        visitOnlineStore = { response ->
+            response.store.shop.ecommerceSiteUrl.takeIf { !it.isNullOrBlank() }?.also {
+                context.visitUriPage(it.trim(), logTag = TAG)
+            }
+        },
     )
 }
 
@@ -132,6 +144,7 @@ fun MainUI(
     snackbarHostState: SnackbarHostState,
     onTabClicked: (HomeTab) -> Unit,
     navigateToStore: (Recommendation.Response) -> Unit,
+    visitOnlineStore: (Recommendation.Response) -> Unit,
     productViewModel: ProductViewModel = hiltViewModel(),
     recommendationViewModel: RecommendationViewModel = hiltViewModel(),
     compareProductViewModel: CompareProductViewModel = hiltViewModel(),
@@ -239,6 +252,7 @@ fun MainUI(
                         modifier = Modifier,
                         response = peek.data,
                         onNavigate = navigateToStore,
+                        visitOnlineStore = visitOnlineStore,
                         onViewProduct = {
                             bottomSheetPeek =
                                 BottomSheetPeek.RecommendationResponse.Single(it)
@@ -251,8 +265,12 @@ fun MainUI(
                         modifier = Modifier,
                         response = peek.data,
                         onNavigate = navigateToStore,
+                        visitOnlineStore = visitOnlineStore,
                     )
                 }
+            }
+            AnimatedVisibility(bottomSheetPeek !is BottomSheetPeek.Ignore) {
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -273,6 +291,7 @@ private fun MainUIPreview() {
             snackbarHostState = snackbarHostState,
             onTabClicked = { selectedTab = it },
             navigateToStore = {},
+            visitOnlineStore = {},
             productViewModel = ProductViewModel(
                 stateHandle = stateHandle,
                 productRepository = ProductRepository.Fake,

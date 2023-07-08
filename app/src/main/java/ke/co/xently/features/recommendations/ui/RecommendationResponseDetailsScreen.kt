@@ -11,27 +11,39 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
+import ke.co.xently.features.core.currencyNumberFormat
 import ke.co.xently.features.recommendations.models.Recommendation
+import ke.co.xently.features.recommendations.ui.components.RecommendationSummaryItemDropdownMenu
 import ke.co.xently.features.recommendations.ui.components.StoreRecommendationSummaryItem
 import ke.co.xently.ui.theme.XentlyTheme
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import kotlin.random.Random
 
 @Composable
@@ -39,15 +51,15 @@ fun RecommendationResponseDetailsScreen(
     modifier: Modifier,
     response: Recommendation.Response,
     onNavigate: (Recommendation.Response) -> Unit,
+    visitOnlineStore: (Recommendation.Response) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         StoreRecommendationSummaryItem(response = response) {
-            IconButton(onClick = { onNavigate(response) }) {
-                Icon(
-                    Icons.Default.NearMe,
-                    contentDescription = stringResource(R.string.xently_navigate_to_store),
-                )
-            }
+            RecommendationSummaryItemTrailingContent(
+                response = response,
+                onNavigate = onNavigate,
+                visitOnlineStore = visitOnlineStore,
+            )
         }
 
         Divider()
@@ -70,18 +82,10 @@ fun RecommendationResponseDetailsScreen(
                     Text(text = stringResource(R.string.xently_empty_recommendation_details))
                 }
             } else {
-                val titleStyle = MaterialTheme.typography.titleLarge
                 LazyColumn(modifier = Modifier.then(modifier)) {
                     if (!areHitsEmpty) {
                         item {
-                            ListItem(
-                                headlineContent = {
-                                    Text(
-                                        text = stringResource(R.string.xently_hits_title),
-                                        style = titleStyle,
-                                    )
-                                },
-                            )
+                            TitleText(title = stringResource(R.string.xently_hits_title))
                         }
                         items(response.hit.items, key = { it.bestMatched.name }) {
                             HitItem(item = it)
@@ -89,14 +93,7 @@ fun RecommendationResponseDetailsScreen(
                     }
                     if (!areMissesEmpty) {
                         item {
-                            ListItem(
-                                headlineContent = {
-                                    Text(
-                                        text = stringResource(R.string.xently_misses_title),
-                                        style = titleStyle,
-                                    )
-                                },
-                            )
+                            TitleText(title = stringResource(R.string.xently_misses_title))
                         }
                         items(response.miss.items, key = { it.value }) {
                             MissItem(item = it)
@@ -109,13 +106,96 @@ fun RecommendationResponseDetailsScreen(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun RecommendationSummaryItemTrailingContent(
+    response: Recommendation.Response,
+    onNavigate: (Recommendation.Response) -> Unit,
+    visitOnlineStore: (Recommendation.Response) -> Unit
+) {
+    AnimatedContent(targetState = response.hasAnOnlineStore()) { hasAnOnlineStore ->
+        if (hasAnOnlineStore) {
+            var showComparisonListItemMenu by remember {
+                mutableStateOf(false)
+            }
+            Box {
+                IconButton(
+                    onClick = {
+                        showComparisonListItemMenu = !showComparisonListItemMenu
+                    },
+                ) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = stringResource(
+                            R.string.xently_content_description_options_for_item,
+                            response.store,
+                        ),
+                    )
+                }
+
+                RecommendationSummaryItemDropdownMenu(
+                    response = response,
+                    showComparisonListItemMenu = showComparisonListItemMenu,
+                    onNavigate = onNavigate,
+                    onViewProduct = null,
+                    visitOnlineStore = visitOnlineStore,
+                    onDismissRequest = {
+                        showComparisonListItemMenu = false
+                    },
+                )
+            }
+        } else {
+            PlainTooltipBox(
+                tooltip = {
+                    Text(text = stringResource(R.string.xently_navigate_to_store))
+                },
+            ) {
+                IconButton(
+                    onClick = { onNavigate(response) },
+                    modifier = Modifier.tooltipTrigger(),
+                ) {
+                    Icon(
+                        Icons.Default.NearMe,
+                        contentDescription = stringResource(R.string.xently_navigate_to_store),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TitleText(title: String) {
+    ListItem(
+        headlineContent = {
+            Text(
+                text = title,
+                fontWeight = FontWeight.Bold,
+                textDecoration = TextDecoration.Underline,
+                style = MaterialTheme.typography.titleLarge,
+            )
+        }
+    )
+}
+
+@Composable
 private fun HitItem(item: Recommendation.Response.Hit.Item) {
     ListItem(
         headlineContent = {
             Text(text = item.shoppingList.name)
         },
         supportingContent = {
-            Text(text = item.bestMatched.name)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(text = item.bestMatched.name)
+                Text(
+                    style = MaterialTheme.typography.labelMedium,
+                    text = stringResource(
+                        R.string.xently_recommendation_response_approximate_unit_selling_price,
+                        LocalContext.current.currencyNumberFormat.format(item.bestMatched.unitPrice),
+                        item.bestMatched.lastKnownDateOfPurchase()
+                            .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)),
+                    ),
+                )
+            }
         },
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -206,6 +286,7 @@ private fun RecommendationResponseDetailsScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             response = response,
             onNavigate = {},
+            visitOnlineStore = {},
         )
     }
 }

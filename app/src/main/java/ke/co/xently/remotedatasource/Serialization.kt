@@ -9,9 +9,11 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import ke.co.xently.features.recommendations.models.Recommendation
 import ke.co.xently.remotedatasource.Exclude.During.BOTH
 import ke.co.xently.remotedatasource.Exclude.During.DESERIALIZATION
 import ke.co.xently.remotedatasource.Exclude.During.SERIALIZATION
+import java.math.BigDecimal
 
 object Serialization {
     private fun getExclusionStrategy(during: Exclude.During = BOTH): ExclusionStrategy {
@@ -50,6 +52,42 @@ object Serialization {
                 return Uri.parse(uri)
             }
         }.nullSafe())
+        .registerTypeAdapter(BigDecimal::class.java, object : TypeAdapter<BigDecimal>() {
+            override fun write(out: JsonWriter?, value: BigDecimal?) {
+                out?.value(value?.toString()?.toDouble())
+            }
+
+            override fun read(`in`: JsonReader?): BigDecimal? {
+                val value = `in`?.nextDouble() ?: return null
+                return BigDecimal(value)
+            }
+        }.nullSafe())
+        .registerTypeAdapter(
+            android.icu.math.BigDecimal::class.java,
+            object : TypeAdapter<android.icu.math.BigDecimal>() {
+                override fun write(out: JsonWriter?, value: android.icu.math.BigDecimal?) {
+                    out?.value(value?.toString()?.toDouble())
+                }
+
+                override fun read(`in`: JsonReader?): android.icu.math.BigDecimal? {
+                    val value = `in`?.nextDouble() ?: return null
+                    return android.icu.math.BigDecimal(value)
+                }
+            }.nullSafe()
+        )
+        .registerTypeAdapter(
+            Recommendation.Response.Miss.Item::class.java,
+            object : TypeAdapter<Recommendation.Response.Miss.Item>() {
+                override fun write(out: JsonWriter?, value: Recommendation.Response.Miss.Item?) {
+                    out?.value(value?.toString())
+                }
+
+                override fun read(`in`: JsonReader?): Recommendation.Response.Miss.Item? {
+                    val value = `in`?.nextString() ?: return null
+                    return Recommendation.Response.Miss.Item(value)
+                }
+            }.nullSafe()
+        )
         /*.setPrettyPrinting()
         .setVersion(1.0)*/
         .create()

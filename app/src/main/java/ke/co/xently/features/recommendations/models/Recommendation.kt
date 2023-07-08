@@ -5,6 +5,7 @@ import android.os.Parcelable
 import ke.co.xently.features.core.models.Location
 import ke.co.xently.features.store.models.Store
 import kotlinx.parcelize.Parcelize
+import java.time.LocalDateTime
 
 sealed interface Recommendation {
     @Parcelize
@@ -81,7 +82,7 @@ sealed interface Recommendation {
         companion object {
             val default = Request(
                 currentLocation = Location.default,
-                storeDistanceMeters = 50,
+                storeDistanceMeters = 50000,
                 shoppingList = emptyList(),
             )
         }
@@ -93,13 +94,15 @@ sealed interface Recommendation {
         val hit: Hit,
         val miss: Miss,
     ) : Recommendation {
+        fun hasAnOnlineStore() = store.hasAnOnlineStore()
+
         data class EstimatedExpenditure(val unit: Number = 0, val total: Number = 0) {
             companion object {
                 val default = EstimatedExpenditure()
             }
         }
 
-        data class Miss(val count: Int, val items: List<Item>) {
+        data class Miss(val count: Int, val items: List<Item> = emptyList()) {
             @JvmInline
             value class Item(val value: String) {
                 companion object {
@@ -115,7 +118,7 @@ sealed interface Recommendation {
             }
         }
 
-        data class Hit(val count: Int, val items: List<Item>) {
+        data class Hit(val count: Int, val items: List<Item> = emptyList()) {
             data class Item(
                 val bestMatched: BestMatched,
                 val shoppingList: ShoppingList,
@@ -135,6 +138,9 @@ sealed interface Recommendation {
                     val totalPrice: BigDecimal,
                     val pricePerBaseMeasurementUnitQuantity: BigDecimal,
                 ) {
+                    // TODO: Move inside the constructor and fetch from server
+                    fun lastKnownDateOfPurchase(): LocalDateTime = LocalDateTime.now()
+
                     companion object {
                         val default = BestMatched(
                             name = "",

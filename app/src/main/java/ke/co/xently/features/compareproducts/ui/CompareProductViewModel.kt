@@ -1,5 +1,6 @@
 package ke.co.xently.features.compareproducts.ui
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -65,6 +66,7 @@ class CompareProductViewModel @Inject constructor(
                 result.onSuccess {
                     compareProductsStateChannel.send(State.Success(it))
                 }.onFailure {
+                    Log.e(TAG, "compareProducts: ${it.localizedMessage}", it)
                     compareProductsStateChannel.send(State.Failure(it))
                 }
             }
