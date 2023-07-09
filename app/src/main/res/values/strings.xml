@@ -7,7 +7,6 @@
     <string name="xently_button_label_select_store_location">Please select store location on the map</string>
     <string name="xently_button_label_back">Back</string>
     <string name="xently_product_name_page_title">Name of product</string>
-    <string name="xently_text_field_label_name">Name</string>
     <string name="xently_text_field_label_name_required">Name*</string>
     <string name="xently_text_field_label_name_plural">Name plural</string>
     <string name="xently_measurement_unit_page_title">Measurement unit of product</string>
@@ -30,7 +29,6 @@
     <string name="xently_text_field_label_time_purchased">Time purchased</string>
     <string name="xently_text_field_label_date_purchased">Date purchased</string>
     <string name="xently_date_time_picker_confirm_button_label">Confirm selection</string>
-    <string name="xently_button_label_loading">Loading…</string>
     <string name="xently_content_description_add_attribute">Add attribute</string>
     <string name="xently_remove">Remove</string>
     <string name="xently_edit">Edit</string>
@@ -71,7 +69,6 @@
     <string name="xently_checkbox_label_reuse_store">Reuse the store?</string>
     <string name="xently_checkbox_label_reuse_store_and_shop">Reuse store and/or shop?</string>
     <string name="xently_reuse_details_intro">Reuse the following details when adding another product.</string>
-    <string name="xently_button_label_submitting">Submitting…</string>
     <string name="xently_summary_page_subtitle">This is what we have captured so far.</string>
     <string name="xently_generic_error_message">Sorry, an unknown error was encountered.</string>
     <string name="xently_iso_currency_code" translatable="true">KES</string>
@@ -94,7 +91,6 @@
     <string name="xently_button_label_add_another_item">Please add another item to compare with</string>
     <string name="xently_retry">Retry</string>
     <string name="xently_compare_product_response_title">Products are ordered by the cheapest first</string>
-    <string name="xently_recommendation_response_title">Title</string>
     <string name="xently_recommendation_response_approximate_store_distance">Approximately, %1$s away</string>
     <string name="xently_recommendation_response_summary">Found %1$d out of %2$d products with an estimated total expenditure of %3$s.</string>
     <string name="xently_navigate_to_store">Navigate to store</string>
@@ -120,4 +116,7 @@
     <string name="xently_recommendation_Response_sort_by_store_distance">Distance to the store</string>
     <string name="xently_recommendation_Response_sort_by_estimated_expenditure">Estimated expenditure</string>
     <string name="xently_switch_order">Click to switch to %1$s order</string>
+    <string name="xently_compare_product_response_sort_by_cheapest_first">Cheapest first</string>
+    <string name="xently_compare_product_response_sort_by_expensive_first">Expensive first</string>
+    <string name="xently_content_description_sort_compare_product_responses">Sort compare product responses</string>
 </resources>

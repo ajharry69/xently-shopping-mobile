@@ -13,20 +13,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -42,10 +47,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +61,7 @@ import ke.co.xently.BottomSheet
 import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
 import ke.co.xently.features.compareproducts.models.ComparisonListItem
+import ke.co.xently.features.core.OrderBy
 import ke.co.xently.features.core.cleansedForNumberParsing
 import ke.co.xently.features.core.currencyNumberFormat
 import ke.co.xently.features.core.isRetryable
@@ -86,6 +95,7 @@ fun CompareProductsRequestScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CompareProductsRequestScreen(
     draftComparisonListItem: ComparisonListItem,
@@ -345,12 +355,60 @@ internal fun CompareProductsRequestScreen(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Divider()
+            Surface(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Sort,
+                        contentDescription = stringResource(R.string.xently_content_description_sort_compare_product_responses),
+                    )
+                    Column {
+                        val label by remember(request.orderBy) {
+                            derivedStateOf {
+                                when (request.orderBy) {
+                                    OrderBy.Ascending -> R.string.xently_compare_product_response_sort_by_cheapest_first
+                                    OrderBy.Descending -> R.string.xently_compare_product_response_sort_by_expensive_first
+                                }
+                            }
+                        }
+                        Text(text = stringResource(label))
+                        PlainTooltipBox(
+                            tooltip = {
+                                Text(
+                                    text = stringResource(
+                                        R.string.xently_switch_order,
+                                        stringResource(request.orderBy.opposite.label)
+                                            .toLowerCase(Locale.current),
+                                    ),
+                                )
+                            },
+                        ) {
+                            Text(
+                                text = stringResource(request.orderBy.label),
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline,
+                                modifier = Modifier
+                                    .tooltipTrigger()
+                                    .toggleable(
+                                        value = true,
+                                        role = Role.Switch,
+                                        onValueChange = {
+                                            request
+                                                .copy(orderBy = request.orderBy.opposite)
+                                                .let(saveDraftCompareProductsRequest)
+                                        },
+                                    ),
+                            )
+                        }
+                    }
+                }
+            }
             val enableGetCompareProductsButton by remember(comparisonsLoading, request) {
                 derivedStateOf {
                     !comparisonsLoading && request.comparisonList.size > 1
