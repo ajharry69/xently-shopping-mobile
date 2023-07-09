@@ -123,7 +123,40 @@ sealed interface Recommendation {
                 val bestMatched: BestMatched,
                 val shoppingList: ShoppingList,
             ) {
+                override fun equals(other: Any?): Boolean {
+                    if (this === other) return true
+                    if (javaClass != other?.javaClass) return false
+
+                    other as Item
+
+                    if (bestMatched != other.bestMatched) return false
+                    if (shoppingList != other.shoppingList) return false
+
+                    return true
+                }
+
+                override fun hashCode(): Int {
+                    var result = bestMatched.hashCode()
+                    result = 31 * result + shoppingList.hashCode()
+                    return result
+                }
+
                 data class ShoppingList(val name: String, val quantityToPurchase: Number = 1) {
+                    override fun hashCode(): Int {
+                        return name.hashCode()
+                    }
+
+                    override fun equals(other: Any?): Boolean {
+                        if (this === other) return true
+                        if (javaClass != other?.javaClass) return false
+
+                        other as ShoppingList
+
+                        if (name != other.name) return false
+
+                        return true
+                    }
+
                     companion object {
                         val default = ShoppingList(name = "")
                     }
@@ -140,6 +173,21 @@ sealed interface Recommendation {
                 ) {
                     // TODO: Move inside the constructor and fetch from server
                     fun lastKnownDateOfPurchase(): LocalDateTime = LocalDateTime.now()
+
+                    override fun hashCode(): Int {
+                        return name.hashCode()
+                    }
+
+                    override fun equals(other: Any?): Boolean {
+                        if (this === other) return true
+                        if (javaClass != other?.javaClass) return false
+
+                        other as BestMatched
+
+                        if (name != other.name) return false
+
+                        return true
+                    }
 
                     companion object {
                         val default = BestMatched(

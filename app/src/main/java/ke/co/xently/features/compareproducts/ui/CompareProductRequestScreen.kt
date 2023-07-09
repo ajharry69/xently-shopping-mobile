@@ -49,7 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ke.co.xently.BottomSheetPeek
+import ke.co.xently.BottomSheet
 import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
 import ke.co.xently.features.compareproducts.models.ComparisonListItem
@@ -64,7 +64,7 @@ fun CompareProductsRequestScreen(
     modifier: Modifier,
     viewModel: CompareProductViewModel,
     snackbarHostState: SnackbarHostState,
-    bottomSheetPeek: (BottomSheetPeek) -> Unit,
+    bottomSheetPeek: (BottomSheet) -> Unit,
 ) {
     val draftComparisonListItemIndex: Int by viewModel.draftComparisonListItemIndex.collectAsState()
     val comparisonsState: State by viewModel.comparisonsStateFlow.collectAsState(State.Idle)
@@ -94,7 +94,7 @@ internal fun CompareProductsRequestScreen(
     modifier: Modifier,
     draftComparisonListItemIndex: Int,
     snackbarHostState: SnackbarHostState,
-    bottomSheetPeek: (BottomSheetPeek) -> Unit,
+    bottomSheetPeek: (BottomSheet) -> Unit,
     saveDraftCompareProductsRequest: (request: CompareProduct.Request) -> Unit,
     clearDraftComparisonListItem: () -> Unit,
     compareProducts: () -> Unit,
@@ -151,7 +151,7 @@ internal fun CompareProductsRequestScreen(
     val context = LocalContext.current
     LaunchedEffect(comparisonsState) {
         if (comparisonsState is State.Success) {
-            bottomSheetPeek(BottomSheetPeek.CompareProductResponse(comparisonsState.data))
+            bottomSheetPeek(BottomSheet.CompareProductResponse(comparisonsState.data))
         } else if (comparisonsState is State.Failure) {
             val message = comparisonsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)

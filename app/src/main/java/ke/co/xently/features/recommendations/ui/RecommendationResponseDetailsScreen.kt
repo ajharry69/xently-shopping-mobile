@@ -87,7 +87,10 @@ fun RecommendationResponseDetailsScreen(
                         item {
                             TitleText(title = stringResource(R.string.xently_hits_title))
                         }
-                        items(response.hit.items, key = { it.bestMatched.name }) {
+                        items(
+                            response.hit.items,
+                            key = { it.bestMatched.name + it.shoppingList.name },
+                        ) {
                             HitItem(item = it)
                         }
                     }

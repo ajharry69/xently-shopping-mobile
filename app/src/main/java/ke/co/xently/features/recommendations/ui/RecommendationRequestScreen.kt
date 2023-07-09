@@ -51,7 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ke.co.xently.BottomSheetPeek
+import ke.co.xently.BottomSheet
 import ke.co.xently.R
 import ke.co.xently.features.core.isRetryable
 import ke.co.xently.features.core.loadingIndicatorLabel
@@ -66,7 +66,7 @@ fun RecommendationRequestScreen(
     modifier: Modifier,
     viewModel: RecommendationViewModel,
     snackbarHostState: SnackbarHostState,
-    bottomSheetPeek: (BottomSheetPeek) -> Unit,
+    bottomSheetPeek: (BottomSheet) -> Unit,
 ) {
     val draftShoppingListItemIndex: Int by viewModel.draftShoppingListItemIndex.collectAsState()
     val recommendationsState: State by viewModel.recommendationsStateFlow.collectAsState(State.Idle)
@@ -105,7 +105,7 @@ fun RecommendationRequestScreen(
     modifier: Modifier,
     draftShoppingListItemIndex: Int,
     snackbarHostState: SnackbarHostState,
-    bottomSheetPeek: (BottomSheetPeek) -> Unit,
+    bottomSheetPeek: (BottomSheet) -> Unit,
     saveDraftRecommendationRequest: (request: Recommendation.Request) -> Unit,
     clearDraftShoppingListItem: () -> Unit,
     getRecommendations: () -> Unit,
@@ -139,7 +139,7 @@ fun RecommendationRequestScreen(
     val context = LocalContext.current
     LaunchedEffect(recommendationsState) {
         if (recommendationsState is State.Success) {
-            bottomSheetPeek(BottomSheetPeek.RecommendationResponse.Many(recommendationsState.data))
+            bottomSheetPeek(BottomSheet.RecommendationResponse.Many(recommendationsState.data))
         } else if (recommendationsState is State.Failure) {
             val message = recommendationsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)

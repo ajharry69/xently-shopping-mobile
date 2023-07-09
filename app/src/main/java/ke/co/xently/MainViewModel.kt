@@ -10,8 +10,8 @@ class MainViewModel @Inject constructor(
     private val stateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
-        private val CURRENT_ACTIVE_TAB_KEY =
-            MainActivity::class.java.simpleName.plus("CURRENT_ACTIVE_TAB_KEY")
+        private val TAG = MainViewModel::class.java.simpleName
+        private val CURRENT_ACTIVE_TAB_KEY = TAG.plus("CURRENT_ACTIVE_TAB_KEY")
     }
 
     val currentlyActiveTab = stateHandle.getStateFlow(
