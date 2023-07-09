@@ -9,8 +9,8 @@ sealed interface CompareProduct {
 
     @Parcelize
     data class Request(
-        override val comparisonList: List<ComparisonListItem>,
         val orderBy: OrderBy,
+        override val comparisonList: List<ComparisonListItem>,
     ) : CompareProduct, Parcelable {
         override fun hashCode(): Int {
             var result = comparisonList.hashCode()
@@ -35,5 +35,8 @@ sealed interface CompareProduct {
         }
     }
 
-    data class Response(override val comparisonList: List<ComparisonListItem>) : CompareProduct
+    data class Response(
+        val orderedBy: OrderBy,
+        override val comparisonList: List<ComparisonListItem>,
+    ) : CompareProduct
 }

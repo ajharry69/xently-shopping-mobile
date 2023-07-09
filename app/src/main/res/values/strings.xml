@@ -90,7 +90,8 @@
     <string name="xently_error_missing_name">Name is required</string>
     <string name="xently_button_label_add_another_item">Please add another item to compare with</string>
     <string name="xently_retry">Retry</string>
-    <string name="xently_compare_product_response_title">Products are ordered by the cheapest first</string>
+    <string name="xently_compare_product_response_title">Comparisons</string>
+    <string name="xently_compare_product_response_subtitle">Results are ordered by the %1$s</string>
     <string name="xently_recommendation_response_approximate_store_distance">Approximately, %1$s away</string>
     <string name="xently_recommendation_response_summary">Found %1$d out of %2$d products with an estimated total expenditure of %3$s.</string>
     <string name="xently_navigate_to_store">Navigate to store</string>

@@ -14,14 +14,20 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
 import ke.co.xently.features.compareproducts.models.ComparisonListItem
+import ke.co.xently.features.core.OrderBy
 import ke.co.xently.features.core.currencyNumberFormat
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlin.random.Random
@@ -36,7 +42,23 @@ fun CompareProductResponseScreen(
             headlineContent = {
                 Text(
                     text = stringResource(R.string.xently_compare_product_response_title),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            },
+            supportingContent = {
+                val label by remember(response.orderedBy) {
+                    derivedStateOf {
+                        when (response.orderedBy) {
+                            OrderBy.Ascending -> R.string.xently_compare_product_response_sort_by_cheapest_first
+                            OrderBy.Descending -> R.string.xently_compare_product_response_sort_by_expensive_first
+                        }
+                    }
+                }
+                Text(
+                    text = stringResource(
+                        R.string.xently_compare_product_response_subtitle,
+                        stringResource(label).toLowerCase(Locale.current),
+                    ),
                 )
             },
         )
@@ -73,7 +95,7 @@ private fun CompareProductResponseScreenPreview() {
         }
         CompareProductResponseScreen(
             modifier = Modifier.fillMaxSize(),
-            response = CompareProduct.Response(comparisonList),
+            response = CompareProduct.Response(OrderBy.Ascending, comparisonList),
         )
     }
 }
