@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
@@ -45,6 +46,7 @@ fun XentlyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
+    wrapSurfaceHeight: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -70,7 +72,11 @@ fun XentlyTheme(
         typography = Typography,
         content = {
             Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = if (wrapSurfaceHeight) {
+                    Modifier.fillMaxWidth()
+                } else {
+                    Modifier.fillMaxSize()
+                },
                 color = MaterialTheme.colorScheme.background,
                 content = content,
             )

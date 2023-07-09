@@ -84,7 +84,7 @@ fun AnimatedModalBottomSheet(
                 is BottomSheet.RecommendationResponse.Many -> {
                     RecommendationResponseScreen(
                         modifier = Modifier,
-                        response = sheet.data,
+                        responses = sheet.data,
                         onNavigate = navigateToStore,
                         visitOnlineStore = visitOnlineStore,
                         onViewProduct = {

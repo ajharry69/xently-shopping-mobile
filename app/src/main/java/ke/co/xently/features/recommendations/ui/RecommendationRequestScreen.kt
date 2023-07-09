@@ -369,20 +369,18 @@ fun RecommendationRequestScreen(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = getRecommendations,
             ) {
+                val (label, loadingLabelPrefix) = if (isGettingCurrentLocation) {
+                    R.string.xently_button_label_get_your_current_location to R.string.xently_button_label_getting_current_location
+                } else {
+                    R.string.xently_button_label_get_recommendations to R.string.xently_button_label_getting_recommendations
+                }
                 Text(
-                    text = if (isGettingCurrentLocation) {
-                        stringResource(
-                            R.string.xently_button_label_getting_current_location
-                        )
-                    } else {
-                        loadingIndicatorLabel(
-                            loading = recommendationsLoading,
-                            label = stringResource(R.string.xently_button_label_get_recommendations)
-                                .toUpperCase(Locale.current),
-                            loadingLabelPrefix = stringResource(R.string.xently_button_label_getting_recommendations),
-                            keys = arrayOf(recommendationsState),
-                        )
-                    },
+                    text = loadingIndicatorLabel(
+                        loading = recommendationsLoading || isGettingCurrentLocation,
+                        label = stringResource(label).toUpperCase(Locale.current),
+                        loadingLabelPrefix = stringResource(loadingLabelPrefix),
+                        keys = arrayOf(recommendationsState),
+                    ),
                 )
             }
         }

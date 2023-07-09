@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Xently</string>
-    <string name="xently_home_tab_title_products">Add products</string>
-    <string name="xently_home_tab_title_recommendations">Recommendations</string>
+    <string name="xently_home_tab_title_add_product">Add product</string>
+    <string name="xently_home_tab_title_recommendation">Recommendation</string>
     <string name="xently_home_tab_title_compare">Compare</string>
     <string name="xently_button_label_continue">Continue</string>
     <string name="xently_button_label_select_store_location">Please select store location on the map</string>
@@ -104,7 +104,20 @@
     <string name="xently_empty_recommendation_details">Empty recommendation details</string>
     <string name="xently_error_navigation_app_not_found">Sorry, an app for handling directions was not found.</string>
     <string name="xently_install">Install</string>
-    <string name="xently_button_label_getting_current_location">Getting your current location…</string>
+    <string name="xently_button_label_getting_current_location">Getting your current location</string>
+    <string name="xently_button_label_get_your_current_location">Get your current location</string>
     <string name="xently_recommendation_response_approximate_unit_selling_price">Last purchased on %2$s at %1$s per unit.</string>
     <string name="xently_visit_online_store">Visit the online store</string>
+    <string name="xently_recommendations">Recommendations</string>
+    <string name="xently_content_description_sort_recommendations">Sort recommendations</string>
+    <string name="xently_content_description_sort_recommendations_by">Sort recommendations by</string>
+    <string name="xently_recommendation_Response_sort_by_default">Default order</string>
+    <string name="xently_recommendation_Response_sort_by_store_name">Store name</string>
+    <string name="xently_recommendation_Response_sort_by_hit_count">Number of items found</string>
+    <string name="xently_recommendation_Response_sort_by_miss_count">Number of items not found</string>
+    <string name="xently_order_by_ascending">Ascending</string>
+    <string name="xently_order_by_descending">Descending</string>
+    <string name="xently_recommendation_Response_sort_by_store_distance">Distance to the store</string>
+    <string name="xently_recommendation_Response_sort_by_estimated_expenditure">Estimated expenditure</string>
+    <string name="xently_switch_order">Click to switch to %1$s order</string>
 </resources>
