@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Xently</string>
     <string name="xently_home_tab_title_add_product">Add product</string>
-    <string name="xently_home_tab_title_recommendation">Recommendation</string>
+    <string name="xently_home_tab_title_recommend">Recommend</string>
     <string name="xently_home_tab_title_compare">Compare</string>
     <string name="xently_button_label_continue">Continue</string>
     <string name="xently_button_label_select_store_location">Please select store location on the map</string>
@@ -41,8 +41,8 @@
     <string name="xently_content_description_add_item">Add "%1$s"</string>
     <string name="xently_empty_shopping_list_message">You have an empty shopping list. Please fill in the form above to get started adding items to your shopping list.</string>
     <string name="xently_text_field_label_shopping_list_item_name">Descriptive item name</string>
-    <string name="xently_text_field_help_text_shopping_list_item_name">For example, (2packs of) 400g (brown) bread (by eliot). Descriptions in brackets are optional.</string>
-    <string name="xently_text_field_help_text_comparison_list_item_name">For example, 400g bread</string>
+    <string name="xently_text_field_help_text_shopping_list_item_name">Example, (2packs of) 400g (brown) bread (by eliot).</string>
+    <string name="xently_text_field_help_text_comparison_list_item_name">Example, 400g bread</string>
     <string name="xently_button_label_get_recommendations">Get recommendations</string>
     <string name="xently_button_label_getting_recommendations">Getting recommendations</string>
     <string name="xently_button_label_compare_products">Compare products</string>

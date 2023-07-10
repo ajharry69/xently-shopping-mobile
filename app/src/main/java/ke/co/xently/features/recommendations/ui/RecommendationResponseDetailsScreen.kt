@@ -3,6 +3,7 @@ package ke.co.xently.features.recommendations.ui
 import android.content.res.Configuration
 import android.icu.math.BigDecimal
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,6 @@ import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltipBox
@@ -117,19 +117,16 @@ private fun RecommendationSummaryItemTrailingContent(
                 mutableStateOf(false)
             }
             Box {
-                IconButton(
-                    onClick = {
+                Icon(
+                    Icons.Default.MoreVert,
+                    contentDescription = stringResource(
+                        R.string.xently_content_description_options_for_item,
+                        response.store,
+                    ),
+                    modifier = Modifier.clickable {
                         showComparisonListItemMenu = !showComparisonListItemMenu
                     },
-                ) {
-                    Icon(
-                        Icons.Default.MoreVert,
-                        contentDescription = stringResource(
-                            R.string.xently_content_description_options_for_item,
-                            response.store,
-                        ),
-                    )
-                }
+                )
 
                 RecommendationSummaryItemDropdownMenu(
                     response = response,
@@ -148,15 +145,13 @@ private fun RecommendationSummaryItemTrailingContent(
                     Text(text = stringResource(R.string.xently_navigate_to_store))
                 },
             ) {
-                IconButton(
-                    onClick = { onNavigate(response) },
-                    modifier = Modifier.tooltipTrigger(),
-                ) {
-                    Icon(
-                        Icons.Default.NearMe,
-                        contentDescription = stringResource(R.string.xently_navigate_to_store),
-                    )
-                }
+                Icon(
+                    Icons.Default.NearMe,
+                    contentDescription = stringResource(R.string.xently_navigate_to_store),
+                    modifier = Modifier
+                        .tooltipTrigger()
+                        .clickable { onNavigate(response) },
+                )
             }
         }
     }

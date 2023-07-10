@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -29,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,7 +58,7 @@ import ke.co.xently.features.recommendations.ui.RecommendationRequestScreen
 import ke.co.xently.features.recommendations.ui.RecommendationViewModel
 import ke.co.xently.features.shop.repositories.ShopRepository
 import ke.co.xently.features.store.repositories.StoreRepository
-import ke.co.xently.ui.components.AnimatedModalBottomSheet
+import ke.co.xently.ui.components.ModalBottomSheet
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.launch
 
@@ -168,15 +172,27 @@ fun MainUI(
         Column(modifier = Modifier.padding(innerPadding)) {
             TabRow(selectedTabIndex = selectedTab.ordinal) {
                 for (tab in HomeTab.values()) {
-                    Tab(
-                        selected = selectedTab == tab,
-                        onClick = {
-                            onTabClicked(tab)
+                    val title = stringResource(tab.title)
+                    PlainTooltipBox(
+                        tooltip = {
+                            Text(text = title)
                         },
-                        text = {
-                            Text(stringResource(tab.title))
-                        },
-                    )
+                    ) {
+                        Tab(
+                            modifier = Modifier.tooltipTrigger(),
+                            selected = selectedTab == tab,
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurface,
+                            onClick = {
+                                onTabClicked(tab)
+                            },
+                            icon = {
+                                Icon(tab.image, contentDescription = title)
+                            },
+                            text = {
+                                Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            },
+                        )
+                    }
                 }
             }
 
@@ -210,7 +226,7 @@ fun MainUI(
         }
     }
 
-    AnimatedModalBottomSheet(
+    ModalBottomSheet(
         bottomSheet = bottomSheet,
         navigateToStore = navigateToStore,
         hideBottomSheet = hideBottomSheet,

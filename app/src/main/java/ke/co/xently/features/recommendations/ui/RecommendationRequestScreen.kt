@@ -20,10 +20,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -97,6 +99,7 @@ fun RecommendationRequestScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecommendationRequestScreen(
     draftShoppingListItem: Recommendation.Request.ShoppingListItem,
@@ -229,19 +232,28 @@ fun RecommendationRequestScreen(
                         },
                     ),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                    trailingIcon = if (showAddButton) {
-                        {
-                            IconButton(onClick = addShoppingListItem) {
+                    trailingIcon = {
+                        val contentDescription = stringResource(
+                            R.string.xently_content_description_add_item,
+                            draftShoppingListItem.name,
+                        )
+                        PlainTooltipBox(
+                            tooltip = {
+                                Text(text = contentDescription)
+                            },
+                        ) {
+                            IconButton(
+                                onClick = addShoppingListItem,
+                                enabled = showAddButton,
+                                modifier = Modifier.tooltipTrigger(),
+                            ) {
                                 Icon(
                                     Icons.Default.Add,
-                                    contentDescription = stringResource(
-                                        R.string.xently_content_description_add_item,
-                                        draftShoppingListItem.name,
-                                    ),
+                                    contentDescription = contentDescription,
                                 )
                             }
                         }
-                    } else null,
+                    },
                 )
                 Divider()
             }

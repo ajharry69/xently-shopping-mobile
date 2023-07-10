@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun AnimatedModalBottomSheet(
+fun ModalBottomSheet(
     bottomSheet: () -> BottomSheet,
     navigateToStore: (Recommendation.Response) -> Unit,
     visitOnlineStore: (Recommendation.Response) -> Unit,
@@ -55,7 +55,7 @@ fun AnimatedModalBottomSheet(
 
     val scope = rememberCoroutineScope()
 
-    AnimatedVisibility(openBottomSheet) {
+    if (openBottomSheet) {
         // Example usage: https://www.composables.com/components/material3/modalbottomsheet
         ModalBottomSheet(
             sheetState = bottomSheetState,
