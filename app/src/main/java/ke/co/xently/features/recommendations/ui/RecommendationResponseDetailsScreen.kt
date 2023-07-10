@@ -6,13 +6,11 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,20 +28,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
-import ke.co.xently.features.core.currencyNumberFormat
 import ke.co.xently.features.recommendations.models.Recommendation
+import ke.co.xently.features.recommendations.ui.components.HitItem
+import ke.co.xently.features.recommendations.ui.components.MissItem
 import ke.co.xently.features.recommendations.ui.components.RecommendationSummaryItemDropdownMenu
 import ke.co.xently.features.recommendations.ui.components.StoreRecommendationSummaryItem
 import ke.co.xently.ui.theme.XentlyTheme
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import kotlin.random.Random
 
 @Composable
@@ -177,50 +173,6 @@ private fun TitleText(title: String) {
                 style = MaterialTheme.typography.titleLarge,
             )
         }
-    )
-}
-
-@Composable
-private fun HitItem(item: Recommendation.Response.Hit.Item) {
-    ListItem(
-        headlineContent = {
-            Text(text = item.shoppingList.name)
-        },
-        supportingContent = {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = item.bestMatched.name)
-                Text(
-                    style = MaterialTheme.typography.labelMedium,
-                    text = stringResource(
-                        R.string.xently_recommendation_response_approximate_unit_selling_price,
-                        LocalContext.current.currencyNumberFormat.format(item.bestMatched.unitPrice),
-                        item.bestMatched.lastKnownDateOfPurchase()
-                            .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)),
-                    ),
-                )
-            }
-        },
-        trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = item.shoppingList.quantityToPurchase.toString(),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Icon(Icons.Default.NavigateNext, contentDescription = null)
-            }
-        },
-    )
-}
-
-@Composable
-private fun MissItem(item: Recommendation.Response.Miss.Item) {
-    ListItem(
-        headlineContent = {
-            Text(text = item.value)
-        },
-        trailingContent = {
-            Icon(Icons.Default.NavigateNext, contentDescription = null)
-        },
     )
 }
 

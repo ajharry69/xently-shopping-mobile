@@ -2,10 +2,13 @@ package ke.co.xently.features.recommendations.models
 
 import android.icu.math.BigDecimal
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import ke.co.xently.features.core.models.Location
 import ke.co.xently.features.store.models.Store
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 sealed interface Recommendation {
     @Parcelize
@@ -169,11 +172,12 @@ sealed interface Recommendation {
                      * price after multiplying the unit price by the quantity of items planned for purchase
                      */
                     val totalPrice: BigDecimal,
-                    val pricePerBaseMeasurementUnitQuantity: BigDecimal,
+                    /**
+                     * Expected in the format: 2023-07-10T20:37:00
+                     */
+                    @SerializedName("latestDateOfPurchase")
+                    val latestDateOfPurchaseUTCString: String,
                 ) {
-                    // TODO: Move inside the constructor and fetch from server
-                    fun lastKnownDateOfPurchase(): LocalDateTime = LocalDateTime.now()
-
                     override fun hashCode(): Int {
                         return name.hashCode()
                     }
@@ -190,11 +194,14 @@ sealed interface Recommendation {
                     }
 
                     companion object {
+                        val LATEST_DATE_OF_PURCHASE_FORMAT: DateTimeFormatter =
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
                         val default = BestMatched(
                             name = "",
                             unitPrice = BigDecimal.ZERO,
                             totalPrice = BigDecimal.ZERO,
-                            pricePerBaseMeasurementUnitQuantity = BigDecimal.ZERO,
+                            latestDateOfPurchaseUTCString = LocalDateTime.now(ZoneOffset.UTC)
+                                .format(LATEST_DATE_OF_PURCHASE_FORMAT),
                         )
                     }
                 }

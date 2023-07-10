@@ -18,6 +18,9 @@ import androidx.compose.ui.text.intl.Locale
 import ke.co.xently.R
 import kotlinx.coroutines.delay
 import java.net.ConnectException
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -60,6 +63,11 @@ inline fun Context.visitUriPage(
         Log.e(logTag, "An error was encountered when visiting: $uri", ex)
         onActivityNotFound()
     }
+}
+
+fun LocalDateTime.toSystemDefaultZonedDateTime(zoneId: ZoneId = ZoneId.systemDefault()): ZonedDateTime {
+    return atZone(zoneId)
+        .withZoneSameInstant(ZoneId.systemDefault())
 }
 
 @Composable
