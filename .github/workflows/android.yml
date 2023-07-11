@@ -85,12 +85,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Decrypting dependencies
-        run: |
-          sudo apt update && sudo apt install -y git-crypt
-          echo "${{ secrets.GIT_CRYPT_KEY }}" | base64 -d > ./git-crypt-key
-          git-crypt unlock ./git-crypt-key
-          rm ./git-crypt-key
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
