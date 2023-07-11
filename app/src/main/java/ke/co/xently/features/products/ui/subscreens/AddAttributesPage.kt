@@ -138,7 +138,7 @@ fun AddAttributesPage(
                     Attribute.LocalViewModel.default.copy(name = query)
                         .let(searchAttribute)
                 },
-                placeholder = {
+                label = {
                     Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
                 },
                 onSuggestionSelected = {
@@ -162,6 +162,9 @@ fun AddAttributesPage(
                         },
                     )
                 },
+                supportingText = {
+                    Text(text = stringResource(R.string.xently_text_field_help_text_attribute_name))
+                },
             )
 
             AutoCompleteTextField(
@@ -176,7 +179,7 @@ fun AddAttributesPage(
                         )
                     }.let(searchAttributeValue)
                 },
-                placeholder = {
+                label = {
                     Text(text = stringResource(R.string.xently_search_bar_placeholder_value))
                 },
                 onSuggestionSelected = {

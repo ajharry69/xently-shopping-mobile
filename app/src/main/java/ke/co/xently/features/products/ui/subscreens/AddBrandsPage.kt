@@ -90,7 +90,7 @@ fun AddBrandsPage(
                 doSearch()
             },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = {
+            label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
             },
             trailingIcon = if (nameAutoCompleteState.query.isNotBlank()) {
