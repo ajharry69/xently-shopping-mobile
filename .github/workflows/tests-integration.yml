@@ -1,0 +1,40 @@
+name: Integration tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Decrypting dependencies
+        run: |
+          sudo apt update && sudo apt install -y git-crypt
+          echo "${{ secrets.GIT_CRYPT_KEY }}" | base64 -d > ./git-crypt-key
+          git-crypt unlock ./git-crypt-key
+          rm ./git-crypt-key
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Add required properties
+        run: |
+          cat > local.properties <<EOF
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          API_BASE_URL=https://shopping.xently.co.ke/api/
+          EOF
+
+      - name: Unit test
+        run: ./gradlew connectedAndroidTest
