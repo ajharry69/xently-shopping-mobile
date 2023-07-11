@@ -43,6 +43,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Add required properties
+        run: |
+          cat > local.properties <<EOF
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          EOF
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
