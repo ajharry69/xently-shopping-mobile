@@ -1,0 +1,91 @@
+name: Deploy to Google play store
+
+on:
+  push:
+    tags: [ "v*.*.*" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Decrypting dependencies
+        run: |
+          sudo apt update && sudo apt install -y git-crypt
+          echo "${{ secrets.GIT_CRYPT_KEY }}" | base64 -d > ./git-crypt-key
+          git-crypt unlock ./git-crypt-key
+          rm ./git-crypt-key
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Add required properties
+        run: |
+          cat > local.properties <<EOF
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          API_BASE_URL=https://shopping.xently.co.ke/api/
+          EOF
+
+      - name: Get tag version
+        id: tagVersion
+        run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+
+      - name: Update app version name
+        run: |
+          cat >> local.properties <<EOF
+          versionName=${{ steps.tagVersion.outputs.TAG }}
+          EOF
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Get release track name
+        id: track
+        run: |
+          track=$(python3 -c "import re; out = re.search(r'-([a-zA-Z]+)\d*', '${{ steps.tagVersion.outputs.TAG }}'); print(out.group(1) if out and out.group(1) and out.group(1).lower() in ['alpha', 'beta', 'internalsharing', 'internal'] else 'production')")
+          echo "name=$track" >> $GITHUB_OUTPUT
+
+      - name: Build Android App Bundle
+        id: aab
+        run: |
+          track="${{ steps.track.outputs.name }}"
+          packageNameSuffix=".$track"
+          if [[ "$track" == "alpha" ]]; then
+            ./gradlew bundleAlpha
+          elif [[ "$track" == "beta" ]]; then
+            ./gradlew bundleBeta
+          else
+            track="release"
+            packageNameSuffix=""
+            ./gradlew bundleRelease
+          fi
+          echo "track=$track" >> $GITHUB_OUTPUT
+          echo "packageNameSuffix=$packageNameSuffix" >> $GITHUB_OUTPUT
+
+      - name: Upload AAB
+        id: uploadArtifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-${{ steps.tagVersion.outputs.TAG }}
+          path: app/build/outputs/bundle/${{ steps.aab.outputs.track }}/app-${{ steps.aab.outputs.track }}.aab
+
+      - name: Deploy to Play Store
+        id: deploy
+        # Reference doc: https://github.com/marketplace/actions/upload-android-release-to-play-store
+        uses: r0adkll/upload-google-play@v1.0.18
+        with:
+          track: ${{ steps.track.outputs.name }}
+          whatsNewDirectory: whatsnew/
+          packageName: co.ke.xently.shopping${{ steps.aab.outputs.packageNameSuffix }}
+          releaseName: ${{ steps.tagVersion.outputs.TAG }}
+          serviceAccountJson: secrets/service-account.json
+          mappingFile: app/build/outputs/mapping/${{ steps.aab.outputs.track }}/mapping.txt
+          releaseFiles: app/build/outputs/bundle/${{ steps.aab.outputs.track }}/app-${{ steps.aab.outputs.track }}.aab

@@ -1,5 +1,6 @@
 package ke.co.xently.features.products.ui.subscreens
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.text.format.DateFormat
 import androidx.annotation.StringRes
@@ -82,6 +83,7 @@ private sealed interface GeneralDetailUIState {
     }
 }
 
+@SuppressLint("NewApi") // TODO: Remove this
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddGeneralDetailsPage(
