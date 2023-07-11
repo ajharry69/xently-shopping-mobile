@@ -36,5 +36,105 @@ jobs:
           API_BASE_URL=https://shopping.xently.co.ke/api/
           EOF
 
-      - name: Build
+      - name: Run build
         run: ./gradlew build
+
+  unit-test:
+    needs:
+      - build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Decrypting dependencies
+        run: |
+          sudo apt update && sudo apt install -y git-crypt
+          echo "${{ secrets.GIT_CRYPT_KEY }}" | base64 -d > ./git-crypt-key
+          git-crypt unlock ./git-crypt-key
+          rm ./git-crypt-key
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Add required properties
+        run: |
+          cat > local.properties <<EOF
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          API_BASE_URL=https://shopping.xently.co.ke/api/
+          EOF
+      - name: Run tests
+        run: ./gradlew test
+
+  instrumentation-test:
+    needs:
+      - build
+
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        api-level: [ 29 ]
+        target: [ google_apis_playstore ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Decrypting dependencies
+        run: |
+          sudo apt update && sudo apt install -y git-crypt
+          echo "${{ secrets.GIT_CRYPT_KEY }}" | base64 -d > ./git-crypt-key
+          git-crypt unlock ./git-crypt-key
+          rm ./git-crypt-key
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Add required properties
+        run: |
+          cat > local.properties <<EOF
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          API_BASE_URL=https://shopping.xently.co.ke/api/
+          EOF
+      - name: AVD cache
+        uses: actions/cache@v2
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedAndroidTest
