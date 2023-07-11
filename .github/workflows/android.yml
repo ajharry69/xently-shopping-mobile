@@ -40,9 +40,6 @@ jobs:
         run: ./gradlew build
 
   unit-test:
-    needs:
-      - build
-
     runs-on: ubuntu-latest
 
     steps:
@@ -73,9 +70,6 @@ jobs:
         run: ./gradlew test
 
   instrumentation-test:
-    needs:
-      - build
-
     runs-on: macos-latest
 
     strategy:
