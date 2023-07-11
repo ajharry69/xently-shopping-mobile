@@ -47,6 +47,7 @@ jobs:
         run: |
           cat > local.properties <<EOF
           MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          API_BASE_URL=https://shopping.xently.co.ke/api/
           EOF
 
       - name: Set up JDK
