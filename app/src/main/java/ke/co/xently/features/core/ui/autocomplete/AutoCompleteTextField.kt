@@ -87,7 +87,7 @@ fun AutoCompleteTextField(
         shape = shape,
         color = colors.containerColor,
         contentColor = contentColorFor(colors.containerColor),
-        tonalElevation = tonalElevation,
+        tonalElevation = if (active) tonalElevation else 0.dp,
         modifier = modifier
             .zIndex(1f)
             .width(SearchBarMinWidth),
