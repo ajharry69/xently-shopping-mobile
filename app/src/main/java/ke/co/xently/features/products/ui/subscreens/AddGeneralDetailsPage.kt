@@ -3,7 +3,6 @@ package ke.co.xently.features.products.ui.subscreens
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.text.format.DateFormat
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.features.core.cleansedForNumberParsing
 import ke.co.xently.features.core.javaLocale
+import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.theme.XentlyTheme
@@ -59,28 +59,17 @@ import java.time.LocalTime
 import java.time.ZoneOffset
 import java.util.Date
 
-private sealed interface GeneralDetailUIState {
-    @get:StringRes
-    val message: Int
+private sealed class GeneralDetailUIState(message: Int) : UIState(message) {
+    sealed class UnitPriceError(message: Int) : GeneralDetailUIState(message)
+    sealed class PackCountError(message: Int) : GeneralDetailUIState(message)
 
-    sealed interface UnitPriceError : GeneralDetailUIState
-    sealed interface PackCountError : GeneralDetailUIState
+    object OK : GeneralDetailUIState(android.R.string.ok)
 
-    object OK : GeneralDetailUIState {
-        override val message: Int = R.string.xently_button_label_continue
-    }
+    object MissingUnitPrice : UnitPriceError(R.string.xently_button_label_missing_unit_price)
 
-    object MissingUnitPrice : UnitPriceError {
-        override val message: Int = R.string.xently_button_label_missing_unit_price
-    }
+    object InvalidUnitPrice : UnitPriceError(R.string.xently_button_label_invalid_unit_price)
 
-    object InvalidUnitPrice : UnitPriceError {
-        override val message: Int = R.string.xently_button_label_invalid_unit_price
-    }
-
-    object InvalidPackCount : PackCountError {
-        override val message: Int = R.string.xently_button_label_invalid_pack_count
-    }
+    object InvalidPackCount : PackCountError(R.string.xently_button_label_invalid_pack_count)
 }
 
 @SuppressLint("NewApi") // TODO: Remove this
@@ -276,7 +265,7 @@ fun AddGeneralDetailsPage(
             },
             supportingText = if (uiState is GeneralDetailUIState.PackCountError) {
                 {
-                    Text(text = stringResource(uiState.message))
+                    Text(text = uiState(context = context))
                 }
             } else null,
             singleLine = true,
@@ -292,7 +281,7 @@ fun AddGeneralDetailsPage(
             },
             supportingText = if (uiState is GeneralDetailUIState.UnitPriceError) {
                 {
-                    Text(text = stringResource(uiState.message))
+                    Text(text = uiState(context = context))
                 }
             } else null,
             singleLine = true,

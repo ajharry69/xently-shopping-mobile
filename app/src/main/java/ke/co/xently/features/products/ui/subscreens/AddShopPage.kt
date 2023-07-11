@@ -1,7 +1,6 @@
 package ke.co.xently.features.products.ui.subscreens
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,12 +15,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.features.core.ui.AutoCompleteTextField
+import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.features.shop.models.Shop
@@ -29,17 +30,11 @@ import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-private sealed interface ShopContinueButtonLabel {
-    @get:StringRes
-    val label: Int
 
-    object Continue : ShopContinueButtonLabel {
-        override val label: Int = R.string.xently_button_label_continue
-    }
+private sealed class ShopUIState(message: Int) : UIState(message) {
+    object OK : ShopUIState(android.R.string.ok)
 
-    object MissingShopName : ShopContinueButtonLabel {
-        override val label: Int = R.string.xently_button_label_missing_shop_name
-    }
+    object MissingShopName : ShopUIState(R.string.xently_error_missing_shop_name)
 }
 
 @Composable
@@ -61,15 +56,15 @@ fun AddShopPage(
         mutableStateOf(TextFieldValue(shop.ecommerceSiteUrl ?: ""))
     }
 
-    var buttonLabel by remember {
-        mutableStateOf<ShopContinueButtonLabel>(ShopContinueButtonLabel.Continue)
+    var uiState by remember {
+        mutableStateOf<ShopUIState>(ShopUIState.OK)
     }
 
     LaunchedEffect(nameAutoCompleteState.query) {
-        buttonLabel = if (nameAutoCompleteState.query.isBlank()) {
-            ShopContinueButtonLabel.MissingShopName
+        uiState = if (nameAutoCompleteState.query.isBlank()) {
+            ShopUIState.MissingShopName
         } else {
-            ShopContinueButtonLabel.Continue
+            ShopUIState.OK
         }
     }
 
@@ -79,9 +74,9 @@ fun AddShopPage(
         subheading = R.string.xently_add_shop_page_sub_heading,
         onBackClick = onPreviousClick,
         continueButton = {
-            val enabled by remember(buttonLabel) {
+            val enabled by remember(uiState) {
                 derivedStateOf {
-                    buttonLabel is ShopContinueButtonLabel.Continue
+                    uiState is ShopUIState.OK
                 }
             }
             Button(
@@ -94,7 +89,7 @@ fun AddShopPage(
                     ).let(onContinueClick)
                 },
             ) {
-                Text(stringResource(buttonLabel.label))
+                Text(stringResource(R.string.xently_button_label_continue))
             }
         },
     ) {
@@ -108,9 +103,15 @@ fun AddShopPage(
             onSuggestionSelected = saveDraft,
             onSearchSuggestionSelected = onSearchSuggestionSelected,
             suggestionContent = { Text(text = it.name) },
-            placeholder = {
+            label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name_required))
             },
+            isError = uiState is ShopUIState.MissingShopName,
+            supportingText = if (uiState is ShopUIState.MissingShopName) {
+                {
+                    Text(text = uiState(LocalContext.current))
+                }
+            } else null,
         )
 
         TextField(

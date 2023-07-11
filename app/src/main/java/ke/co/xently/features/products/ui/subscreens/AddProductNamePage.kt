@@ -1,7 +1,6 @@
 package ke.co.xently.features.products.ui.subscreens
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
@@ -16,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.features.core.ui.AutoCompleteTextField
 import ke.co.xently.features.core.ui.LabeledCheckbox
+import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.models.ProductName
@@ -31,17 +32,11 @@ import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-private sealed interface ProductNameContinueButtonLabel {
-    @get:StringRes
-    val label: Int
+private sealed class ProductNameUIState(message: Int) : UIState(message) {
+    object OK : ProductNameUIState(android.R.string.ok)
 
-    object Continue : ProductNameContinueButtonLabel {
-        override val label: Int = R.string.xently_button_label_continue
-    }
-
-    object MissingProductName : ProductNameContinueButtonLabel {
-        override val label: Int = R.string.xently_button_label_missing_product_name
-    }
+    object MissingProductName :
+        ProductNameUIState(R.string.xently_button_label_missing_product_name)
 }
 
 @Composable
@@ -64,15 +59,15 @@ fun AddProductNamePage(
         mutableStateOf(TextFieldValue(product.name.namePlural ?: ""))
     }
 
-    var buttonLabel by remember {
-        mutableStateOf<ProductNameContinueButtonLabel>(ProductNameContinueButtonLabel.Continue)
+    var uiState by remember {
+        mutableStateOf<ProductNameUIState>(ProductNameUIState.OK)
     }
 
     LaunchedEffect(nameAutoCompleteState.query) {
-        buttonLabel = if (nameAutoCompleteState.query.isBlank()) {
-            ProductNameContinueButtonLabel.MissingProductName
+        uiState = if (nameAutoCompleteState.query.isBlank()) {
+            ProductNameUIState.MissingProductName
         } else {
-            ProductNameContinueButtonLabel.Continue
+            ProductNameUIState.OK
         }
     }
 
@@ -99,9 +94,9 @@ fun AddProductNamePage(
         heading = R.string.xently_product_name_page_title,
         onBackClick = onPreviousClick,
         continueButton = {
-            val enabled by remember(buttonLabel) {
+            val enabled by remember(uiState) {
                 derivedStateOf {
-                    buttonLabel is ProductNameContinueButtonLabel.Continue
+                    uiState is ProductNameUIState.OK
                 }
             }
             Button(
@@ -119,7 +114,7 @@ fun AddProductNamePage(
                     }.let(onContinueClick)
                 },
             ) {
-                Text(stringResource(buttonLabel.label))
+                Text(stringResource(R.string.xently_button_label_continue))
             }
         },
     ) {
@@ -135,9 +130,15 @@ fun AddProductNamePage(
             suggestionContent = {
                 Text(text = it.descriptiveName.ifBlank { it.name.name })
             },
-            placeholder = {
+            label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name_required))
             },
+            isError = uiState is ProductNameUIState.MissingProductName,
+            supportingText = if (uiState is ProductNameUIState.MissingProductName) {
+                {
+                    Text(text = uiState(LocalContext.current))
+                }
+            } else null,
         )
 
         LabeledCheckbox(

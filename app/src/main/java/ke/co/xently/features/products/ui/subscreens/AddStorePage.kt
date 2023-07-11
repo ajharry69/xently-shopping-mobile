@@ -110,7 +110,7 @@ fun AddStorePage(
             onSuggestionSelected = saveDraft,
             onSearchSuggestionSelected = onSearchSuggestionSelected,
             suggestionContent = { Text(text = it.toString()) },
-            placeholder = {
+            label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
             },
         )

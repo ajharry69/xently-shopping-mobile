@@ -1,7 +1,7 @@
 package ke.co.xently.features.products.ui.subscreens
 
+import android.content.Context
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,17 +37,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 private sealed interface MeasurementUIState {
-    @get:StringRes
-    val message: Int
+    operator fun invoke(context: Context): String
 
     sealed interface QuantityError : MeasurementUIState
 
     object OK : MeasurementUIState {
-        override val message: Int = R.string.xently_button_label_continue
+        override operator fun invoke(context: Context): String {
+            return context.getString(android.R.string.ok)
+        }
     }
 
     object InvalidQuantity : QuantityError {
-        override val message: Int = R.string.xently_button_label_invalid_unit_quantity
+        override operator fun invoke(context: Context): String {
+            return context.getString(R.string.xently_button_label_invalid_unit_quantity)
+        }
     }
 }
 
@@ -182,7 +186,7 @@ fun AddMeasurementUnitPage(
             suggestionContent = {
                 Text(text = it.toString())
             },
-            placeholder = {
+            label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
             },
         )
@@ -246,7 +250,7 @@ fun AddMeasurementUnitPage(
             },
             supportingText = if (uiState is MeasurementUIState.QuantityError) {
                 {
-                    Text(text = stringResource(uiState.message))
+                    Text(text = uiState(context = LocalContext.current))
                 }
             } else null,
             singleLine = true,
