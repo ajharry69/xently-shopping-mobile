@@ -121,4 +121,5 @@
     <string name="xently_compare_product_response_sort_by_expensive_first">Expensive first</string>
     <string name="xently_content_description_sort_compare_product_responses">Sort compare product responses</string>
     <string name="xently_text_field_help_text_attribute_name">E.g. feature</string>
+    <string name="xently_text_field_help_text_attribute_value">E.g. oled</string>
 </resources>

@@ -209,6 +209,9 @@ fun AddAttributesPage(
                         },
                     )
                 },
+                supportingText = {
+                    Text(text = stringResource(R.string.xently_text_field_help_text_attribute_value))
+                },
             )
         }
 
