@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -144,6 +145,10 @@ fun ForegroundLocationTracker(
     permissionsState: LocationPermissionsState = LocationPermissionsState.CoarseAndFine,
     onLocationUpdates: (Location) -> Unit,
 ) {
+    // When in preview, early return
+    if (LocalInspectionMode.current) {
+        return
+    }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
