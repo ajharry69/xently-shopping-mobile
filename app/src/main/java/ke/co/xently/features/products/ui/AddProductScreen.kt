@@ -56,6 +56,7 @@ fun AddProductScreen(
         currentlyActiveStep = currentlyActiveStep,
         locationPermissionsState = LocationPermissionsState.CoarseAndFine,
         snackbarHostState = snackbarHostState,
+        traversedSteps = viewModel.traversedSteps,
         brandSuggestionsState = viewModel.brandSuggestionsFlow,
         addProductState = viewModel.saveProductStateFlow,
         attributeSuggestionsState = viewModel.attributeSuggestionsFlow,
@@ -91,6 +92,7 @@ fun AddProductScreen(
     snackbarHostState: SnackbarHostState,
     product: Product.LocalViewModel,
 
+    traversedSteps: Flow<Set<AddProductStep>>,
     brandSuggestionsState: Flow<List<Brand>>,
     addProductState: Flow<State>,
     attributeSuggestionsState: Flow<List<Attribute>>,
@@ -133,10 +135,19 @@ fun AddProductScreen(
             edgePadding = 0.dp,
             selectedTabIndex = currentlyActiveStep.ordinal,
         ) {
+            val traversed by traversedSteps.collectAsState(initial = emptySet())
             for (step in AddProductStep.values()) {
+                val enabled = step == currentlyActiveStep || step in traversed
                 Tab(
                     selected = step.ordinal <= currentlyActiveStep.ordinal,
-                    unselectedContentColor = MaterialTheme.colorScheme.onSurface,
+                    enabled = enabled,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurface.run {
+                        if (enabled) {
+                            this
+                        } else {
+                            copy(alpha = 0.38f)
+                        }
+                    },
                     onClick = {
                         saveCurrentlyActiveStep(step)
                     },
@@ -351,6 +362,7 @@ private fun AddProductScreenPreview() {
             locationPermissionsState = LocationPermissionsState.Simulated,
             product = Product.LocalViewModel.default,
 
+            traversedSteps = MutableStateFlow(emptySet()),
             brandSuggestionsState = MutableStateFlow(emptyList()),
             addProductState = flowOf(State.Idle),
             attributeSuggestionsState = MutableStateFlow(emptyList()),
