@@ -81,7 +81,7 @@ fun LabeledCheckbox(
 @Preview
 @Composable
 private fun LabeledCheckboxPreview() {
-    XentlyTheme {
+    XentlyTheme(wrapSurfaceHeight = true) {
         Column {
             var checked by remember {
                 mutableStateOf(Random.nextBoolean())
@@ -99,7 +99,7 @@ private fun LabeledCheckboxPreview() {
 @Preview
 @Composable
 private fun LabeledCheckboxDisabledPreview() {
-    XentlyTheme {
+    XentlyTheme(wrapSurfaceHeight = true) {
         Column {
             var checked by remember {
                 mutableStateOf(Random.nextBoolean())

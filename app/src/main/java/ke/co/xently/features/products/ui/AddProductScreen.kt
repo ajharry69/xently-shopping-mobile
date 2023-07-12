@@ -4,17 +4,20 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import ke.co.xently.features.attributes.models.Attribute
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.brands.models.Brand
@@ -36,6 +39,7 @@ import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlin.random.Random
 
 @Composable
 fun AddProductScreen(
@@ -43,15 +47,16 @@ fun AddProductScreen(
     viewModel: ProductViewModel,
     snackbarHostState: SnackbarHostState,
 ) {
-    val addProductStep: AddProductStep by viewModel.currentlyActiveStep.collectAsState()
-    val product: Product.LocalViewModel by viewModel.product.collectAsState()
+    val currentlyActiveStep by viewModel.currentlyActiveStep.collectAsState()
+    val product by viewModel.product.collectAsState()
 
     AddProductScreen(
         modifier = modifier,
         product = product,
-        addProductStep = addProductStep,
+        currentlyActiveStep = currentlyActiveStep,
         locationPermissionsState = LocationPermissionsState.CoarseAndFine,
         snackbarHostState = snackbarHostState,
+        traversedSteps = viewModel.traversedSteps,
         brandSuggestionsState = viewModel.brandSuggestionsFlow,
         addProductState = viewModel.saveProductStateFlow,
         attributeSuggestionsState = viewModel.attributeSuggestionsFlow,
@@ -82,11 +87,12 @@ fun AddProductScreen(
 @Composable
 fun AddProductScreen(
     modifier: Modifier,
-    addProductStep: AddProductStep,
+    currentlyActiveStep: AddProductStep,
     locationPermissionsState: LocationPermissionsState,
     snackbarHostState: SnackbarHostState,
     product: Product.LocalViewModel,
 
+    traversedSteps: Flow<Set<AddProductStep>>,
     brandSuggestionsState: Flow<List<Brand>>,
     addProductState: Flow<State>,
     attributeSuggestionsState: Flow<List<Attribute>>,
@@ -115,27 +121,47 @@ fun AddProductScreen(
     onAttributeSuggestionClicked: (Attribute) -> Unit,
 ) {
     val navigateToNext: () -> Unit by rememberUpdatedState {
-        AddProductStep.valueOfOrdinalOrFirstByOrdinal(addProductStep.ordinal + 1)
+        AddProductStep.valueOfOrdinalOrFirstByOrdinal(currentlyActiveStep.ordinal + 1)
             .also(saveCurrentlyActiveStep)
     }
 
     val navigateToPrevious: () -> Unit by rememberUpdatedState {
-        AddProductStep.valueOfOrdinalOrFirstByOrdinal(addProductStep.ordinal - 1)
+        AddProductStep.valueOfOrdinalOrFirstByOrdinal(currentlyActiveStep.ordinal - 1)
             .also(saveCurrentlyActiveStep)
     }
 
-    val progress by remember(addProductStep) {
-        derivedStateOf {
-            (((addProductStep.ordinal + 1) * 1) / AddProductStep.values().size).toFloat()
-        }
-    }
-
     Column(modifier = Modifier.then(modifier)) {
-        LinearProgressIndicator(
-            progress = progress,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        AnimatedContent(targetState = addProductStep) { step ->
+        ScrollableTabRow(
+            edgePadding = 0.dp,
+            selectedTabIndex = currentlyActiveStep.ordinal,
+        ) {
+            val traversed by traversedSteps.collectAsState(initial = emptySet())
+            for (step in AddProductStep.values()) {
+                val enabled = step == currentlyActiveStep || step in traversed
+                Tab(
+                    selected = step.ordinal <= currentlyActiveStep.ordinal,
+                    enabled = enabled,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurface.run {
+                        if (enabled) {
+                            this
+                        } else {
+                            copy(alpha = 0.38f)
+                        }
+                    },
+                    onClick = {
+                        saveCurrentlyActiveStep(step)
+                    },
+                    text = {
+                        Text(
+                            stringResource(step.title),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                )
+            }
+        }
+        AnimatedContent(targetState = currentlyActiveStep) { step ->
             when (step) {
                 AddProductStep.Store -> {
                     val productDraft: (Store) -> Product.LocalViewModel by rememberUpdatedState {
@@ -327,11 +353,16 @@ private fun AddProductScreenPreview() {
     XentlyTheme {
         AddProductScreen(
             modifier = Modifier.fillMaxSize(),
-            addProductStep = AddProductStep.valueOfOrdinalOrFirstByOrdinal(0),
+            currentlyActiveStep = AddProductStep.valueOfOrdinalOrFirstByOrdinal(
+                Random.nextInt(
+                    AddProductStep.values().size
+                )
+            ),
             snackbarHostState = SnackbarHostState(),
             locationPermissionsState = LocationPermissionsState.Simulated,
             product = Product.LocalViewModel.default,
 
+            traversedSteps = MutableStateFlow(emptySet()),
             brandSuggestionsState = MutableStateFlow(emptyList()),
             addProductState = flowOf(State.Idle),
             attributeSuggestionsState = MutableStateFlow(emptyList()),

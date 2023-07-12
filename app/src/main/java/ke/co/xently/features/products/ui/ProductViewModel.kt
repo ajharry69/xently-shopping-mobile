@@ -39,6 +39,7 @@ class ProductViewModel @Inject constructor(
     companion object {
         private val TAG = ProductViewModel::class.java.simpleName
         private val CURRENT_ACTIVE_STEP_KEY = TAG.plus("CURRENT_ACTIVE_STEP_KEY")
+        private val TRAVERSED_STEPS_KEY = TAG.plus("TRAVERSED_STEPS_KEY")
         private val CURRENT_PRODUCT_KEY = TAG.plus("CURRENT_PRODUCT_KEY")
     }
 
@@ -82,8 +83,14 @@ class ProductViewModel @Inject constructor(
 
     val saveProductStateFlow = saveProductStateChannel.receiveAsFlow()
 
+    val traversedSteps = stateHandle.getStateFlow(
+        TRAVERSED_STEPS_KEY,
+        emptySet<AddProductStep>(),
+    )
+
     fun saveCurrentlyActiveStep(step: AddProductStep) {
         stateHandle[CURRENT_ACTIVE_STEP_KEY] = step
+        stateHandle[TRAVERSED_STEPS_KEY] = traversedSteps.value + step
     }
 
     fun savePermanently(stepsToPersist: Array<AddProductStep>) {
@@ -138,6 +145,7 @@ class ProductViewModel @Inject constructor(
                         }
                     }
                     saveDraft(newDraftProduct)
+                    stateHandle[TRAVERSED_STEPS_KEY] = emptySet<AddProductStep>()
                     saveProductStateChannel.send(State.Success(it))
                 }.onFailure {
                     saveProductStateChannel.send(State.Failure(it))
