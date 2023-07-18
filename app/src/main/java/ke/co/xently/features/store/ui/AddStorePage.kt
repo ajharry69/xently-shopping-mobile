@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.ui.subscreens
+package ke.co.xently.features.store.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -35,31 +35,27 @@ import com.google.maps.android.compose.rememberMarkerState
 import ke.co.xently.R
 import ke.co.xently.features.core.models.toLocation
 import ke.co.xently.features.core.ui.AutoCompleteTextField
+import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.locationtracker.ForegroundLocationTracker
 import ke.co.xently.features.locationtracker.LocationPermissionsState
-import ke.co.xently.features.products.ui.components.AddProductPage
+import ke.co.xently.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.features.store.models.Store
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AddStorePage(
     modifier: Modifier,
     store: Store,
+    service: StoreAutoCompleteService,
     snackbarHostState: SnackbarHostState,
-    suggestionsState: Flow<List<Store>>,
     permissionsState: LocationPermissionsState,
-    search: (Store) -> Unit,
     saveDraft: (Store) -> Unit,
-    onSearchSuggestionSelected: () -> Unit,
     onContinueClick: (Store) -> Unit,
 ) {
     val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
         query = store.name,
-        suggestionsState = suggestionsState,
     )
 
     var location by remember(store.location) {
@@ -80,7 +76,7 @@ fun AddStorePage(
         }
     }
 
-    AddProductPage(
+    MultiStepScreen(
         modifier = modifier,
         heading = R.string.xently_add_store_page_title,
         subheading = R.string.xently_add_store_page_sub_heading,
@@ -102,14 +98,13 @@ fun AddStorePage(
     ) {
         AutoCompleteTextField(
             modifier = Modifier.fillMaxWidth(),
+            service = service,
             state = nameAutoCompleteState,
             onSearch = { query ->
                 Store.LocalViewModel.default.copy(name = query)
-                    .let(search)
             },
             onSuggestionSelected = saveDraft,
-            onSearchSuggestionSelected = onSearchSuggestionSelected,
-            suggestionContent = { Text(text = it.toString()) },
+            suggestionContent = { Text(text = it.toLocalViewModel().toString()) },
             label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
             },
@@ -242,12 +237,10 @@ private fun AddStorePagePreview() {
         AddStorePage(
             modifier = Modifier.fillMaxSize(),
             store = Store.LocalViewModel.default,
+            service = StoreAutoCompleteService.Fake,
             snackbarHostState = SnackbarHostState(),
-            suggestionsState = MutableStateFlow(emptyList()),
             permissionsState = LocationPermissionsState.Simulated,
-            search = {},
             saveDraft = {},
-            onSearchSuggestionSelected = {},
         ) {}
     }
 }

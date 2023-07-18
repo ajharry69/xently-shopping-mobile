@@ -9,6 +9,8 @@ import ke.co.xently.features.core.currencyNumberFormat
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.store.models.Store
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -118,6 +120,7 @@ sealed interface Product {
         }
     }
 
+    @Serializable
     data class RemoteResponse(
         override val id: Long,
         override val name: ProductName.RemoteResponse,
@@ -126,6 +129,7 @@ sealed interface Product {
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.RemoteResponse?,
         override val measurementUnitQuantity: Float,
+        @Contextual // TODO: Find a better serialization strategy
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.RemoteResponse>,
         override val attributes: List<AttributeValue.RemoteResponse>,

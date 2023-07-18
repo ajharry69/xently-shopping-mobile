@@ -41,14 +41,15 @@ import ke.co.xently.BottomSheet
 import ke.co.xently.HomeTab
 import ke.co.xently.MainViewModel
 import ke.co.xently.R
-import ke.co.xently.features.attributes.repositories.AttributeRepository
-import ke.co.xently.features.attributesvalues.repositories.AttributeValueRepository
-import ke.co.xently.features.brands.repositories.BrandRepository
+import ke.co.xently.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
+import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
+import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.features.compareproducts.repositories.CompareProductRepository
 import ke.co.xently.features.compareproducts.ui.CompareProductViewModel
 import ke.co.xently.features.compareproducts.ui.CompareProductsRequestScreen
 import ke.co.xently.features.core.visitUriPage
-import ke.co.xently.features.measurementunit.repositories.MeasurementUnitRepository
+import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
+import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
 import ke.co.xently.features.products.repositories.ProductRepository
 import ke.co.xently.features.products.ui.AddProductScreen
 import ke.co.xently.features.products.ui.ProductViewModel
@@ -56,8 +57,8 @@ import ke.co.xently.features.recommendations.models.Recommendation
 import ke.co.xently.features.recommendations.repositories.RecommendationRepository
 import ke.co.xently.features.recommendations.ui.RecommendationRequestScreen
 import ke.co.xently.features.recommendations.ui.RecommendationViewModel
-import ke.co.xently.features.shop.repositories.ShopRepository
-import ke.co.xently.features.store.repositories.StoreRepository
+import ke.co.xently.features.shop.datasources.remoteservices.ShopAutoCompleteService
+import ke.co.xently.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.ui.components.ModalBottomSheet
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.launch
@@ -257,12 +258,13 @@ private fun MainUIPreview() {
             productViewModel = ProductViewModel(
                 stateHandle = stateHandle,
                 productRepository = ProductRepository.Fake,
-                storeRepository = StoreRepository.Fake,
-                shopRepository = ShopRepository.Fake,
-                brandRepository = BrandRepository.Fake,
-                attributeRepository = AttributeRepository.Fake,
-                attributeValueRepository = AttributeValueRepository.Fake,
-                measurementUnitRepository = MeasurementUnitRepository.Fake,
+                shopAutoCompleteService = ShopAutoCompleteService.Fake,
+                storeAutoCompleteService = StoreAutoCompleteService.Fake,
+                brandAutoCompleteService = BrandAutoCompleteService.Fake,
+                productAutoCompleteService = ProductAutoCompleteService.Fake,
+                attributeAutoCompleteService = AttributeAutoCompleteService.Fake,
+                attributeValueAutoCompleteService = AttributeValueAutoCompleteService.Fake,
+                measurementUnitAutoCompleteService = MeasurementUnitAutoCompleteService.Fake,
             ),
             recommendationViewModel = RecommendationViewModel(
                 stateHandle = stateHandle,

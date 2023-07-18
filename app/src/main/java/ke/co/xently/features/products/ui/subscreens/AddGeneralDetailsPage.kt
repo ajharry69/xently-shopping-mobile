@@ -46,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.features.core.cleansedForNumberParsing
 import ke.co.xently.features.core.javaLocale
+import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.products.models.Product
-import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.theme.XentlyTheme
 import java.math.BigDecimal
 import java.time.Clock
@@ -238,7 +238,7 @@ fun AddGeneralDetailsPage(
         }
     }
 
-    AddProductPage(
+    MultiStepScreen(
         modifier = modifier,
         heading = R.string.xently_general_details_page_title,
         onBackClick = onPreviousClick,

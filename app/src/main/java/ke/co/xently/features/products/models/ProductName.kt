@@ -3,6 +3,7 @@ package ke.co.xently.features.products.models
 import android.os.Parcelable
 import ke.co.xently.features.core.models.IdNameSymbolAndPlural
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 sealed interface ProductName : IdNameSymbolAndPlural {
 
@@ -14,6 +15,7 @@ sealed interface ProductName : IdNameSymbolAndPlural {
         override val symbolPlural: String?,
     ) : ProductName
 
+    @Serializable
     data class RemoteResponse(
         override val id: Long,
         override val name: String,

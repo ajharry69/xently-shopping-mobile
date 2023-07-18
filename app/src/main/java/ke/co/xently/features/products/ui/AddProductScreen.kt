@@ -18,23 +18,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ke.co.xently.features.attributes.models.Attribute
+import ke.co.xently.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
+import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
 import ke.co.xently.features.attributesvalues.models.AttributeValue
+import ke.co.xently.features.attributesvalues.ui.AddAttributesPage
+import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.features.brands.models.Brand
+import ke.co.xently.features.brands.ui.AddBrandsPage
 import ke.co.xently.features.locationtracker.LocationPermissionsState
-import ke.co.xently.features.measurementunit.models.MeasurementUnit
+import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
+import ke.co.xently.features.measurementunit.ui.AddMeasurementUnitPage
+import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
 import ke.co.xently.features.products.models.Product
-import ke.co.xently.features.products.models.ProductName
-import ke.co.xently.features.products.ui.subscreens.AddAttributesPage
-import ke.co.xently.features.products.ui.subscreens.AddBrandsPage
 import ke.co.xently.features.products.ui.subscreens.AddGeneralDetailsPage
-import ke.co.xently.features.products.ui.subscreens.AddMeasurementUnitPage
 import ke.co.xently.features.products.ui.subscreens.AddProductNamePage
-import ke.co.xently.features.products.ui.subscreens.AddShopPage
-import ke.co.xently.features.products.ui.subscreens.AddStorePage
 import ke.co.xently.features.products.ui.subscreens.SummaryPage
+import ke.co.xently.features.shop.datasources.remoteservices.ShopAutoCompleteService
 import ke.co.xently.features.shop.models.Shop
+import ke.co.xently.features.shop.ui.AddShopPage
+import ke.co.xently.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.features.store.models.Store
+import ke.co.xently.features.store.ui.AddStorePage
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,36 +56,25 @@ fun AddProductScreen(
 
     AddProductScreen(
         modifier = modifier,
-        product = product,
         currentlyActiveStep = currentlyActiveStep,
         locationPermissionsState = LocationPermissionsState.CoarseAndFine,
         snackbarHostState = snackbarHostState,
+        product = product,
+
+        shopAutoCompleteService = viewModel.shopAutoCompleteService,
+        storeAutoCompleteService = viewModel.storeAutoCompleteService,
+        brandAutoCompleteService = viewModel.brandAutoCompleteService,
+        productAutoCompleteService = viewModel.productAutoCompleteService,
+        attributeAutoCompleteService = viewModel.attributeAutoCompleteService,
+        attributeValueAutoCompleteService = viewModel.attributeValueAutoCompleteService,
+        measurementUnitAutoCompleteService = viewModel.measurementUnitAutoCompleteService,
+
         traversedSteps = viewModel.traversedSteps,
-        brandSuggestionsState = viewModel.brandSuggestionsFlow,
         addProductState = viewModel.saveProductStateFlow,
-        attributeSuggestionsState = viewModel.attributeSuggestionsFlow,
-        attributeValueSuggestionsState = viewModel.attributeValueSuggestionsFlow,
-        storeSuggestionsState = viewModel.storeSuggestionsFlow,
-        shopSuggestionsState = viewModel.shopSuggestionsFlow,
-        productSuggestionsState = viewModel.productSuggestionsFlow,
         savePermanently = viewModel::savePermanently,
         saveDraft = viewModel::saveDraft,
         saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
-        searchBrands = viewModel::searchBrand,
-        searchAttributeValue = viewModel::searchAttributeValue,
-        searchAttribute = viewModel::searchAttribute,
-        searchStores = viewModel::searchStore,
-        onStoreSearchSuggestionSelected = viewModel::clearStoreSearchSuggestions,
-        searchShops = viewModel::searchShop,
-        onShopSearchSuggestionSelected = viewModel::clearShopSearchSuggestions,
-        searchProductNames = viewModel::searchProductName,
-        onProductSearchSuggestionSelected = viewModel::clearProductSearchSuggestions,
-        measurementUnitSuggestionsState = viewModel.measurementUnitSuggestionsFlow,
-        searchMeasurementUnits = viewModel::searchMeasurementUnit,
-        onMeasurementUnitSearchSuggestionSelected = viewModel::clearMeasurementUnitSearchSuggestions,
-        onBrandSearchSuggestionSelected = { viewModel.clearBrandSearchSuggestions() },
-        onAttributeValueSuggestionClicked = { viewModel.clearAttributeValueSuggestions() },
-    ) { viewModel.clearAttributeSuggestions() }
+    )
 }
 
 @Composable
@@ -92,33 +85,19 @@ fun AddProductScreen(
     snackbarHostState: SnackbarHostState,
     product: Product.LocalViewModel,
 
-    traversedSteps: Flow<Set<AddProductStep>>,
-    brandSuggestionsState: Flow<List<Brand>>,
-    addProductState: Flow<State>,
-    attributeSuggestionsState: Flow<List<Attribute>>,
-    attributeValueSuggestionsState: Flow<List<AttributeValue>>,
-    storeSuggestionsState: Flow<List<Store>>,
-    shopSuggestionsState: Flow<List<Shop>>,
-    productSuggestionsState: Flow<List<Product>>,
-    measurementUnitSuggestionsState: Flow<List<MeasurementUnit>>,
+    shopAutoCompleteService: ShopAutoCompleteService,
+    storeAutoCompleteService: StoreAutoCompleteService,
+    brandAutoCompleteService: BrandAutoCompleteService,
+    productAutoCompleteService: ProductAutoCompleteService,
+    attributeAutoCompleteService: AttributeAutoCompleteService,
+    attributeValueAutoCompleteService: AttributeValueAutoCompleteService,
+    measurementUnitAutoCompleteService: MeasurementUnitAutoCompleteService,
 
+    traversedSteps: Flow<Set<AddProductStep>>,
+    addProductState: Flow<State>,
     savePermanently: (Array<AddProductStep>) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
-    searchBrands: (Brand) -> Unit,
-    searchAttributeValue: (AttributeValue) -> Unit,
-    searchAttribute: (Attribute) -> Unit,
-    searchStores: (Store) -> Unit,
-    onStoreSearchSuggestionSelected: () -> Unit,
-    searchShops: (Shop) -> Unit,
-    onShopSearchSuggestionSelected: () -> Unit,
-    searchProductNames: (ProductName) -> Unit,
-    onProductSearchSuggestionSelected: () -> Unit,
-    searchMeasurementUnits: (MeasurementUnit) -> Unit,
-    onMeasurementUnitSearchSuggestionSelected: () -> Unit,
-    onBrandSearchSuggestionSelected: (Brand) -> Unit,
-    onAttributeValueSuggestionClicked: (AttributeValue) -> Unit,
-    onAttributeSuggestionClicked: (Attribute) -> Unit,
 ) {
     val navigateToNext: () -> Unit by rememberUpdatedState {
         AddProductStep.valueOfOrdinalOrFirstByOrdinal(currentlyActiveStep.ordinal + 1)
@@ -170,15 +149,13 @@ fun AddProductScreen(
                     AddStorePage(
                         modifier = Modifier.fillMaxSize(),
                         store = product.store,
+                        service = storeAutoCompleteService,
                         snackbarHostState = snackbarHostState,
-                        suggestionsState = storeSuggestionsState,
                         permissionsState = locationPermissionsState,
-                        search = searchStores,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
                         },
-                        onSearchSuggestionSelected = onStoreSearchSuggestionSelected,
                     ) {
                         productDraft(it)
                             .let(saveDraft)
@@ -195,14 +172,12 @@ fun AddProductScreen(
                     AddShopPage(
                         modifier = Modifier.fillMaxSize(),
                         shop = product.store.shop,
-                        onPreviousClick = navigateToPrevious,
-                        suggestionsState = shopSuggestionsState,
-                        search = searchShops,
+                        service = shopAutoCompleteService,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
                         },
-                        onSearchSuggestionSelected = onShopSearchSuggestionSelected,
+                        onPreviousClick = navigateToPrevious,
                     ) {
                         productDraft(it)
                             .let(saveDraft)
@@ -225,14 +200,12 @@ fun AddProductScreen(
                     AddProductNamePage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
-                        onPreviousClick = navigateToPrevious,
-                        suggestionsState = productSuggestionsState,
-                        search = searchProductNames,
+                        service = productAutoCompleteService,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
                         },
-                        onSearchSuggestionSelected = onProductSearchSuggestionSelected,
+                        onPreviousClick = navigateToPrevious,
                     ) {
                         productDraft(it)
                             .let(saveDraft)
@@ -256,13 +229,11 @@ fun AddProductScreen(
                     AddMeasurementUnitPage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
-                        suggestionsState = measurementUnitSuggestionsState,
-                        search = searchMeasurementUnits,
+                        service = measurementUnitAutoCompleteService,
                         onSuggestionSelected = {
                             productDraft(product.copy(measurementUnit = it.toLocalViewModel()))
                                 .let(saveDraft)
                         },
-                        onSearchSuggestionSelected = onMeasurementUnitSearchSuggestionSelected,
                         onPreviousClick = navigateToPrevious,
                     ) {
                         productDraft(it)
@@ -290,14 +261,12 @@ fun AddProductScreen(
                     AddBrandsPage(
                         modifier = Modifier.fillMaxSize(),
                         brands = product.brands,
-                        suggestionsState = brandSuggestionsState,
-                        search = searchBrands,
-                        onPreviousClick = navigateToPrevious,
+                        service = brandAutoCompleteService,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
                         },
-                        onSearchSuggestionSelected = onBrandSearchSuggestionSelected,
+                        onPreviousClick = navigateToPrevious,
                     ) { brands ->
                         productDraft(brands)
                             .let(saveDraft)
@@ -312,12 +281,8 @@ fun AddProductScreen(
                     AddAttributesPage(
                         modifier = Modifier.fillMaxSize(),
                         attributes = product.attributes,
-                        attributeValueSuggestionsState = attributeValueSuggestionsState,
-                        attributeSuggestionsState = attributeSuggestionsState,
-                        searchAttributeValue = searchAttributeValue,
-                        onAttributeValueSuggestionClicked = onAttributeValueSuggestionClicked,
-                        searchAttribute = searchAttribute,
-                        onAttributeSuggestionClicked = onAttributeSuggestionClicked,
+                        nameService = attributeAutoCompleteService,
+                        valueService = attributeValueAutoCompleteService,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
@@ -358,36 +323,23 @@ private fun AddProductScreenPreview() {
                     AddProductStep.values().size
                 )
             ),
-            snackbarHostState = SnackbarHostState(),
             locationPermissionsState = LocationPermissionsState.Simulated,
+            snackbarHostState = SnackbarHostState(),
             product = Product.LocalViewModel.default,
 
-            traversedSteps = MutableStateFlow(emptySet()),
-            brandSuggestionsState = MutableStateFlow(emptyList()),
-            addProductState = flowOf(State.Idle),
-            attributeSuggestionsState = MutableStateFlow(emptyList()),
-            attributeValueSuggestionsState = MutableStateFlow(emptyList()),
-            storeSuggestionsState = MutableStateFlow(emptyList()),
-            shopSuggestionsState = MutableStateFlow(emptyList()),
-            productSuggestionsState = MutableStateFlow(emptyList()),
-            measurementUnitSuggestionsState = MutableStateFlow(emptyList()),
+            shopAutoCompleteService = ShopAutoCompleteService.Fake,
+            storeAutoCompleteService = StoreAutoCompleteService.Fake,
+            brandAutoCompleteService = BrandAutoCompleteService.Fake,
+            productAutoCompleteService = ProductAutoCompleteService.Fake,
+            attributeAutoCompleteService = AttributeAutoCompleteService.Fake,
+            attributeValueAutoCompleteService = AttributeValueAutoCompleteService.Fake,
+            measurementUnitAutoCompleteService = MeasurementUnitAutoCompleteService.Fake,
 
+            traversedSteps = MutableStateFlow(emptySet()),
+            addProductState = flowOf(State.Idle),
             savePermanently = {},
             saveDraft = {},
             saveCurrentlyActiveStep = {},
-            searchBrands = {},
-            searchAttributeValue = {},
-            searchAttribute = {},
-            searchStores = {},
-            onStoreSearchSuggestionSelected = {},
-            searchShops = {},
-            onShopSearchSuggestionSelected = {},
-            searchProductNames = {},
-            onProductSearchSuggestionSelected = {},
-            searchMeasurementUnits = {},
-            onMeasurementUnitSearchSuggestionSelected = {},
-            onBrandSearchSuggestionSelected = {},
-            onAttributeValueSuggestionClicked = {},
-        ) {}
+        )
     }
 }

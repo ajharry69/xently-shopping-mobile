@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.ui.subscreens
+package ke.co.xently.features.attributesvalues.ui
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -29,38 +29,30 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
+import ke.co.xently.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
 import ke.co.xently.features.attributes.models.Attribute
+import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.core.javaLocale
 import ke.co.xently.features.core.ui.AutoCompleteTextField
+import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.models.Product
-import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddAttributesPage(
     modifier: Modifier = Modifier,
     attributes: List<AttributeValue>,
-    attributeValueSuggestionsState: Flow<List<AttributeValue>>,
-    attributeSuggestionsState: Flow<List<Attribute>>,
-    searchAttributeValue: (AttributeValue) -> Unit,
-    onAttributeValueSuggestionClicked: (AttributeValue) -> Unit,
-    searchAttribute: (Attribute) -> Unit,
-    onAttributeSuggestionClicked: (Attribute) -> Unit,
+    nameService: AttributeAutoCompleteService,
+    valueService: AttributeValueAutoCompleteService,
     saveDraft: (List<AttributeValue>) -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (List<AttributeValue>) -> Unit,
 ) {
-    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
-        suggestionsState = attributeSuggestionsState,
-    )
-    val valueAutoCompleteState = rememberAutoCompleteTextFieldState(
-        suggestionsState = attributeValueSuggestionsState,
-    )
+    val nameAutoCompleteState = rememberAutoCompleteTextFieldState()
+    val valueAutoCompleteState = rememberAutoCompleteTextFieldState()
 
     val attrs = remember {
         mutableStateListOf(*attributes.toTypedArray())
@@ -70,7 +62,7 @@ fun AddAttributesPage(
         saveDraft(attrs)
     }
 
-    AddProductPage(
+    MultiStepScreen(
         modifier = modifier,
         heading = R.string.xently_add_attributes_page_title,
         onBackClick = onPreviousClick,
@@ -130,19 +122,18 @@ fun AddAttributesPage(
                 }
             } else null
 
-            AutoCompleteTextField(
+            AutoCompleteTextField<Attribute, Attribute>(
                 state = nameAutoCompleteState,
+                service = nameService,
                 modifier = Modifier.weight(1f),
                 trailingIcon = trailingIcon,
                 onSearch = { query ->
                     Attribute.LocalViewModel.default.copy(name = query)
-                        .let(searchAttribute)
                 },
                 label = {
                     Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
                 },
                 onSuggestionSelected = {
-                    onAttributeSuggestionClicked(it)
                     nameAutoCompleteState.updateQuery(it.toString())
                     if (isNameAndValueProvided) {
                         savableAttribute(AttributeValue.LocalViewModel.default)
@@ -167,8 +158,9 @@ fun AddAttributesPage(
                 },
             )
 
-            AutoCompleteTextField(
+            AutoCompleteTextField<AttributeValue, AttributeValue>(
                 state = valueAutoCompleteState,
+                service = valueService,
                 modifier = Modifier.weight(1f),
                 trailingIcon = trailingIcon,
                 onSearch = { query ->
@@ -177,13 +169,12 @@ fun AddAttributesPage(
                             value = query,
                             attribute = attribute.copy(name = nameAutoCompleteState.query),
                         )
-                    }.let(searchAttributeValue)
+                    }
                 },
                 label = {
                     Text(text = stringResource(R.string.xently_search_bar_placeholder_value))
                 },
                 onSuggestionSelected = {
-                    onAttributeValueSuggestionClicked(it)
                     valueAutoCompleteState.updateQuery(it.value)
                     if (isNameAndValueProvided) {
                         savableAttribute(it)
@@ -259,12 +250,8 @@ private fun AddAttributesPagePreview() {
         AddAttributesPage(
             modifier = Modifier.fillMaxSize(),
             attributes = Product.LocalViewModel.default.attributes,
-            attributeValueSuggestionsState = MutableStateFlow(emptyList()),
-            attributeSuggestionsState = MutableStateFlow(emptyList()),
-            searchAttributeValue = {},
-            onAttributeValueSuggestionClicked = {},
-            searchAttribute = {},
-            onAttributeSuggestionClicked = {},
+            nameService = AttributeAutoCompleteService.Fake,
+            valueService = AttributeValueAutoCompleteService.Fake,
             saveDraft = {},
             onPreviousClick = {},
         ) {}

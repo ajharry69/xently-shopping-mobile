@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.ui.subscreens
+package ke.co.xently.features.shop.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,13 +22,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.features.core.ui.AutoCompleteTextField
+import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
-import ke.co.xently.features.products.ui.components.AddProductPage
+import ke.co.xently.features.shop.datasources.remoteservices.ShopAutoCompleteService
 import ke.co.xently.features.shop.models.Shop
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 
 private sealed class ShopUIState(message: Int) : UIState(message) {
@@ -41,16 +40,13 @@ private sealed class ShopUIState(message: Int) : UIState(message) {
 fun AddShopPage(
     modifier: Modifier = Modifier,
     shop: Shop,
-    suggestionsState: Flow<List<Shop>>,
-    search: (Shop) -> Unit,
+    service: ShopAutoCompleteService,
     saveDraft: (Shop) -> Unit,
-    onSearchSuggestionSelected: () -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (Shop) -> Unit,
 ) {
     val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
         query = shop.name,
-        suggestionsState = suggestionsState,
     )
     var eCommerceWebsiteUrl by remember(shop.ecommerceSiteUrl) {
         mutableStateOf(TextFieldValue(shop.ecommerceSiteUrl ?: ""))
@@ -68,7 +64,7 @@ fun AddShopPage(
         }
     }
 
-    AddProductPage(
+    MultiStepScreen(
         modifier = modifier,
         heading = R.string.xently_add_shop_page_title,
         subheading = R.string.xently_add_shop_page_sub_heading,
@@ -93,15 +89,14 @@ fun AddShopPage(
             }
         },
     ) {
-        AutoCompleteTextField(
+        AutoCompleteTextField<Shop, Shop>(
             modifier = Modifier.fillMaxWidth(),
             state = nameAutoCompleteState,
+            service = service,
             onSearch = { query ->
                 Shop.LocalViewModel.default.copy(name = query)
-                    .let(search)
             },
             onSuggestionSelected = saveDraft,
-            onSearchSuggestionSelected = onSearchSuggestionSelected,
             suggestionContent = { Text(text = it.name) },
             label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name_required))
@@ -138,12 +133,9 @@ private fun AddShopPagePreview() {
         AddShopPage(
             modifier = Modifier.fillMaxSize(),
             shop = Shop.LocalViewModel.default,
-            suggestionsState = MutableStateFlow(emptyList()),
-            search = {},
+            service = ShopAutoCompleteService.Fake,
             saveDraft = {},
             onPreviousClick = {},
-            onContinueClick = {},
-            onSearchSuggestionSelected = {},
-        )
+        ) {}
     }
 }

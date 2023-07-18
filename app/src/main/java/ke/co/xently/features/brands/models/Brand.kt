@@ -2,6 +2,7 @@ package ke.co.xently.features.brands.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 sealed interface Brand {
     val id: Long
@@ -12,6 +13,7 @@ sealed interface Brand {
         override val name: String,
     ) : Brand
 
+    @Serializable
     data class RemoteResponse(
         override val id: Long,
         override val name: String,

@@ -40,11 +40,11 @@ import ke.co.xently.features.core.isRetryable
 import ke.co.xently.features.core.javaLocale
 import ke.co.xently.features.core.loadingIndicatorLabel
 import ke.co.xently.features.core.ui.LabeledCheckbox
+import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.AddProductStep
 import ke.co.xently.features.products.ui.State
-import ke.co.xently.features.products.ui.components.AddProductPage
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -118,7 +118,7 @@ fun SummaryPage(
         }
     }
 
-    AddProductPage(
+    MultiStepScreen(
         modifier = Modifier.then(modifier),
         heading = stringResource(R.string.xently_summary_page_title),
         subheading = stringResource(R.string.xently_summary_page_subtitle),
