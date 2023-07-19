@@ -34,6 +34,7 @@ jobs:
           cat > local.properties <<EOF
           MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
           API_BASE_URL=https://shopping.xently.co.ke/api/
+          AUTO_COMPLETE_BASE_URL=wss://shopping.xently.co.ke/
           EOF
 
       - name: Run build

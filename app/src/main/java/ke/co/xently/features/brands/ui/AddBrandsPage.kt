@@ -73,7 +73,7 @@ fun AddBrandsPage(
         val doSearch: () -> Brand by rememberUpdatedState {
             Brand.LocalViewModel.default.copy(name = nameAutoCompleteState.query)
         }
-        AutoCompleteTextField(
+        AutoCompleteTextField<Brand, Brand>(
             state = nameAutoCompleteState,
             service = service,
             onSuggestionSelected = {

@@ -8,15 +8,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 sealed interface MeasurementUnitAutoCompleteService :
-    AutoCompleteService<MeasurementUnit, MeasurementUnit> {
+    AutoCompleteService<MeasurementUnit> {
     @Singleton
     class Actual @Inject constructor(client: HttpClient) :
-        WebsocketAutoCompleteService<MeasurementUnit, MeasurementUnit>(
+        WebsocketAutoCompleteService<MeasurementUnit>(
             client = client,
             endpoint = "search/suggest/measurement-units",
             queryString = { it.name },
         ), MeasurementUnitAutoCompleteService
 
-    object Fake : AutoCompleteService.Fake<MeasurementUnit, MeasurementUnit>(),
+    object Fake : AutoCompleteService.Fake<MeasurementUnit>(),
         MeasurementUnitAutoCompleteService
 }

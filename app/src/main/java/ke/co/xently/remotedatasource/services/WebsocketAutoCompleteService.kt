@@ -14,9 +14,12 @@ import ke.co.xently.remotedatasource.exceptions.WebsocketConnectionFailedExcepti
 import ke.co.xently.remotedatasource.exceptions.WebsocketException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -27,14 +30,18 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-open class WebsocketAutoCompleteService<in Q, out R>(
+@OptIn(ExperimentalSerializationApi::class)
+open class WebsocketAutoCompleteService<in Q>(
     private val client: HttpClient,
     private val endpoint: String,
     private val waitDuration: Duration = 1.seconds,
     private val waitActiveRetryCount: Int = 3,
-    private val waitBackoffMultiplier: Int = 1,
+    private val waitBackoffMultiplier: Int = 2,
     private val queryString: (Q) -> String,
-) : AutoCompleteService<Q, R> {
+    private val mapResponse: Json.(response: String) -> AutoCompleteService.ResultState = {
+        decodeFromString(it)
+    },
+) : AutoCompleteService<Q> {
     companion object {
         private val TAG = WebsocketAutoCompleteService::class.java.simpleName
     }
@@ -47,9 +54,8 @@ open class WebsocketAutoCompleteService<in Q, out R>(
 
     private var socket: WebSocketSession? = null
 
-    override suspend fun initSession(): Result<Unit> {
+    override suspend fun initSession(logSuccessfulInitialization: Boolean): AutoCompleteService.InitState {
         return try {
-            Log.i(TAG, "initSession: ...")
             socket = socket ?: client.webSocketSession {
                 url(urlString = urlString)
             }
@@ -59,7 +65,7 @@ open class WebsocketAutoCompleteService<in Q, out R>(
             while (!socket!!.isActive && retryCountDown > 0) {
                 Log.i(
                     TAG,
-                    "initSession: waiting for $newWaitDuration for the socket to be active...",
+                    "Waiting for $newWaitDuration for the session to be active...",
                 )
                 delay(newWaitDuration)
                 retryCountDown -= 1
@@ -67,63 +73,80 @@ open class WebsocketAutoCompleteService<in Q, out R>(
             }
 
             if (socket!!.isActive) {
-                Result.success(Unit).also {
-                    Log.i(TAG, "initSession: successfully initialized session")
+                AutoCompleteService.InitState.Success.also {
+                    if (logSuccessfulInitialization) {
+                        Log.i(TAG, "Successfully initialised session")
+                    }
                 }
             } else {
-                Result.failure(WebsocketConnectionFailedException())
+                AutoCompleteService.InitState.Failure(WebsocketConnectionFailedException())
             }
         } catch (e: Exception) {
-            Result.failure(WebsocketException(e))
-        }.onFailure {
-            Log.e(TAG, "initSession: error: ${it.localizedMessage}", it)
+            Log.e(TAG, "Error initialising session", e)
+            AutoCompleteService.InitState.Failure(WebsocketException(e))
         }
     }
 
     @Serializable
     data class Request(val q: String, val size: Int = 5)
 
-    @OptIn(ExperimentalSerializationApi::class)
     override suspend fun search(query: Q, size: Int) {
-        initSession().onSuccess {
-            try {
-                socket?.run {
-                    val request = Request(q = queryString(query), size = size)
-                    val content = Json.encodeToString(request)
-                    send(content)
-                    Log.i(TAG, "search: sent search request for: $content")
-                }
-            } catch (ex: Exception) {
-                Log.e(TAG, "search: ${ex.localizedMessage}", ex)
+        val request = Request(q = queryString(query), size = size)
+        val content = Json.encodeToString(request)
+
+        val state = initSession(logSuccessfulInitialization = false)
+        if (state !is AutoCompleteService.InitState.Success) {
+            Log.i(
+                TAG,
+                "Skipping search propagation for ${content}. Search session is not successfully initialised!",
+            )
+            return
+        }
+
+        try {
+            socket?.run {
+                send(content)
+                Log.i(TAG, "Sent a search request for: $content")
             }
+        } catch (ex: Exception) {
+            Log.e(TAG, "Error searching for '$content'", ex)
         }
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    override fun getSearchResults(): Flow<List<R>> {
-        Log.i(TAG, "getSearchResults: ...")
+    override fun getSearchResults(): Flow<AutoCompleteService.ResultState> {
         return socket?.run {
-            Log.i(TAG, "getSearchResults: socket was initialised")
             incoming.receiveAsFlow()
                 .filter { it is Frame.Text }
                 .map { frame ->
                     val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
-                        Log.i(TAG, "getSearchResults: $it")
+                        Log.i(TAG, "Results: $it")
                     }
                     val json = Json {
                         ignoreUnknownKeys = true
                     }
-                    json.decodeFromString(response)
+                    json.mapResponse(response)
                 }
-        } ?: flow { }
+                .onStart {
+                    emit(AutoCompleteService.ResultState.Loading)
+                    Log.i(TAG, "Session was successfully initialised. Getting search results...")
+                }
+                .catch {
+                    emit(AutoCompleteService.ResultState.Failure(it))
+                    Log.e(TAG, "Error getting search results", it)
+                }
+        } ?: flowOf<AutoCompleteService.ResultState>().onEach {
+            Log.i(TAG, "getSearchResults: returned default flow...")
+        }
     }
 
     override suspend fun closeSession() {
-        Log.i(TAG, "closeSession: ...")
+        Log.i(TAG, "Requested session closure...")
         try {
             socket?.close()?.also {
-                Log.i(TAG, "closeSession: closed websocket session.")
+                Log.i(TAG, "Successfully closed websocket session.")
             }
+        } catch (ex: Exception) {
+            Log.e(TAG, "Error closing session", ex)
         } finally {
             socket = null
         }

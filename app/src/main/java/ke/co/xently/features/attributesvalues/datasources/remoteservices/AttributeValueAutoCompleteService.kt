@@ -8,15 +8,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 sealed interface AttributeValueAutoCompleteService :
-    AutoCompleteService<AttributeValue, AttributeValue> {
+    AutoCompleteService<AttributeValue> {
     @Singleton
     class Actual @Inject constructor(client: HttpClient) :
-        WebsocketAutoCompleteService<AttributeValue, AttributeValue>(
+        WebsocketAutoCompleteService<AttributeValue>(
             client = client,
             endpoint = "search/suggest/attribute-values",
             queryString = { it.toString() },
         ), AttributeValueAutoCompleteService
 
-    object Fake : AutoCompleteService.Fake<AttributeValue, AttributeValue>(),
+    object Fake : AutoCompleteService.Fake<AttributeValue>(),
         AttributeValueAutoCompleteService
 }

@@ -59,7 +59,7 @@ fun rememberAutoCompleteTextFieldState(
 @Composable
 fun <Q, R> AutoCompleteTextField(
     modifier: Modifier = Modifier,
-    service: AutoCompleteService<Q, R> = AutoCompleteService.Fake(),
+    service: AutoCompleteService<Q> = AutoCompleteService.Fake(),
     isError: Boolean = false,
     numberOfResults: Int = 5,
     state: AutoCompleteTextFieldState = rememberAutoCompleteTextFieldState(),
@@ -77,16 +77,37 @@ fun <Q, R> AutoCompleteTextField(
         mutableStateListOf<R>()
     }
 
+    var resultState: AutoCompleteService.ResultState by remember {
+        mutableStateOf(AutoCompleteService.ResultState.Idle)
+    }
+
+    LaunchedEffect(resultState) {
+        when (@Suppress("LocalVariableName") val _state = resultState) {
+            is AutoCompleteService.ResultState.Failure -> {
+                suggestions.clear()
+            }
+
+            AutoCompleteService.ResultState.Idle -> {
+
+            }
+
+            AutoCompleteService.ResultState.Loading -> {
+
+            }
+
+            is AutoCompleteService.ResultState.Success<*> -> {
+                suggestions.clear()
+                @Suppress("UNCHECKED_CAST")
+                suggestions.addAll(_state.data as List<R>)
+            }
+        }
+    }
+
     AutoCompleteSearchResults(
         service = service,
-        shouldShowSuggestions = {
-            state.query.isNotBlank()
-        },
-        suggestions = {
-            suggestions.clear()
-            suggestions.addAll(it)
-        },
-    )
+    ) {
+        resultState = it
+    }
 
     var nameSearchActive by remember {
         mutableStateOf(false)
@@ -150,10 +171,14 @@ private fun AutoCompleteTextFieldPreview() {
             }
         }
         Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
-            AutoCompleteTextField(
+            AutoCompleteTextField<String, String>(
                 modifier = Modifier.fillMaxWidth(),
                 state = rememberAutoCompleteTextFieldState(),
-                service = AutoCompleteService.Fake(suggestions),
+                service = AutoCompleteService.Fake(
+                    AutoCompleteService.ResultState.Success(
+                        suggestions
+                    )
+                ),
                 onSearch = { "" },
                 onSuggestionSelected = {},
                 onSearchSuggestionSelected = {},

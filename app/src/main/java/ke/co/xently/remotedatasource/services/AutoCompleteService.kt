@@ -3,24 +3,41 @@ package ke.co.xently.remotedatasource.services
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-interface AutoCompleteService<in Q, out R> {
+interface AutoCompleteService<in Q> {
+    sealed interface InitState {
+        object Idle : InitState
+        object Loading : InitState
 
-    suspend fun initSession(): Result<Unit>
+        object Success : InitState
+
+        data class Failure(val error: Throwable) : InitState
+    }
+
+    sealed interface ResultState {
+        object Idle : ResultState
+        object Loading : ResultState
+
+        data class Success<out T>(val data: List<T>) : ResultState
+
+        data class Failure(val error: Throwable) : ResultState
+    }
+
+    suspend fun initSession(logSuccessfulInitialization: Boolean = true): InitState
 
     suspend fun search(query: Q, size: Int = 5)
 
-    fun getSearchResults(): Flow<List<R>>
+    fun getSearchResults(): Flow<ResultState>
 
     suspend fun closeSession()
 
-    open class Fake<in Q, out R>(
-        private val results: List<R> = emptyList(),
-    ) : AutoCompleteService<Q, R> {
-        override suspend fun initSession(): Result<Unit> {
-            return Result.success(Unit)
+    open class Fake<in Q>(
+        private val results: ResultState = ResultState.Idle,
+    ) : AutoCompleteService<Q> {
+        override suspend fun initSession(logSuccessfulInitialization: Boolean): InitState {
+            return InitState.Idle
         }
 
-        override fun getSearchResults(): Flow<List<R>> {
+        override fun getSearchResults(): Flow<ResultState> {
             return flowOf(results)
         }
 

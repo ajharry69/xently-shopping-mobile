@@ -7,14 +7,14 @@ import ke.co.xently.remotedatasource.services.WebsocketAutoCompleteService
 import javax.inject.Inject
 import javax.inject.Singleton
 
-sealed interface ShopAutoCompleteService : AutoCompleteService<Shop, Shop> {
+sealed interface ShopAutoCompleteService : AutoCompleteService<Shop> {
     @Singleton
     class Actual @Inject constructor(client: HttpClient) :
-        WebsocketAutoCompleteService<Shop, Shop>(
+        WebsocketAutoCompleteService<Shop>(
             client = client,
             endpoint = "search/suggest/shops",
             queryString = Shop::name,
         ), ShopAutoCompleteService
 
-    object Fake : AutoCompleteService.Fake<Shop, Shop>(), ShopAutoCompleteService
+    object Fake : AutoCompleteService.Fake<Shop>(), ShopAutoCompleteService
 }
