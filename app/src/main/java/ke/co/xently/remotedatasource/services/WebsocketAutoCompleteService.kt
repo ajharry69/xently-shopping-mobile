@@ -24,13 +24,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalSerializationApi::class)
 open class WebsocketAutoCompleteService<in Q>(
     private val client: HttpClient,
     private val endpoint: String,
@@ -38,9 +36,7 @@ open class WebsocketAutoCompleteService<in Q>(
     private val waitActiveRetryCount: Int = 3,
     private val waitBackoffMultiplier: Int = 2,
     private val queryString: (Q) -> String,
-    private val mapResponse: Json.(Response<Q>) -> AutoCompleteService.ResultState = {
-        decodeFromString(it.json)
-    },
+    private val mapResponse: Json.(Response<Q>) -> AutoCompleteService.ResultState,
 ) : AutoCompleteService<Q> {
     companion object {
         private val TAG = WebsocketAutoCompleteService::class.java.simpleName
@@ -92,6 +88,7 @@ open class WebsocketAutoCompleteService<in Q>(
     @Serializable
     data class Request(val q: String, val size: Int = 5)
 
+    @OptIn(ExperimentalSerializationApi::class)
     override suspend fun search(query: Q, size: Int) {
         val q = queryString(query)
 
@@ -102,6 +99,7 @@ open class WebsocketAutoCompleteService<in Q>(
         }
 
         currentQuery = query
+
         val request = Request(q = q, size = size)
         val content = Json.encodeToString(request)
 

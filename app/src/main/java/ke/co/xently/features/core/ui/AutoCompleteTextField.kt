@@ -5,15 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -67,7 +64,6 @@ fun <Q, R> AutoCompleteTextField(
     service: AutoCompleteService<Q> = AutoCompleteService.Fake(),
     isError: Boolean = false,
     numberOfResults: Int = 5,
-    showLoadingProgressBarWhenNecessary: Boolean = true,
     state: AutoCompleteTextFieldState = rememberAutoCompleteTextFieldState(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -135,14 +131,6 @@ fun <Q, R> AutoCompleteTextField(
     }
     val coroutineScope = rememberCoroutineScope()
 
-    val shouldShowLoadingProgressBar by remember {
-        derivedStateOf {
-            showLoadingProgressBarWhenNecessary
-                    && state.query.isNotBlank()
-                    && resultState is AutoCompleteService.ResultState.Loading
-        }
-    }
-
     ke.co.xently.features.core.ui.autocomplete.AutoCompleteTextField(
         query = state.query,
         onQueryChange = {
@@ -157,13 +145,7 @@ fun <Q, R> AutoCompleteTextField(
         onActiveChange = {},
         modifier = Modifier.then(modifier),
         label = label,
-        trailingIcon = if (!shouldShowLoadingProgressBar) {
-            trailingIcon
-        } else {
-            {
-                CircularProgressIndicator(modifier = Modifier.size(28.dp))
-            }
-        },
+        trailingIcon = trailingIcon,
         supportingText = supportingText,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
