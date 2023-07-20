@@ -38,8 +38,8 @@ open class WebsocketAutoCompleteService<in Q>(
     private val waitActiveRetryCount: Int = 3,
     private val waitBackoffMultiplier: Int = 2,
     private val queryString: (Q) -> String,
-    private val mapResponse: Json.(response: String) -> AutoCompleteService.ResultState = {
-        decodeFromString(it)
+    private val mapResponse: Json.(Response<Q>) -> AutoCompleteService.ResultState = {
+        decodeFromString(it.json)
     },
 ) : AutoCompleteService<Q> {
     companion object {
@@ -51,6 +51,8 @@ open class WebsocketAutoCompleteService<in Q>(
         append('/')
         append(endpoint.removePrefix("/"))
     }
+
+    private var currentQuery: Q? = null
 
     private var socket: WebSocketSession? = null
 
@@ -91,7 +93,16 @@ open class WebsocketAutoCompleteService<in Q>(
     data class Request(val q: String, val size: Int = 5)
 
     override suspend fun search(query: Q, size: Int) {
-        val request = Request(q = queryString(query), size = size)
+        val q = queryString(query)
+
+        if (q.isBlank()) {
+            currentQuery = null
+            Log.i(TAG, "Skipping search of blank query...")
+            return
+        }
+
+        currentQuery = query
+        val request = Request(q = q, size = size)
         val content = Json.encodeToString(request)
 
         val state = initSession(logSuccessfulInitialization = false)
@@ -113,6 +124,8 @@ open class WebsocketAutoCompleteService<in Q>(
         }
     }
 
+    data class Response<Q>(val json: String, val currentQuery: Q?)
+
     override fun getSearchResults(): Flow<AutoCompleteService.ResultState> {
         return socket?.run {
             incoming.receiveAsFlow()
@@ -124,7 +137,7 @@ open class WebsocketAutoCompleteService<in Q>(
                     val json = Json {
                         ignoreUnknownKeys = true
                     }
-                    json.mapResponse(response)
+                    json.mapResponse(Response(json = response, currentQuery = currentQuery))
                 }
                 .onStart {
                     emit(AutoCompleteService.ResultState.Loading)
@@ -149,6 +162,7 @@ open class WebsocketAutoCompleteService<in Q>(
             Log.e(TAG, "Error closing session", ex)
         } finally {
             socket = null
+            currentQuery = null
         }
     }
 }

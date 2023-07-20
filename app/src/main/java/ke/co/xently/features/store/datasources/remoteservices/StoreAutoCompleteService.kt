@@ -17,9 +17,16 @@ sealed interface StoreAutoCompleteService : AutoCompleteService<Store> {
         endpoint = "search/suggest/stores",
         queryString = Store::name,
         mapResponse = { response ->
-            decodeFromString<List<Store.RemoteResponse>>(response).let {
-                AutoCompleteService.ResultState.Success(it)
-            }
+            decodeFromString<List<Store.RemoteResponse>>(response.json)
+                .map { it.toLocalViewModel() }
+                .let {
+                    val data = if (response.currentQuery == null) {
+                        it
+                    } else {
+                        listOf(response.currentQuery.toLocalViewModel()) + it
+                    }
+                    AutoCompleteService.ResultState.Success(data)
+                }
         },
     ), StoreAutoCompleteService
 

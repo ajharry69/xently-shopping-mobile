@@ -5,12 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,8 +27,10 @@ import androidx.compose.ui.unit.dp
 import ke.co.xently.features.core.ui.components.AutoCompleteSearchResults
 import ke.co.xently.remotedatasource.services.AutoCompleteService
 import ke.co.xently.ui.theme.XentlyTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class AutoCompleteTextFieldState {
@@ -62,6 +67,7 @@ fun <Q, R> AutoCompleteTextField(
     service: AutoCompleteService<Q> = AutoCompleteService.Fake(),
     isError: Boolean = false,
     numberOfResults: Int = 5,
+    showLoadingProgressBarWhenNecessary: Boolean = true,
     state: AutoCompleteTextFieldState = rememberAutoCompleteTextFieldState(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -87,6 +93,13 @@ fun <Q, R> AutoCompleteTextField(
                 suggestions.clear()
             }
 
+            is AutoCompleteService.ResultState.Success<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                val results = _state.data as List<R>
+                suggestions.clear()
+                suggestions.addAll(results)
+            }
+
             AutoCompleteService.ResultState.Idle -> {
 
             }
@@ -94,18 +107,10 @@ fun <Q, R> AutoCompleteTextField(
             AutoCompleteService.ResultState.Loading -> {
 
             }
-
-            is AutoCompleteService.ResultState.Success<*> -> {
-                suggestions.clear()
-                @Suppress("UNCHECKED_CAST")
-                suggestions.addAll(_state.data as List<R>)
-            }
         }
     }
 
-    AutoCompleteSearchResults(
-        service = service,
-    ) {
+    AutoCompleteSearchResults(service = service) {
         resultState = it
     }
 
@@ -120,10 +125,24 @@ fun <Q, R> AutoCompleteTextField(
         if (wasSuggestionSelected) {
             wasSuggestionSelected = false
         } else {
-            nameSearchActive = state.query.isNotBlank() && suggestions.isNotEmpty()
+            (state.query.isNotBlank() && suggestions.isNotEmpty()).let {
+                if (!it) {
+                    delay(800.milliseconds) // Delay hiding the soft keyboard
+                }
+                nameSearchActive = it
+            }
         }
     }
     val coroutineScope = rememberCoroutineScope()
+
+    val shouldShowLoadingProgressBar by remember {
+        derivedStateOf {
+            showLoadingProgressBarWhenNecessary
+                    && state.query.isNotBlank()
+                    && resultState is AutoCompleteService.ResultState.Loading
+        }
+    }
+
     ke.co.xently.features.core.ui.autocomplete.AutoCompleteTextField(
         query = state.query,
         onQueryChange = {
@@ -138,7 +157,13 @@ fun <Q, R> AutoCompleteTextField(
         onActiveChange = {},
         modifier = Modifier.then(modifier),
         label = label,
-        trailingIcon = trailingIcon,
+        trailingIcon = if (!shouldShowLoadingProgressBar) {
+            trailingIcon
+        } else {
+            {
+                CircularProgressIndicator(modifier = Modifier.size(28.dp))
+            }
+        },
         supportingText = supportingText,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
