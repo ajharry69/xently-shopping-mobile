@@ -25,6 +25,11 @@ fun <Q> AutoCompleteSearchResults(
             if (it == Lifecycle.Event.ON_PAUSE) {
                 service.closeSession()
             } else if (it == Lifecycle.Event.ON_RESUME) {
+                // Ensure previous sessions are closed before initialising another
+                // this is a defensive move aimed at preventing the possibility of
+                // running into unexpected errors.
+                service.closeSession()
+
                 val initState = service.initSession()
                 while (initState !is AutoCompleteService.InitState.Success && initState !is AutoCompleteService.InitState.Failure) {
                     delay(100.milliseconds)
