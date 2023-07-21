@@ -26,13 +26,13 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.features.core.cleansedForNumberParsing
-import ke.co.xently.features.core.ui.AutoCompleteTextField
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
+import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
 
 private sealed interface MeasurementUIState {
@@ -170,7 +170,7 @@ fun AddMeasurementUnitPage(
             }
         },
     ) {
-        AutoCompleteTextField<MeasurementUnit, MeasurementUnit>(
+        AddProductAutoCompleteTextField<MeasurementUnit, MeasurementUnit>(
             modifier = Modifier.fillMaxWidth(),
             service = service,
             state = nameAutoCompleteState,

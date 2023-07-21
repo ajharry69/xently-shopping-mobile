@@ -69,6 +69,7 @@ fun <Q, R> AutoCompleteTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onSearch: (String) -> Q,
     onSuggestionSelected: (R) -> Unit,
+    closeSessionKey: @Composable () -> Any = { true },
     onSearchSuggestionSelected: () -> Unit = {},
     label: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -106,7 +107,7 @@ fun <Q, R> AutoCompleteTextField(
         }
     }
 
-    AutoCompleteSearchResults(service = service) {
+    AutoCompleteSearchResults(service = service, closeSessionKey = closeSessionKey) {
         resultState = it
     }
 

@@ -10,7 +10,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -45,6 +47,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.random.Random
 
+val LocalAddProductStep = compositionLocalOf {
+    AddProductStep.valueOfOrdinalOrFirstByOrdinal(0)
+}
+
 @Composable
 fun AddProductScreen(
     modifier: Modifier,
@@ -54,27 +60,29 @@ fun AddProductScreen(
     val currentlyActiveStep by viewModel.currentlyActiveStep.collectAsState()
     val product by viewModel.product.collectAsState()
 
-    AddProductScreen(
-        modifier = modifier,
-        currentlyActiveStep = currentlyActiveStep,
-        locationPermissionsState = LocationPermissionsState.CoarseAndFine,
-        snackbarHostState = snackbarHostState,
-        product = product,
+    CompositionLocalProvider(LocalAddProductStep provides currentlyActiveStep) {
+        AddProductScreen(
+            modifier = modifier,
+            currentlyActiveStep = currentlyActiveStep,
+            locationPermissionsState = LocationPermissionsState.CoarseAndFine,
+            snackbarHostState = snackbarHostState,
+            product = product,
 
-        shopAutoCompleteService = viewModel.shopAutoCompleteService,
-        storeAutoCompleteService = viewModel.storeAutoCompleteService,
-        brandAutoCompleteService = viewModel.brandAutoCompleteService,
-        productAutoCompleteService = viewModel.productAutoCompleteService,
-        attributeAutoCompleteService = viewModel.attributeAutoCompleteService,
-        attributeValueAutoCompleteService = viewModel.attributeValueAutoCompleteService,
-        measurementUnitAutoCompleteService = viewModel.measurementUnitAutoCompleteService,
+            shopAutoCompleteService = viewModel.shopAutoCompleteService,
+            storeAutoCompleteService = viewModel.storeAutoCompleteService,
+            brandAutoCompleteService = viewModel.brandAutoCompleteService,
+            productAutoCompleteService = viewModel.productAutoCompleteService,
+            attributeAutoCompleteService = viewModel.attributeAutoCompleteService,
+            attributeValueAutoCompleteService = viewModel.attributeValueAutoCompleteService,
+            measurementUnitAutoCompleteService = viewModel.measurementUnitAutoCompleteService,
 
-        traversedSteps = viewModel.traversedSteps,
-        addProductState = viewModel.saveProductStateFlow,
-        savePermanently = viewModel::savePermanently,
-        saveDraft = viewModel::saveDraft,
-        saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
-    )
+            traversedSteps = viewModel.traversedSteps,
+            addProductState = viewModel.saveProductStateFlow,
+            savePermanently = viewModel::savePermanently,
+            saveDraft = viewModel::saveDraft,
+            saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
+        )
+    }
 }
 
 @Composable

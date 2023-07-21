@@ -29,10 +29,10 @@ import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.features.brands.models.Brand
-import ke.co.xently.features.core.ui.AutoCompleteTextField
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.models.Product
+import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -73,7 +73,7 @@ fun AddBrandsPage(
         val doSearch: () -> Brand by rememberUpdatedState {
             Brand.LocalViewModel.default.copy(name = nameAutoCompleteState.query)
         }
-        AutoCompleteTextField<Brand, Brand>(
+        AddProductAutoCompleteTextField<Brand, Brand>(
             state = nameAutoCompleteState,
             service = service,
             onSuggestionSelected = {

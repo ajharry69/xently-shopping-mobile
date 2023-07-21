@@ -21,13 +21,13 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
-import ke.co.xently.features.core.ui.AutoCompleteTextField
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
 import ke.co.xently.features.products.models.Product
+import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
 
 private sealed class ProductNameUIState(message: Int) : UIState(message) {
@@ -113,7 +113,7 @@ fun AddProductNamePage(
             }
         },
     ) {
-        AutoCompleteTextField(
+        AddProductAutoCompleteTextField(
             modifier = Modifier.fillMaxWidth(),
             service = service,
             state = nameAutoCompleteState,

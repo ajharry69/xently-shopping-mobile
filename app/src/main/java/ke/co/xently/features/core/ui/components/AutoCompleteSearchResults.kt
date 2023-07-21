@@ -2,6 +2,7 @@ package ke.co.xently.features.core.ui.components
 
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
@@ -15,10 +16,15 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun <Q> AutoCompleteSearchResults(
     service: AutoCompleteService<Q>,
+    closeSessionKey: @Composable () -> Any,
     suggestions: (AutoCompleteService.ResultState) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val lifecycle = LocalLifecycleOwner.current
+
+    LaunchedEffect(closeSessionKey()) {
+        service.closeSession()
+    }
 
     CallOnLifecycleEvent {
         coroutineScope.launch {

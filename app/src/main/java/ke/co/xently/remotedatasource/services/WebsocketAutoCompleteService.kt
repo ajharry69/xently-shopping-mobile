@@ -63,7 +63,7 @@ open class WebsocketAutoCompleteService<in Q>(
             while (!socket!!.isActive && retryCountDown > 0) {
                 Log.i(
                     TAG,
-                    "Waiting for $newWaitDuration for the session to be active...",
+                    "[$urlString]: waiting for $newWaitDuration for the session to be active...",
                 )
                 delay(newWaitDuration)
                 retryCountDown -= 1
@@ -73,14 +73,14 @@ open class WebsocketAutoCompleteService<in Q>(
             if (socket!!.isActive) {
                 AutoCompleteService.InitState.Success.also {
                     if (logSuccessfulInitialization) {
-                        Log.i(TAG, "Successfully initialised session")
+                        Log.i(TAG, "[$urlString]: successfully initialised session")
                     }
                 }
             } else {
                 AutoCompleteService.InitState.Failure(WebsocketConnectionFailedException())
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error initialising session", e)
+            Log.e(TAG, "[$urlString]: error initialising session", e)
             AutoCompleteService.InitState.Failure(WebsocketException(e))
         }
     }
@@ -94,7 +94,7 @@ open class WebsocketAutoCompleteService<in Q>(
 
         if (q.isBlank()) {
             currentQuery = null
-            Log.i(TAG, "Skipping search of blank query...")
+            Log.i(TAG, "[$urlString]: skipping search of blank query...")
             return
         }
 
@@ -107,7 +107,7 @@ open class WebsocketAutoCompleteService<in Q>(
         if (state !is AutoCompleteService.InitState.Success) {
             Log.i(
                 TAG,
-                "Skipping search propagation for ${content}. Search session is not successfully initialised!",
+                "[$urlString]: skipping search propagation for ${content}. Search session is not successfully initialised!",
             )
             return
         }
@@ -115,10 +115,10 @@ open class WebsocketAutoCompleteService<in Q>(
         try {
             socket?.run {
                 send(content)
-                Log.i(TAG, "Sent a search request for: $content")
+                Log.i(TAG, "[$urlString]: sent a search request for: $content")
             }
         } catch (ex: Exception) {
-            Log.e(TAG, "Error searching for '$content'", ex)
+            Log.e(TAG, "[$urlString]: error searching for '$content'", ex)
         }
     }
 
@@ -130,7 +130,7 @@ open class WebsocketAutoCompleteService<in Q>(
                 .filter { it is Frame.Text }
                 .map { frame ->
                     val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
-                        Log.i(TAG, "Results: $it")
+                        Log.i(TAG, "[$urlString]: results: $it")
                     }
                     val json = Json {
                         ignoreUnknownKeys = true
@@ -139,25 +139,25 @@ open class WebsocketAutoCompleteService<in Q>(
                 }
                 .onStart {
                     emit(AutoCompleteService.ResultState.Loading)
-                    Log.i(TAG, "Session was successfully initialised. Getting search results...")
+                    Log.i(TAG, "[$urlString]: session was successfully initialised. Getting search results...")
                 }
                 .catch {
                     emit(AutoCompleteService.ResultState.Failure(it))
-                    Log.e(TAG, "Error getting search results", it)
+                    Log.e(TAG, "[$urlString]: error getting search results", it)
                 }
         } ?: flowOf<AutoCompleteService.ResultState>().onEach {
-            Log.i(TAG, "getSearchResults: returned default flow...")
+            Log.i(TAG, "[$urlString]: getSearchResults: returned default flow...")
         }
     }
 
     override suspend fun closeSession() {
-        Log.i(TAG, "Requested session closure...")
+        Log.i(TAG, "[$urlString]: requested session closure...")
         try {
             socket?.close()?.also {
-                Log.i(TAG, "Successfully closed websocket session.")
+                Log.i(TAG, "[$urlString]: successfully closed websocket session.")
             }
         } catch (ex: Exception) {
-            Log.e(TAG, "Error closing session", ex)
+            Log.e(TAG, "[$urlString]: error closing session", ex)
         } finally {
             socket = null
             currentQuery = null

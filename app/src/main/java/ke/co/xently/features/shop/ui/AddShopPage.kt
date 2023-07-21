@@ -21,10 +21,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
-import ke.co.xently.features.core.ui.AutoCompleteTextField
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
+import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.features.shop.datasources.remoteservices.ShopAutoCompleteService
 import ke.co.xently.features.shop.models.Shop
 import ke.co.xently.ui.theme.XentlyTheme
@@ -89,7 +89,7 @@ fun AddShopPage(
             }
         },
     ) {
-        AutoCompleteTextField<Shop, Shop>(
+        AddProductAutoCompleteTextField<Shop, Shop>(
             modifier = Modifier.fillMaxWidth(),
             state = nameAutoCompleteState,
             service = service,

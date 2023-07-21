@@ -34,10 +34,10 @@ import ke.co.xently.features.attributes.models.Attribute
 import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.core.javaLocale
-import ke.co.xently.features.core.ui.AutoCompleteTextField
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.models.Product
+import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -122,7 +122,7 @@ fun AddAttributesPage(
                 }
             } else null
 
-            AutoCompleteTextField<Attribute, Attribute>(
+            AddProductAutoCompleteTextField<Attribute, Attribute>(
                 state = nameAutoCompleteState,
                 service = nameService,
                 modifier = Modifier.weight(1f),
@@ -158,7 +158,7 @@ fun AddAttributesPage(
                 },
             )
 
-            AutoCompleteTextField<AttributeValue, AttributeValue>(
+            AddProductAutoCompleteTextField<AttributeValue, AttributeValue>(
                 state = valueAutoCompleteState,
                 service = valueService,
                 modifier = Modifier.weight(1f),
