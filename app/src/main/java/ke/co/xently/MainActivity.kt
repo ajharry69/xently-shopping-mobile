@@ -13,6 +13,8 @@ import ke.co.xently.features.attributesvalues.datasources.remoteservices.Attribu
 import ke.co.xently.features.attributesvalues.ui.LocalAttributeValueAutoCompleteService
 import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.features.brands.ui.LocalBrandAutoCompleteService
+import ke.co.xently.features.locationtracker.LocalLocationPermissionsState
+import ke.co.xently.features.locationtracker.LocationPermissionsState
 import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
 import ke.co.xently.features.measurementunit.ui.LocalMeasurementUnitAutoCompleteService
 import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
@@ -56,6 +58,7 @@ class MainActivity : ComponentActivity() {
 
                 CompositionLocalProvider(
                     LocalSnackbarHostState provides snackbarHostState,
+                    LocalLocationPermissionsState provides LocationPermissionsState.CoarseAndFine,
                     LocalProductAutoCompleteService provides productAutoCompleteService,
                     LocalStoreAutoCompleteService provides storeAutoCompleteService,
                     LocalShopAutoCompleteService provides shopAutoCompleteService,

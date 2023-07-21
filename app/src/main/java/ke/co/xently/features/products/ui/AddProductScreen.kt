@@ -22,7 +22,6 @@ import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.attributesvalues.ui.AddAttributesPage
 import ke.co.xently.features.brands.models.Brand
 import ke.co.xently.features.brands.ui.AddBrandsPage
-import ke.co.xently.features.locationtracker.LocationPermissionsState
 import ke.co.xently.features.measurementunit.ui.AddMeasurementUnitPage
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.subscreens.AddGeneralDetailsPage
@@ -46,11 +45,9 @@ fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
     CompositionLocalProvider(LocalAddProductStep provides currentlyActiveStep) {
         AddProductScreen(
             modifier = modifier,
-            locationPermissionsState = LocationPermissionsState.CoarseAndFine,
             product = product,
             traversedSteps = viewModel.traversedSteps,
             addProductState = viewModel.saveProductStateFlow,
-
             savePermanently = viewModel::savePermanently,
             saveDraft = viewModel::saveDraft,
             saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
@@ -61,7 +58,6 @@ fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
 @Composable
 fun AddProductScreen(
     modifier: Modifier,
-    locationPermissionsState: LocationPermissionsState,
     product: Product.LocalViewModel,
     traversedSteps: Flow<Set<AddProductStep>>,
     addProductState: Flow<State>,
@@ -121,7 +117,6 @@ fun AddProductScreen(
                     AddStorePage(
                         modifier = Modifier.fillMaxSize(),
                         store = product.store,
-                        permissionsState = locationPermissionsState,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
@@ -288,12 +283,11 @@ private fun AddProductScreenPreview() {
         ) {
             AddProductScreen(
                 modifier = Modifier.fillMaxSize(),
-                locationPermissionsState = LocationPermissionsState.Simulated,
                 product = Product.LocalViewModel.default,
                 traversedSteps = MutableStateFlow(emptySet()),
                 addProductState = flowOf(State.Idle),
-
                 savePermanently = {},
+
                 saveDraft = {},
             ) {}
         }

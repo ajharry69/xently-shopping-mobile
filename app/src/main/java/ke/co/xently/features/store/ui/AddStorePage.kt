@@ -37,7 +37,7 @@ import ke.co.xently.features.core.models.toLocation
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.locationtracker.ForegroundLocationTracker
-import ke.co.xently.features.locationtracker.LocationPermissionsState
+import ke.co.xently.features.locationtracker.LocalLocationPermissionsState
 import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.features.store.models.Store
 import ke.co.xently.ui.theme.XentlyTheme
@@ -47,7 +47,6 @@ import ke.co.xently.ui.theme.XentlyTheme
 fun AddStorePage(
     modifier: Modifier,
     store: Store,
-    permissionsState: LocationPermissionsState,
     saveDraft: (Store) -> Unit,
     onContinueClick: (Store) -> Unit,
 ) {
@@ -64,10 +63,7 @@ fun AddStorePage(
         }
     }
 
-    ForegroundLocationTracker(
-        permissionsState = permissionsState,
-        snackbarHostState = LocalSnackbarHostState.current,
-    ) {
+    ForegroundLocationTracker(snackbarHostState = LocalSnackbarHostState.current) {
         if (!isLocationUsable) {
             location = it.toLocation()
         }
@@ -166,7 +162,7 @@ fun AddStorePage(
                 }
             }
 
-            val locationPermissions = permissionsState()
+            val locationPermissions = LocalLocationPermissionsState.current()
 
             val (mapUiSettings, mapProperties) = remember(locationPermissions.allPermissionsGranted) {
                 MapUiSettings(myLocationButtonEnabled = locationPermissions.allPermissionsGranted) to
@@ -234,7 +230,6 @@ private fun AddStorePagePreview() {
         AddStorePage(
             modifier = Modifier.fillMaxSize(),
             store = Store.LocalViewModel.default,
-            permissionsState = LocationPermissionsState.Simulated,
             saveDraft = {},
         ) {}
     }
