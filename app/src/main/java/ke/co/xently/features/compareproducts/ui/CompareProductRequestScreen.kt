@@ -29,7 +29,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,6 +57,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.BottomSheet
+import ke.co.xently.LocalSnackbarHostState
 import ke.co.xently.R
 import ke.co.xently.features.compareproducts.models.CompareProduct
 import ke.co.xently.features.compareproducts.models.ComparisonListItem
@@ -72,7 +72,6 @@ import ke.co.xently.ui.theme.XentlyTheme
 fun CompareProductsRequestScreen(
     modifier: Modifier,
     viewModel: CompareProductViewModel,
-    snackbarHostState: SnackbarHostState,
     bottomSheetPeek: (BottomSheet) -> Unit,
 ) {
     val draftComparisonListItemIndex: Int by viewModel.draftComparisonListItemIndex.collectAsState()
@@ -85,13 +84,12 @@ fun CompareProductsRequestScreen(
         request = request,
         comparisonsState = comparisonsState,
         modifier = modifier,
-        snackbarHostState = snackbarHostState,
-        bottomSheetPeek = bottomSheetPeek,
-        saveIndexedDraftComparisonListItem = viewModel::saveDraftComparisonListItem,
         draftComparisonListItemIndex = draftComparisonListItemIndex,
+        bottomSheetPeek = bottomSheetPeek,
         saveDraftCompareProductsRequest = viewModel::saveDraftCompareProductsRequest,
         clearDraftComparisonListItem = viewModel::clearDraftComparisonListItem,
         compareProducts = viewModel::compareProducts,
+        saveIndexedDraftComparisonListItem = viewModel::saveDraftComparisonListItem,
     )
 }
 
@@ -103,7 +101,6 @@ internal fun CompareProductsRequestScreen(
     comparisonsState: State,
     modifier: Modifier,
     draftComparisonListItemIndex: Int,
-    snackbarHostState: SnackbarHostState,
     bottomSheetPeek: (BottomSheet) -> Unit,
     saveDraftCompareProductsRequest: (request: CompareProduct.Request) -> Unit,
     clearDraftComparisonListItem: () -> Unit,
@@ -159,6 +156,8 @@ internal fun CompareProductsRequestScreen(
     }
 
     val context = LocalContext.current
+    val snackbarHostState = LocalSnackbarHostState.current
+
     LaunchedEffect(comparisonsState) {
         if (comparisonsState is State.Success) {
             bottomSheetPeek(BottomSheet.CompareProductResponse(comparisonsState.data))
@@ -443,12 +442,11 @@ internal fun CompareProductsRequestScreen(
 private fun CompareProductsRequestScreenPreview() {
     XentlyTheme {
         CompareProductsRequestScreen(
-            modifier = Modifier.fillMaxSize(),
             draftComparisonListItem = ComparisonListItem.default,
             request = CompareProduct.Request.default,
             comparisonsState = State.Idle,
+            modifier = Modifier.fillMaxSize(),
             draftComparisonListItemIndex = CompareProductViewModel.DEFAULT_COMPARISON_LIST_ITEM_INDEX,
-            snackbarHostState = SnackbarHostState(),
             bottomSheetPeek = {},
             saveDraftCompareProductsRequest = {},
             clearDraftComparisonListItem = {},

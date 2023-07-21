@@ -14,7 +14,6 @@ import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -40,17 +39,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import ke.co.xently.BottomSheet
 import ke.co.xently.HomeTab
+import ke.co.xently.LocalSnackbarHostState
 import ke.co.xently.MainViewModel
 import ke.co.xently.R
-import ke.co.xently.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
-import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
-import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.features.compareproducts.repositories.CompareProductRepository
 import ke.co.xently.features.compareproducts.ui.CompareProductViewModel
 import ke.co.xently.features.compareproducts.ui.CompareProductsRequestScreen
 import ke.co.xently.features.core.visitUriPage
-import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
-import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
 import ke.co.xently.features.products.repositories.ProductRepository
 import ke.co.xently.features.products.ui.AddProductScreen
 import ke.co.xently.features.products.ui.ProductViewModel
@@ -58,8 +53,6 @@ import ke.co.xently.features.recommendations.models.Recommendation
 import ke.co.xently.features.recommendations.repositories.RecommendationRepository
 import ke.co.xently.features.recommendations.ui.RecommendationRequestScreen
 import ke.co.xently.features.recommendations.ui.RecommendationViewModel
-import ke.co.xently.features.shop.datasources.remoteservices.ShopAutoCompleteService
-import ke.co.xently.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.ui.components.ModalBottomSheet
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.launch
@@ -73,7 +66,7 @@ fun MainUI() {
 
     val scope = rememberCoroutineScope()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = LocalSnackbarHostState.current
 
     val context = LocalContext.current
     val navigateToStore: (Recommendation.Response) -> Unit by rememberUpdatedState { recommendation ->
@@ -126,20 +119,19 @@ fun MainUI() {
 
     MainUI(
         selectedTab = selectedTab,
-        navigateToStore = navigateToStore,
         bottomSheet = { stackOfBottomSheets.firstOrNull() ?: BottomSheet.Ignore },
-        snackbarHostState = snackbarHostState,
-        onTabClicked = viewModel::saveCurrentlyActiveTab,
         hideBottomSheet = {
             stackOfBottomSheets.removeFirstOrNull() == null
         },
-        updateBottomSheetPeek = {
-            stackOfBottomSheets.add(0, it)
-        },
+        onTabClicked = viewModel::saveCurrentlyActiveTab,
+        navigateToStore = navigateToStore,
         visitOnlineStore = { response ->
             response.store.shop.ecommerceSiteUrl.takeIf { !it.isNullOrBlank() }?.also {
                 context.visitUriPage(it.trim(), logTag = TAG)
             }
+        },
+        updateBottomSheetPeek = {
+            stackOfBottomSheets.add(0, it)
         },
     )
 }
@@ -148,7 +140,6 @@ fun MainUI() {
 @OptIn(ExperimentalMaterial3Api::class)
 fun MainUI(
     selectedTab: HomeTab,
-    snackbarHostState: SnackbarHostState,
     bottomSheet: () -> BottomSheet,
     hideBottomSheet: () -> Boolean,
     onTabClicked: (HomeTab) -> Unit,
@@ -161,7 +152,7 @@ fun MainUI(
 ) {
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = LocalSnackbarHostState.current)
         },
         topBar = {
             CenterAlignedTopAppBar(
@@ -206,7 +197,6 @@ fun MainUI(
                     AddProductScreen(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = productViewModel,
-                        snackbarHostState = snackbarHostState,
                     )
                 }
 
@@ -214,7 +204,6 @@ fun MainUI(
                     RecommendationRequestScreen(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = recommendationViewModel,
-                        snackbarHostState = snackbarHostState,
                         bottomSheetPeek = updateBottomSheetPeek,
                     )
                 }
@@ -223,7 +212,6 @@ fun MainUI(
                     CompareProductsRequestScreen(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = compareProductViewModel,
-                        snackbarHostState = snackbarHostState,
                         bottomSheetPeek = updateBottomSheetPeek,
                     )
                 }
@@ -248,27 +236,18 @@ private fun MainUIPreview() {
         var selectedTab by remember {
             mutableStateOf(HomeTab.Recommendations)
         }
-        val snackbarHostState = remember { SnackbarHostState() }
         val stateHandle = remember { SavedStateHandle() }
         MainUI(
             selectedTab = selectedTab,
-            snackbarHostState = snackbarHostState,
             bottomSheet = { BottomSheet.Ignore },
+            hideBottomSheet = { true },
             onTabClicked = { selectedTab = it },
             navigateToStore = {},
-            hideBottomSheet = { true },
             visitOnlineStore = {},
             updateBottomSheetPeek = {},
             productViewModel = ProductViewModel(
                 stateHandle = stateHandle,
                 productRepository = ProductRepository.Fake,
-                shopAutoCompleteService = ShopAutoCompleteService.Fake,
-                storeAutoCompleteService = StoreAutoCompleteService.Fake,
-                brandAutoCompleteService = BrandAutoCompleteService.Fake,
-                productAutoCompleteService = ProductAutoCompleteService.Fake,
-                attributeAutoCompleteService = AttributeAutoCompleteService.Fake,
-                attributeValueAutoCompleteService = AttributeValueAutoCompleteService.Fake,
-                measurementUnitAutoCompleteService = MeasurementUnitAutoCompleteService.Fake,
             ),
             recommendationViewModel = RecommendationViewModel(
                 stateHandle = stateHandle,

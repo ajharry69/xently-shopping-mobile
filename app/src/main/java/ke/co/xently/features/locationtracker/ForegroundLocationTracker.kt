@@ -64,10 +64,29 @@ private object SimulatedMultiplePermissionsState : MultiplePermissionsState {
     }
 }
 
+@Suppress("unused")
 @OptIn(ExperimentalPermissionsApi::class)
 sealed interface LocationPermissionsState {
     @Composable
     operator fun invoke(): MultiplePermissionsState
+
+    object Fine : LocationPermissionsState {
+        @Composable
+        override fun invoke(): MultiplePermissionsState {
+            return rememberMultiplePermissionsState(
+                permissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            )
+        }
+    }
+
+    object Coarse : LocationPermissionsState {
+        @Composable
+        override fun invoke(): MultiplePermissionsState {
+            return rememberMultiplePermissionsState(
+                permissions = listOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+            )
+        }
+    }
 
     object CoarseAndFine : LocationPermissionsState {
         @Composable
@@ -142,7 +161,7 @@ fun ForegroundLocationTracker(
      * or requesting location permissions if non has been granted.
      */
     snackbarHostState: SnackbarHostState,
-    permissionsState: LocationPermissionsState = LocationPermissionsState.CoarseAndFine,
+    permissionsState: LocationPermissionsState = LocalLocationPermissionsState.current,
     onLocationUpdates: (Location) -> Unit,
 ) {
     // When in preview, early return

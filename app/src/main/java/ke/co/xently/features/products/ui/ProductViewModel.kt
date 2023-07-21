@@ -4,15 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ke.co.xently.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
-import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
-import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
-import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
-import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.repositories.ProductRepository
-import ke.co.xently.features.shop.datasources.remoteservices.ShopAutoCompleteService
-import ke.co.xently.features.store.datasources.remoteservices.StoreAutoCompleteService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -22,14 +15,6 @@ import javax.inject.Inject
 class ProductViewModel @Inject constructor(
     private val stateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
-
-    val shopAutoCompleteService: ShopAutoCompleteService,
-    val storeAutoCompleteService: StoreAutoCompleteService,
-    val brandAutoCompleteService: BrandAutoCompleteService,
-    val productAutoCompleteService: ProductAutoCompleteService,
-    val attributeAutoCompleteService: AttributeAutoCompleteService,
-    val attributeValueAutoCompleteService: AttributeValueAutoCompleteService,
-    val measurementUnitAutoCompleteService: MeasurementUnitAutoCompleteService,
 ) : ViewModel() {
     companion object {
         private val TAG = ProductViewModel::class.java.simpleName
@@ -49,7 +34,7 @@ class ProductViewModel @Inject constructor(
 
     private val saveProductStateChannel = Channel<State>()
 
-    val saveProductStateFlow = saveProductStateChannel.receiveAsFlow()
+    val flowOfSaveProductState = saveProductStateChannel.receiveAsFlow()
 
     val traversedSteps = stateHandle.getStateFlow(
         TRAVERSED_STEPS_KEY,

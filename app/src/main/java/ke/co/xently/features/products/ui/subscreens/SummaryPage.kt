@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ke.co.xently.LocalSnackbarHostState
 import ke.co.xently.R
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.brands.models.Brand
@@ -41,26 +41,23 @@ import ke.co.xently.features.core.javaLocale
 import ke.co.xently.features.core.loadingIndicatorLabel
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.core.ui.MultiStepScreen
+import ke.co.xently.features.locationtracker.LocalFlowOfSaveProductState
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.AddProductStep
 import ke.co.xently.features.products.ui.State
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
 
 @Composable
 fun SummaryPage(
     modifier: Modifier,
     product: Product,
-    snackbarHostState: SnackbarHostState,
-    stateFlow: Flow<State>,
     onPreviousClick: () -> Unit,
     onSubmissionSuccess: () -> Unit,
     submit: (Array<AddProductStep>) -> Unit,
 ) {
-    val submissionState by stateFlow.collectAsState(State.Idle)
+    val submissionState by LocalFlowOfSaveProductState.current.collectAsState(State.Idle)
 
     val submitting by remember(submissionState) {
         derivedStateOf {
@@ -77,6 +74,7 @@ fun SummaryPage(
     }
 
     val context = LocalContext.current
+    val snackbarHostState = LocalSnackbarHostState.current
 
     LaunchedEffect(submissionState) {
         when (val state = submissionState) {
@@ -276,8 +274,6 @@ private fun SummaryPage() {
                     }),
                 )
             },
-            stateFlow = flowOf(State.Idle),
-            snackbarHostState = SnackbarHostState(),
             onPreviousClick = {},
             onSubmissionSuccess = {},
         ) {}

@@ -29,9 +29,8 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
-import ke.co.xently.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
 import ke.co.xently.features.attributes.models.Attribute
-import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
+import ke.co.xently.features.attributes.ui.LocalAttributeAutoCompleteService
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.core.javaLocale
 import ke.co.xently.features.core.ui.MultiStepScreen
@@ -45,8 +44,6 @@ import ke.co.xently.ui.theme.XentlyTheme
 fun AddAttributesPage(
     modifier: Modifier = Modifier,
     attributes: List<AttributeValue>,
-    nameService: AttributeAutoCompleteService,
-    valueService: AttributeValueAutoCompleteService,
     saveDraft: (List<AttributeValue>) -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (List<AttributeValue>) -> Unit,
@@ -124,7 +121,7 @@ fun AddAttributesPage(
 
             AddProductAutoCompleteTextField<Attribute, Attribute>(
                 state = nameAutoCompleteState,
-                service = nameService,
+                service = LocalAttributeAutoCompleteService.current,
                 modifier = Modifier.weight(1f),
                 trailingIcon = trailingIcon,
                 onSearch = { query ->
@@ -160,7 +157,7 @@ fun AddAttributesPage(
 
             AddProductAutoCompleteTextField<AttributeValue, AttributeValue>(
                 state = valueAutoCompleteState,
-                service = valueService,
+                service = LocalAttributeValueAutoCompleteService.current,
                 modifier = Modifier.weight(1f),
                 trailingIcon = trailingIcon,
                 onSearch = { query ->
@@ -250,8 +247,6 @@ private fun AddAttributesPagePreview() {
         AddAttributesPage(
             modifier = Modifier.fillMaxSize(),
             attributes = Product.LocalViewModel.default.attributes,
-            nameService = AttributeAutoCompleteService.Fake,
-            valueService = AttributeValueAutoCompleteService.Fake,
             saveDraft = {},
             onPreviousClick = {},
         ) {}

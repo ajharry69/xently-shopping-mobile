@@ -27,7 +27,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -54,6 +53,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.BottomSheet
+import ke.co.xently.LocalSnackbarHostState
 import ke.co.xently.R
 import ke.co.xently.features.core.isRetryable
 import ke.co.xently.features.core.loadingIndicatorLabel
@@ -67,13 +67,14 @@ import ke.co.xently.ui.theme.XentlyTheme
 fun RecommendationRequestScreen(
     modifier: Modifier,
     viewModel: RecommendationViewModel,
-    snackbarHostState: SnackbarHostState,
     bottomSheetPeek: (BottomSheet) -> Unit,
 ) {
     val draftShoppingListItemIndex: Int by viewModel.draftShoppingListItemIndex.collectAsState()
     val recommendationsState: State by viewModel.recommendationsStateFlow.collectAsState(State.Idle)
     val request: Recommendation.Request by viewModel.recommendationRequest.collectAsState()
     val draftShoppingListItem: Recommendation.Request.ShoppingListItem by viewModel.draftShoppingListItem.collectAsState()
+
+    val snackbarHostState = LocalSnackbarHostState.current
 
     if (recommendationsState is State.GettingCurrentLocation) {
         ForegroundLocationTracker(
@@ -89,13 +90,12 @@ fun RecommendationRequestScreen(
         request = request,
         recommendationsState = recommendationsState,
         modifier = modifier,
-        snackbarHostState = snackbarHostState,
-        bottomSheetPeek = bottomSheetPeek,
-        saveIndexedDraftShoppingListItem = viewModel::saveDraftShoppingListItem,
         draftShoppingListItemIndex = draftShoppingListItemIndex,
+        bottomSheetPeek = bottomSheetPeek,
         saveDraftRecommendationRequest = viewModel::saveDraftRecommendationRequest,
         clearDraftShoppingListItem = viewModel::clearDraftShoppingListItem,
         getRecommendations = viewModel::flagGettingCurrentLocation,
+        saveIndexedDraftShoppingListItem = viewModel::saveDraftShoppingListItem,
     )
 }
 
@@ -107,7 +107,6 @@ fun RecommendationRequestScreen(
     recommendationsState: State,
     modifier: Modifier,
     draftShoppingListItemIndex: Int,
-    snackbarHostState: SnackbarHostState,
     bottomSheetPeek: (BottomSheet) -> Unit,
     saveDraftRecommendationRequest: (request: Recommendation.Request) -> Unit,
     clearDraftShoppingListItem: () -> Unit,
@@ -140,6 +139,8 @@ fun RecommendationRequestScreen(
     }
 
     val context = LocalContext.current
+    val snackbarHostState = LocalSnackbarHostState.current
+
     LaunchedEffect(recommendationsState) {
         if (recommendationsState is State.Success) {
             bottomSheetPeek(BottomSheet.RecommendationResponse.Many(recommendationsState.data))
@@ -405,12 +406,11 @@ fun RecommendationRequestScreen(
 private fun RecommendationRequestScreenPreview() {
     XentlyTheme {
         RecommendationRequestScreen(
-            modifier = Modifier.fillMaxSize(),
             draftShoppingListItem = Recommendation.Request.ShoppingListItem.default,
             request = Recommendation.Request.default,
             recommendationsState = State.Idle,
+            modifier = Modifier.fillMaxSize(),
             draftShoppingListItemIndex = RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX,
-            snackbarHostState = SnackbarHostState(),
             bottomSheetPeek = {},
             saveDraftRecommendationRequest = {},
             clearDraftShoppingListItem = {},
