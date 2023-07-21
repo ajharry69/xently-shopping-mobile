@@ -23,6 +23,7 @@ import ke.co.xently.features.attributesvalues.ui.AddAttributesPage
 import ke.co.xently.features.brands.models.Brand
 import ke.co.xently.features.brands.ui.AddBrandsPage
 import ke.co.xently.features.locationtracker.LocalFlowOfSaveProductState
+import ke.co.xently.features.locationtracker.LocalFlowOfTraversedSteps
 import ke.co.xently.features.measurementunit.ui.AddMeasurementUnitPage
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.subscreens.AddGeneralDetailsPage
@@ -33,23 +34,22 @@ import ke.co.xently.features.shop.ui.AddShopPage
 import ke.co.xently.features.store.models.Store
 import ke.co.xently.features.store.ui.AddStorePage
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.random.Random
 
 @Composable
 fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
     val currentlyActiveStep by viewModel.currentlyActiveStep.collectAsState()
-    val product by viewModel.product.collectAsState()
 
     CompositionLocalProvider(
         LocalAddProductStep provides currentlyActiveStep,
+        LocalFlowOfTraversedSteps provides viewModel.traversedSteps,
         LocalFlowOfSaveProductState provides viewModel.flowOfSaveProductState,
     ) {
+        val product by viewModel.product.collectAsState()
+
         AddProductScreen(
             modifier = modifier,
             product = product,
-            traversedSteps = viewModel.traversedSteps,
             savePermanently = viewModel::savePermanently,
             saveDraft = viewModel::saveDraft,
             saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
@@ -61,7 +61,6 @@ fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
 fun AddProductScreen(
     modifier: Modifier,
     product: Product.LocalViewModel,
-    traversedSteps: Flow<Set<AddProductStep>>,
     savePermanently: (Array<AddProductStep>) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
@@ -82,7 +81,7 @@ fun AddProductScreen(
             edgePadding = 0.dp,
             selectedTabIndex = currentlyActiveStep.ordinal,
         ) {
-            val traversed by traversedSteps.collectAsState(initial = emptySet())
+            val traversed by LocalFlowOfTraversedSteps.current.collectAsState(initial = emptySet())
             for (step in AddProductStep.values()) {
                 val enabled = step == currentlyActiveStep || step in traversed
                 Tab(
@@ -283,7 +282,6 @@ private fun AddProductScreenPreview() {
             AddProductScreen(
                 modifier = Modifier.fillMaxSize(),
                 product = Product.LocalViewModel.default,
-                traversedSteps = MutableStateFlow(emptySet()),
                 savePermanently = {},
                 saveDraft = {},
             ) {}
