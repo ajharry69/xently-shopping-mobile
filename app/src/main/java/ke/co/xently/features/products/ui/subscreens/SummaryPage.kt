@@ -41,25 +41,23 @@ import ke.co.xently.features.core.javaLocale
 import ke.co.xently.features.core.loadingIndicatorLabel
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.core.ui.MultiStepScreen
+import ke.co.xently.features.locationtracker.LocalFlowOfSaveProductState
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.AddProductStep
 import ke.co.xently.features.products.ui.State
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
 
 @Composable
 fun SummaryPage(
     modifier: Modifier,
     product: Product,
-    stateFlow: Flow<State>,
     onPreviousClick: () -> Unit,
     onSubmissionSuccess: () -> Unit,
     submit: (Array<AddProductStep>) -> Unit,
 ) {
-    val submissionState by stateFlow.collectAsState(State.Idle)
+    val submissionState by LocalFlowOfSaveProductState.current.collectAsState(State.Idle)
 
     val submitting by remember(submissionState) {
         derivedStateOf {
@@ -276,7 +274,6 @@ private fun SummaryPage() {
                     }),
                 )
             },
-            stateFlow = flowOf(State.Idle),
             onPreviousClick = {},
             onSubmissionSuccess = {},
         ) {}

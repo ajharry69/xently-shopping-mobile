@@ -34,7 +34,7 @@ class ProductViewModel @Inject constructor(
 
     private val saveProductStateChannel = Channel<State>()
 
-    val saveProductStateFlow = saveProductStateChannel.receiveAsFlow()
+    val flowOfSaveProductState = saveProductStateChannel.receiveAsFlow()
 
     val traversedSteps = stateHandle.getStateFlow(
         TRAVERSED_STEPS_KEY,

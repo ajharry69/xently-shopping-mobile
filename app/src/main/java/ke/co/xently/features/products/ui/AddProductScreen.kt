@@ -22,6 +22,7 @@ import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.attributesvalues.ui.AddAttributesPage
 import ke.co.xently.features.brands.models.Brand
 import ke.co.xently.features.brands.ui.AddBrandsPage
+import ke.co.xently.features.locationtracker.LocalFlowOfSaveProductState
 import ke.co.xently.features.measurementunit.ui.AddMeasurementUnitPage
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.subscreens.AddGeneralDetailsPage
@@ -34,7 +35,6 @@ import ke.co.xently.features.store.ui.AddStorePage
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlin.random.Random
 
 @Composable
@@ -42,12 +42,14 @@ fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
     val currentlyActiveStep by viewModel.currentlyActiveStep.collectAsState()
     val product by viewModel.product.collectAsState()
 
-    CompositionLocalProvider(LocalAddProductStep provides currentlyActiveStep) {
+    CompositionLocalProvider(
+        LocalAddProductStep provides currentlyActiveStep,
+        LocalFlowOfSaveProductState provides viewModel.flowOfSaveProductState,
+    ) {
         AddProductScreen(
             modifier = modifier,
             product = product,
             traversedSteps = viewModel.traversedSteps,
-            addProductState = viewModel.saveProductStateFlow,
             savePermanently = viewModel::savePermanently,
             saveDraft = viewModel::saveDraft,
             saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
@@ -60,8 +62,6 @@ fun AddProductScreen(
     modifier: Modifier,
     product: Product.LocalViewModel,
     traversedSteps: Flow<Set<AddProductStep>>,
-    addProductState: Flow<State>,
-
     savePermanently: (Array<AddProductStep>) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
@@ -258,7 +258,6 @@ fun AddProductScreen(
                     SummaryPage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
-                        stateFlow = addProductState,
                         onPreviousClick = navigateToPrevious,
                         onSubmissionSuccess = navigateToNext,
                         submit = savePermanently,
@@ -285,9 +284,7 @@ private fun AddProductScreenPreview() {
                 modifier = Modifier.fillMaxSize(),
                 product = Product.LocalViewModel.default,
                 traversedSteps = MutableStateFlow(emptySet()),
-                addProductState = flowOf(State.Idle),
                 savePermanently = {},
-
                 saveDraft = {},
             ) {}
         }
