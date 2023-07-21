@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -47,16 +45,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.random.Random
 
-val LocalAddProductStep = compositionLocalOf {
-    AddProductStep.valueOfOrdinalOrFirstByOrdinal(0)
-}
-
 @Composable
-fun AddProductScreen(
-    modifier: Modifier,
-    viewModel: ProductViewModel,
-    snackbarHostState: SnackbarHostState,
-) {
+fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
     val currentlyActiveStep by viewModel.currentlyActiveStep.collectAsState()
     val product by viewModel.product.collectAsState()
 
@@ -65,18 +55,17 @@ fun AddProductScreen(
             modifier = modifier,
             currentlyActiveStep = currentlyActiveStep,
             locationPermissionsState = LocationPermissionsState.CoarseAndFine,
-            snackbarHostState = snackbarHostState,
             product = product,
-
             shopAutoCompleteService = viewModel.shopAutoCompleteService,
+
             storeAutoCompleteService = viewModel.storeAutoCompleteService,
             brandAutoCompleteService = viewModel.brandAutoCompleteService,
             productAutoCompleteService = viewModel.productAutoCompleteService,
             attributeAutoCompleteService = viewModel.attributeAutoCompleteService,
             attributeValueAutoCompleteService = viewModel.attributeValueAutoCompleteService,
             measurementUnitAutoCompleteService = viewModel.measurementUnitAutoCompleteService,
-
             traversedSteps = viewModel.traversedSteps,
+
             addProductState = viewModel.saveProductStateFlow,
             savePermanently = viewModel::savePermanently,
             saveDraft = viewModel::saveDraft,
@@ -90,18 +79,17 @@ fun AddProductScreen(
     modifier: Modifier,
     currentlyActiveStep: AddProductStep,
     locationPermissionsState: LocationPermissionsState,
-    snackbarHostState: SnackbarHostState,
     product: Product.LocalViewModel,
-
     shopAutoCompleteService: ShopAutoCompleteService,
+
     storeAutoCompleteService: StoreAutoCompleteService,
     brandAutoCompleteService: BrandAutoCompleteService,
     productAutoCompleteService: ProductAutoCompleteService,
     attributeAutoCompleteService: AttributeAutoCompleteService,
     attributeValueAutoCompleteService: AttributeValueAutoCompleteService,
     measurementUnitAutoCompleteService: MeasurementUnitAutoCompleteService,
-
     traversedSteps: Flow<Set<AddProductStep>>,
+
     addProductState: Flow<State>,
     savePermanently: (Array<AddProductStep>) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
@@ -158,7 +146,6 @@ fun AddProductScreen(
                         modifier = Modifier.fillMaxSize(),
                         store = product.store,
                         service = storeAutoCompleteService,
-                        snackbarHostState = snackbarHostState,
                         permissionsState = locationPermissionsState,
                         saveDraft = {
                             productDraft(it)
@@ -307,7 +294,6 @@ fun AddProductScreen(
                     SummaryPage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
-                        snackbarHostState = snackbarHostState,
                         stateFlow = addProductState,
                         onPreviousClick = navigateToPrevious,
                         onSubmissionSuccess = navigateToNext,
@@ -332,22 +318,20 @@ private fun AddProductScreenPreview() {
                 )
             ),
             locationPermissionsState = LocationPermissionsState.Simulated,
-            snackbarHostState = SnackbarHostState(),
             product = Product.LocalViewModel.default,
-
             shopAutoCompleteService = ShopAutoCompleteService.Fake,
+
             storeAutoCompleteService = StoreAutoCompleteService.Fake,
             brandAutoCompleteService = BrandAutoCompleteService.Fake,
             productAutoCompleteService = ProductAutoCompleteService.Fake,
             attributeAutoCompleteService = AttributeAutoCompleteService.Fake,
             attributeValueAutoCompleteService = AttributeValueAutoCompleteService.Fake,
             measurementUnitAutoCompleteService = MeasurementUnitAutoCompleteService.Fake,
-
             traversedSteps = MutableStateFlow(emptySet()),
+
             addProductState = flowOf(State.Idle),
             savePermanently = {},
             saveDraft = {},
-            saveCurrentlyActiveStep = {},
-        )
+        ) {}
     }
 }

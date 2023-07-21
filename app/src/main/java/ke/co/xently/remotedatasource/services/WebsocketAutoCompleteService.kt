@@ -139,7 +139,10 @@ open class WebsocketAutoCompleteService<in Q>(
                 }
                 .onStart {
                     emit(AutoCompleteService.ResultState.Loading)
-                    Log.i(TAG, "[$urlString]: session was successfully initialised. Getting search results...")
+                    Log.i(
+                        TAG,
+                        "[$urlString]: session was successfully initialised. Getting search results..."
+                    )
                 }
                 .catch {
                     emit(AutoCompleteService.ResultState.Failure(it))

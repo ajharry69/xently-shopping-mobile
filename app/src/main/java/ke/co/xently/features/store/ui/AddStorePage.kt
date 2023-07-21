@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +31,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import ke.co.xently.LocalSnackbarHostState
 import ke.co.xently.R
 import ke.co.xently.features.core.models.toLocation
 import ke.co.xently.features.core.ui.MultiStepScreen
@@ -49,7 +49,6 @@ fun AddStorePage(
     modifier: Modifier,
     store: Store,
     service: StoreAutoCompleteService,
-    snackbarHostState: SnackbarHostState,
     permissionsState: LocationPermissionsState,
     saveDraft: (Store) -> Unit,
     onContinueClick: (Store) -> Unit,
@@ -69,7 +68,7 @@ fun AddStorePage(
 
     ForegroundLocationTracker(
         permissionsState = permissionsState,
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = LocalSnackbarHostState.current,
     ) {
         if (!isLocationUsable) {
             location = it.toLocation()
@@ -238,7 +237,6 @@ private fun AddStorePagePreview() {
             modifier = Modifier.fillMaxSize(),
             store = Store.LocalViewModel.default,
             service = StoreAutoCompleteService.Fake,
-            snackbarHostState = SnackbarHostState(),
             permissionsState = LocationPermissionsState.Simulated,
             saveDraft = {},
         ) {}

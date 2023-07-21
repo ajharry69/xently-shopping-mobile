@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ke.co.xently.LocalSnackbarHostState
 import ke.co.xently.R
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.brands.models.Brand
@@ -54,7 +54,6 @@ import java.math.BigDecimal
 fun SummaryPage(
     modifier: Modifier,
     product: Product,
-    snackbarHostState: SnackbarHostState,
     stateFlow: Flow<State>,
     onPreviousClick: () -> Unit,
     onSubmissionSuccess: () -> Unit,
@@ -77,6 +76,7 @@ fun SummaryPage(
     }
 
     val context = LocalContext.current
+    val snackbarHostState = LocalSnackbarHostState.current
 
     LaunchedEffect(submissionState) {
         when (val state = submissionState) {
@@ -277,7 +277,6 @@ private fun SummaryPage() {
                 )
             },
             stateFlow = flowOf(State.Idle),
-            snackbarHostState = SnackbarHostState(),
             onPreviousClick = {},
             onSubmissionSuccess = {},
         ) {}

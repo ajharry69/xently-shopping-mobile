@@ -14,7 +14,6 @@ import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -40,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import ke.co.xently.BottomSheet
 import ke.co.xently.HomeTab
+import ke.co.xently.LocalSnackbarHostState
 import ke.co.xently.MainViewModel
 import ke.co.xently.R
 import ke.co.xently.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
@@ -73,7 +73,7 @@ fun MainUI() {
 
     val scope = rememberCoroutineScope()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = LocalSnackbarHostState.current
 
     val context = LocalContext.current
     val navigateToStore: (Recommendation.Response) -> Unit by rememberUpdatedState { recommendation ->
@@ -126,20 +126,19 @@ fun MainUI() {
 
     MainUI(
         selectedTab = selectedTab,
-        navigateToStore = navigateToStore,
         bottomSheet = { stackOfBottomSheets.firstOrNull() ?: BottomSheet.Ignore },
-        snackbarHostState = snackbarHostState,
-        onTabClicked = viewModel::saveCurrentlyActiveTab,
         hideBottomSheet = {
             stackOfBottomSheets.removeFirstOrNull() == null
         },
-        updateBottomSheetPeek = {
-            stackOfBottomSheets.add(0, it)
-        },
+        onTabClicked = viewModel::saveCurrentlyActiveTab,
+        navigateToStore = navigateToStore,
         visitOnlineStore = { response ->
             response.store.shop.ecommerceSiteUrl.takeIf { !it.isNullOrBlank() }?.also {
                 context.visitUriPage(it.trim(), logTag = TAG)
             }
+        },
+        updateBottomSheetPeek = {
+            stackOfBottomSheets.add(0, it)
         },
     )
 }
@@ -148,7 +147,6 @@ fun MainUI() {
 @OptIn(ExperimentalMaterial3Api::class)
 fun MainUI(
     selectedTab: HomeTab,
-    snackbarHostState: SnackbarHostState,
     bottomSheet: () -> BottomSheet,
     hideBottomSheet: () -> Boolean,
     onTabClicked: (HomeTab) -> Unit,
@@ -161,7 +159,7 @@ fun MainUI(
 ) {
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = LocalSnackbarHostState.current)
         },
         topBar = {
             CenterAlignedTopAppBar(
@@ -206,7 +204,6 @@ fun MainUI(
                     AddProductScreen(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = productViewModel,
-                        snackbarHostState = snackbarHostState,
                     )
                 }
 
@@ -214,7 +211,6 @@ fun MainUI(
                     RecommendationRequestScreen(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = recommendationViewModel,
-                        snackbarHostState = snackbarHostState,
                         bottomSheetPeek = updateBottomSheetPeek,
                     )
                 }
@@ -223,7 +219,6 @@ fun MainUI(
                     CompareProductsRequestScreen(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = compareProductViewModel,
-                        snackbarHostState = snackbarHostState,
                         bottomSheetPeek = updateBottomSheetPeek,
                     )
                 }
@@ -248,15 +243,13 @@ private fun MainUIPreview() {
         var selectedTab by remember {
             mutableStateOf(HomeTab.Recommendations)
         }
-        val snackbarHostState = remember { SnackbarHostState() }
         val stateHandle = remember { SavedStateHandle() }
         MainUI(
             selectedTab = selectedTab,
-            snackbarHostState = snackbarHostState,
             bottomSheet = { BottomSheet.Ignore },
+            hideBottomSheet = { true },
             onTabClicked = { selectedTab = it },
             navigateToStore = {},
-            hideBottomSheet = { true },
             visitOnlineStore = {},
             updateBottomSheetPeek = {},
             productViewModel = ProductViewModel(
