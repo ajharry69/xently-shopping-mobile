@@ -29,7 +29,6 @@ import ke.co.xently.features.core.cleansedForNumberParsing
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
-import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
@@ -57,7 +56,6 @@ private sealed interface MeasurementUIState {
 fun AddMeasurementUnitPage(
     modifier: Modifier,
     product: Product,
-    service: MeasurementUnitAutoCompleteService,
     onSuggestionSelected: (MeasurementUnit) -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (Product) -> Unit,
@@ -172,7 +170,7 @@ fun AddMeasurementUnitPage(
     ) {
         AddProductAutoCompleteTextField<MeasurementUnit, MeasurementUnit>(
             modifier = Modifier.fillMaxWidth(),
-            service = service,
+            service = LocalMeasurementUnitAutoCompleteService.current,
             state = nameAutoCompleteState,
             onSearch = { query ->
                 MeasurementUnit.LocalViewModel.default.copy(name = query)
@@ -263,7 +261,6 @@ fun AddMeasurementUnitPagePreview() {
         AddMeasurementUnitPage(
             modifier = Modifier.fillMaxSize(),
             product = Product.LocalViewModel.default,
-            service = MeasurementUnitAutoCompleteService.Fake,
             onSuggestionSelected = {},
             onPreviousClick = {},
         ) {}

@@ -27,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
-import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.features.brands.models.Brand
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
@@ -40,7 +39,6 @@ import ke.co.xently.ui.theme.XentlyTheme
 fun AddBrandsPage(
     modifier: Modifier,
     brands: List<Brand>,
-    service: BrandAutoCompleteService,
     saveDraft: (List<Brand>) -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (List<Brand>) -> Unit,
@@ -75,7 +73,7 @@ fun AddBrandsPage(
         }
         AddProductAutoCompleteTextField<Brand, Brand>(
             state = nameAutoCompleteState,
-            service = service,
+            service = LocalBrandAutoCompleteService.current,
             onSuggestionSelected = {
                 manufacturers.add(it)
                 nameAutoCompleteState.resetQuery()
@@ -153,7 +151,6 @@ private fun AddBrandsPagePreview() {
         AddBrandsPage(
             modifier = Modifier.fillMaxSize(),
             brands = Product.LocalViewModel.default.brands,
-            service = BrandAutoCompleteService.Fake,
             saveDraft = {},
             onPreviousClick = {},
         ) {}

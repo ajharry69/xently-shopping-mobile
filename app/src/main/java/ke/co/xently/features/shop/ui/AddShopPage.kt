@@ -25,7 +25,6 @@ import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
-import ke.co.xently.features.shop.datasources.remoteservices.ShopAutoCompleteService
 import ke.co.xently.features.shop.models.Shop
 import ke.co.xently.ui.theme.XentlyTheme
 
@@ -40,7 +39,6 @@ private sealed class ShopUIState(message: Int) : UIState(message) {
 fun AddShopPage(
     modifier: Modifier = Modifier,
     shop: Shop,
-    service: ShopAutoCompleteService,
     saveDraft: (Shop) -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (Shop) -> Unit,
@@ -92,7 +90,7 @@ fun AddShopPage(
         AddProductAutoCompleteTextField<Shop, Shop>(
             modifier = Modifier.fillMaxWidth(),
             state = nameAutoCompleteState,
-            service = service,
+            service = LocalShopAutoCompleteService.current,
             onSearch = { query ->
                 Shop.LocalViewModel.default.copy(name = query)
             },
@@ -133,7 +131,6 @@ private fun AddShopPagePreview() {
         AddShopPage(
             modifier = Modifier.fillMaxSize(),
             shop = Shop.LocalViewModel.default,
-            service = ShopAutoCompleteService.Fake,
             saveDraft = {},
             onPreviousClick = {},
         ) {}

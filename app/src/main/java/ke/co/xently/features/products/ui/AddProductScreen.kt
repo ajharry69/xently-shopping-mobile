@@ -18,25 +18,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ke.co.xently.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
-import ke.co.xently.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
 import ke.co.xently.features.attributesvalues.models.AttributeValue
 import ke.co.xently.features.attributesvalues.ui.AddAttributesPage
-import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.features.brands.models.Brand
 import ke.co.xently.features.brands.ui.AddBrandsPage
 import ke.co.xently.features.locationtracker.LocationPermissionsState
-import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
 import ke.co.xently.features.measurementunit.ui.AddMeasurementUnitPage
-import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.subscreens.AddGeneralDetailsPage
 import ke.co.xently.features.products.ui.subscreens.AddProductNamePage
 import ke.co.xently.features.products.ui.subscreens.SummaryPage
-import ke.co.xently.features.shop.datasources.remoteservices.ShopAutoCompleteService
 import ke.co.xently.features.shop.models.Shop
 import ke.co.xently.features.shop.ui.AddShopPage
-import ke.co.xently.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.features.store.models.Store
 import ke.co.xently.features.store.ui.AddStorePage
 import ke.co.xently.ui.theme.XentlyTheme
@@ -55,14 +48,6 @@ fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
             modifier = modifier,
             locationPermissionsState = LocationPermissionsState.CoarseAndFine,
             product = product,
-            shopAutoCompleteService = viewModel.shopAutoCompleteService,
-            storeAutoCompleteService = viewModel.storeAutoCompleteService,
-
-            brandAutoCompleteService = viewModel.brandAutoCompleteService,
-            productAutoCompleteService = viewModel.productAutoCompleteService,
-            attributeAutoCompleteService = viewModel.attributeAutoCompleteService,
-            attributeValueAutoCompleteService = viewModel.attributeValueAutoCompleteService,
-            measurementUnitAutoCompleteService = viewModel.measurementUnitAutoCompleteService,
             traversedSteps = viewModel.traversedSteps,
             addProductState = viewModel.saveProductStateFlow,
 
@@ -78,14 +63,6 @@ fun AddProductScreen(
     modifier: Modifier,
     locationPermissionsState: LocationPermissionsState,
     product: Product.LocalViewModel,
-    shopAutoCompleteService: ShopAutoCompleteService,
-    storeAutoCompleteService: StoreAutoCompleteService,
-
-    brandAutoCompleteService: BrandAutoCompleteService,
-    productAutoCompleteService: ProductAutoCompleteService,
-    attributeAutoCompleteService: AttributeAutoCompleteService,
-    attributeValueAutoCompleteService: AttributeValueAutoCompleteService,
-    measurementUnitAutoCompleteService: MeasurementUnitAutoCompleteService,
     traversedSteps: Flow<Set<AddProductStep>>,
     addProductState: Flow<State>,
 
@@ -144,7 +121,6 @@ fun AddProductScreen(
                     AddStorePage(
                         modifier = Modifier.fillMaxSize(),
                         store = product.store,
-                        service = storeAutoCompleteService,
                         permissionsState = locationPermissionsState,
                         saveDraft = {
                             productDraft(it)
@@ -166,7 +142,6 @@ fun AddProductScreen(
                     AddShopPage(
                         modifier = Modifier.fillMaxSize(),
                         shop = product.store.shop,
-                        service = shopAutoCompleteService,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
@@ -194,7 +169,6 @@ fun AddProductScreen(
                     AddProductNamePage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
-                        service = productAutoCompleteService,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
@@ -223,7 +197,6 @@ fun AddProductScreen(
                     AddMeasurementUnitPage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
-                        service = measurementUnitAutoCompleteService,
                         onSuggestionSelected = {
                             productDraft(product.copy(measurementUnit = it.toLocalViewModel()))
                                 .let(saveDraft)
@@ -255,7 +228,6 @@ fun AddProductScreen(
                     AddBrandsPage(
                         modifier = Modifier.fillMaxSize(),
                         brands = product.brands,
-                        service = brandAutoCompleteService,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
@@ -275,8 +247,6 @@ fun AddProductScreen(
                     AddAttributesPage(
                         modifier = Modifier.fillMaxSize(),
                         attributes = product.attributes,
-                        nameService = attributeAutoCompleteService,
-                        valueService = attributeValueAutoCompleteService,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
@@ -320,14 +290,6 @@ private fun AddProductScreenPreview() {
                 modifier = Modifier.fillMaxSize(),
                 locationPermissionsState = LocationPermissionsState.Simulated,
                 product = Product.LocalViewModel.default,
-                shopAutoCompleteService = ShopAutoCompleteService.Fake,
-                storeAutoCompleteService = StoreAutoCompleteService.Fake,
-
-                brandAutoCompleteService = BrandAutoCompleteService.Fake,
-                productAutoCompleteService = ProductAutoCompleteService.Fake,
-                attributeAutoCompleteService = AttributeAutoCompleteService.Fake,
-                attributeValueAutoCompleteService = AttributeValueAutoCompleteService.Fake,
-                measurementUnitAutoCompleteService = MeasurementUnitAutoCompleteService.Fake,
                 traversedSteps = MutableStateFlow(emptySet()),
                 addProductState = flowOf(State.Idle),
 

@@ -39,7 +39,6 @@ import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.locationtracker.ForegroundLocationTracker
 import ke.co.xently.features.locationtracker.LocationPermissionsState
 import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
-import ke.co.xently.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.features.store.models.Store
 import ke.co.xently.ui.theme.XentlyTheme
 
@@ -48,7 +47,6 @@ import ke.co.xently.ui.theme.XentlyTheme
 fun AddStorePage(
     modifier: Modifier,
     store: Store,
-    service: StoreAutoCompleteService,
     permissionsState: LocationPermissionsState,
     saveDraft: (Store) -> Unit,
     onContinueClick: (Store) -> Unit,
@@ -97,7 +95,7 @@ fun AddStorePage(
     ) {
         AddProductAutoCompleteTextField(
             modifier = Modifier.fillMaxWidth(),
-            service = service,
+            service = LocalStoreAutoCompleteService.current,
             state = nameAutoCompleteState,
             onSearch = { query ->
                 Store.LocalViewModel.default.copy(name = query)
@@ -236,7 +234,6 @@ private fun AddStorePagePreview() {
         AddStorePage(
             modifier = Modifier.fillMaxSize(),
             store = Store.LocalViewModel.default,
-            service = StoreAutoCompleteService.Fake,
             permissionsState = LocationPermissionsState.Simulated,
             saveDraft = {},
         ) {}

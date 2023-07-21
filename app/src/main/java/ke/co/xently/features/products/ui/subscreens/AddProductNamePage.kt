@@ -25,8 +25,8 @@ import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
-import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
 import ke.co.xently.features.products.models.Product
+import ke.co.xently.features.products.ui.LocalProductAutoCompleteService
 import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
 
@@ -41,7 +41,6 @@ private sealed class ProductNameUIState(message: Int) : UIState(message) {
 fun AddProductNamePage(
     modifier: Modifier,
     product: Product,
-    service: ProductAutoCompleteService,
     saveDraft: (Product) -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (Product) -> Unit,
@@ -115,7 +114,7 @@ fun AddProductNamePage(
     ) {
         AddProductAutoCompleteTextField(
             modifier = Modifier.fillMaxWidth(),
-            service = service,
+            service = LocalProductAutoCompleteService.current,
             state = nameAutoCompleteState,
             onSearch = { query ->
                 Product.LocalViewModel.default.run {
@@ -168,7 +167,6 @@ private fun AddProductNamePagePreview() {
         AddProductNamePage(
             modifier = Modifier.fillMaxSize(),
             product = Product.LocalViewModel.default,
-            service = ProductAutoCompleteService.Fake,
             saveDraft = {},
             onPreviousClick = {},
         ) {}
