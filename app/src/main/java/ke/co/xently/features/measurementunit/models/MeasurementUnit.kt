@@ -3,6 +3,7 @@ package ke.co.xently.features.measurementunit.models
 import android.os.Parcelable
 import ke.co.xently.features.core.models.IdNameSymbolAndPlural
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 sealed interface MeasurementUnit : IdNameSymbolAndPlural {
 
@@ -14,6 +15,7 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
         override val symbolPlural: String?,
     ) : MeasurementUnit
 
+    @Serializable
     data class RemoteResponse(
         override val id: Long,
         override val name: String,

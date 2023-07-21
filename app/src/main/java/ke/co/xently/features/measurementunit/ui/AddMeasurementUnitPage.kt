@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.ui.subscreens
+package ke.co.xently.features.measurementunit.ui
 
 import android.content.Context
 import android.content.res.Configuration
@@ -26,15 +26,14 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.features.core.cleansedForNumberParsing
-import ke.co.xently.features.core.ui.AutoCompleteTextField
 import ke.co.xently.features.core.ui.LabeledCheckbox
+import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
+import ke.co.xently.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
 import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
-import ke.co.xently.features.products.ui.components.AddProductPage
+import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 private sealed interface MeasurementUIState {
     operator fun invoke(context: Context): String
@@ -58,10 +57,8 @@ private sealed interface MeasurementUIState {
 fun AddMeasurementUnitPage(
     modifier: Modifier,
     product: Product,
-    suggestionsState: Flow<List<MeasurementUnit>>,
-    search: (MeasurementUnit) -> Unit,
+    service: MeasurementUnitAutoCompleteService,
     onSuggestionSelected: (MeasurementUnit) -> Unit,
-    onSearchSuggestionSelected: () -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (Product) -> Unit,
 ) {
@@ -69,8 +66,7 @@ fun AddMeasurementUnitPage(
         mutableStateOf(TextFieldValue(product.measurementUnitQuantity.toString()))
     }
     val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
-        query = product.measurementUnit?.name ?: "",
-        suggestionsState = suggestionsState
+        query = product.measurementUnit?.name ?: ""
     )
 
     var namePlural by remember(product.measurementUnit?.namePlural) {
@@ -136,7 +132,7 @@ fun AddMeasurementUnitPage(
         }
     }
 
-    AddProductPage(
+    MultiStepScreen(
         modifier = modifier,
         heading = R.string.xently_measurement_unit_page_title,
         subheading = R.string.xently_measurement_unit_page_sub_heading,
@@ -174,15 +170,14 @@ fun AddMeasurementUnitPage(
             }
         },
     ) {
-        AutoCompleteTextField(
+        AddProductAutoCompleteTextField<MeasurementUnit, MeasurementUnit>(
             modifier = Modifier.fillMaxWidth(),
+            service = service,
             state = nameAutoCompleteState,
             onSearch = { query ->
                 MeasurementUnit.LocalViewModel.default.copy(name = query)
-                    .let(search)
             },
             onSuggestionSelected = onSuggestionSelected,
-            onSearchSuggestionSelected = onSearchSuggestionSelected,
             suggestionContent = {
                 Text(text = it.toString())
             },
@@ -268,12 +263,9 @@ fun AddMeasurementUnitPagePreview() {
         AddMeasurementUnitPage(
             modifier = Modifier.fillMaxSize(),
             product = Product.LocalViewModel.default,
-            suggestionsState = MutableStateFlow(emptyList()),
-            search = {},
+            service = MeasurementUnitAutoCompleteService.Fake,
             onSuggestionSelected = {},
-            onSearchSuggestionSelected = {},
             onPreviousClick = {},
-            onContinueClick = {},
-        )
+        ) {}
     }
 }

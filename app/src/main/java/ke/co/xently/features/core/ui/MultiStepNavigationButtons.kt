@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.ui.components
+package ke.co.xently.features.core.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +19,7 @@ import ke.co.xently.ui.theme.XentlyTheme
 
 
 @Composable
-fun AddProductNavigationButtons(
+fun MultiStepNavigationButtons(
     modifier: Modifier = Modifier,
     buttons: @Composable RowScope.() -> Unit
 ) {
@@ -43,11 +43,14 @@ fun AddProductNavigationButtons(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-private fun AddProductNavigationButtonsPreview() {
-    XentlyTheme {
-        AddProductNavigationButtons {
+private fun MultiStepNavigationButtonsPreview() {
+    XentlyTheme(wrapSurfaceHeight = true) {
+        MultiStepNavigationButtons {
             Button(onClick = { }) {
                 Text(text = "Example")
+            }
+            Button(onClick = { }) {
+                Text(text = "Another example")
             }
         }
     }

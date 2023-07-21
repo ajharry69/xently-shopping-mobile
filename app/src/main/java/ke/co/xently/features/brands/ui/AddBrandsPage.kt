@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.ui.subscreens
+package ke.co.xently.features.brands.ui
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -27,30 +27,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.R
+import ke.co.xently.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.features.brands.models.Brand
-import ke.co.xently.features.core.ui.AutoCompleteTextField
+import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.features.products.models.Product
-import ke.co.xently.features.products.ui.components.AddProductPage
+import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddBrandsPage(
     modifier: Modifier,
     brands: List<Brand>,
-    suggestionsState: Flow<List<Brand>>,
-    onSearchSuggestionSelected: (Brand) -> Unit,
-    search: (Brand) -> Unit,
+    service: BrandAutoCompleteService,
     saveDraft: (List<Brand>) -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (List<Brand>) -> Unit,
 ) {
-    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
-        suggestionsState = suggestionsState,
-    )
+    val nameAutoCompleteState = rememberAutoCompleteTextFieldState()
     val manufacturers = remember {
         mutableStateListOf(*brands.toTypedArray())
     }
@@ -59,7 +54,7 @@ fun AddBrandsPage(
         saveDraft(manufacturers)
     }
 
-    AddProductPage(
+    MultiStepScreen(
         modifier = modifier,
         heading = R.string.xently_add_brands_page_title,
         subheading = R.string.xently_add_brands_page_sub_heading,
@@ -75,15 +70,14 @@ fun AddBrandsPage(
             }
         },
     ) {
-        val doSearch: () -> Unit by rememberUpdatedState {
+        val doSearch: () -> Brand by rememberUpdatedState {
             Brand.LocalViewModel.default.copy(name = nameAutoCompleteState.query)
-                .let(search)
         }
-        AutoCompleteTextField(
+        AddProductAutoCompleteTextField<Brand, Brand>(
             state = nameAutoCompleteState,
+            service = service,
             onSuggestionSelected = {
                 manufacturers.add(it)
-                onSearchSuggestionSelected(it)
                 nameAutoCompleteState.resetQuery()
             },
             onSearch = {
@@ -159,12 +153,9 @@ private fun AddBrandsPagePreview() {
         AddBrandsPage(
             modifier = Modifier.fillMaxSize(),
             brands = Product.LocalViewModel.default.brands,
-            suggestionsState = MutableStateFlow(emptyList()),
-            search = {},
+            service = BrandAutoCompleteService.Fake,
             saveDraft = {},
             onPreviousClick = {},
-            onContinueClick = {},
-            onSearchSuggestionSelected = {},
-        )
+        ) {}
     }
 }

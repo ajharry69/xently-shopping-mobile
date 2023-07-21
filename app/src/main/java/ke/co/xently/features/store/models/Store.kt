@@ -6,6 +6,7 @@ import ke.co.xently.features.core.models.Location
 import ke.co.xently.features.core.numberFormat
 import ke.co.xently.features.shop.models.Shop
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import kotlin.math.roundToInt
 
 sealed interface Store {
@@ -22,6 +23,7 @@ sealed interface Store {
         override val shop: Shop.RemoteRequest,
     ) : Store
 
+    @Serializable
     data class RemoteResponse(
         override val id: Long,
         override val name: String,

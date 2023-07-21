@@ -2,6 +2,7 @@ package ke.co.xently.features.attributes.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 sealed interface Attribute {
     val id: Long
@@ -12,6 +13,7 @@ sealed interface Attribute {
         override val name: String,
     ) : Attribute
 
+    @Serializable
     data class RemoteResponse(
         override val id: Long,
         override val name: String,

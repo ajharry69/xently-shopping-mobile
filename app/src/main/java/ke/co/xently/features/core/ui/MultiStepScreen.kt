@@ -1,4 +1,4 @@
-package ke.co.xently.features.products.ui.components
+package ke.co.xently.features.core.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import ke.co.xently.R
 
 @Composable
-fun AddProductPage(
+fun MultiStepScreen(
     modifier: Modifier,
     @StringRes
     heading: Int,
@@ -37,7 +37,7 @@ fun AddProductPage(
     continueButton: @Composable BoxScope.() -> Unit,
     form: @Composable ColumnScope.() -> Unit,
 ) {
-    AddProductPage(
+    MultiStepScreen(
         modifier = modifier,
         heading = stringResource(heading),
         subheading = subheading?.let { stringResource(it) },
@@ -51,7 +51,7 @@ fun AddProductPage(
 }
 
 @Composable
-fun AddProductPage(
+fun MultiStepScreen(
     modifier: Modifier,
     heading: String,
     subheading: String? = null,
@@ -100,7 +100,7 @@ fun AddProductPage(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         )
 
-        AddProductNavigationButtons(
+        MultiStepNavigationButtons(
             buttons = {
                 AnimatedVisibility(visible = showBackButton, modifier = Modifier.weight(1f)) {
                     OutlinedButton(

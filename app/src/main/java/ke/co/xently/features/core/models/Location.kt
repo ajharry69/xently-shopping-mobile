@@ -3,8 +3,10 @@ package ke.co.xently.features.core.models
 import android.os.Parcelable
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
+@Serializable
 data class Location(
     val latitude: Double,
     val longitude: Double,

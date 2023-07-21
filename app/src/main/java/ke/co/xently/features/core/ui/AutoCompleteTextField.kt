@@ -11,22 +11,26 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ke.co.xently.features.core.ui.components.AutoCompleteSearchResults
+import ke.co.xently.remotedatasource.services.AutoCompleteService
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 
 
-class AutoCompleteTextFieldState<T>(val suggestionsState: Flow<List<T>>) {
+class AutoCompleteTextFieldState {
     var query by mutableStateOf("")
         private set
 
@@ -40,13 +44,12 @@ class AutoCompleteTextFieldState<T>(val suggestionsState: Flow<List<T>>) {
 }
 
 @Composable
-fun <T> rememberAutoCompleteTextFieldState(
-    suggestionsState: Flow<List<T>>,
+fun rememberAutoCompleteTextFieldState(
     query: String = "",
     vararg key: Any?,
-): AutoCompleteTextFieldState<T> {
+): AutoCompleteTextFieldState {
     val state = remember(*key) {
-        AutoCompleteTextFieldState(suggestionsState)
+        AutoCompleteTextFieldState()
     }
 
     LaunchedEffect(query) {
@@ -56,34 +59,58 @@ fun <T> rememberAutoCompleteTextFieldState(
 }
 
 @Composable
-fun <T> rememberAutoCompleteTextFieldState(
-    suggestions: List<T> = emptyList(),
-    query: String = "",
-    vararg key: Any?,
-): AutoCompleteTextFieldState<T> {
-    return rememberAutoCompleteTextFieldState(
-        query = query,
-        suggestionsState = MutableStateFlow(suggestions),
-        key = key,
-    )
-}
-
-@Composable
-fun <T> AutoCompleteTextField(
+fun <Q, R> AutoCompleteTextField(
     modifier: Modifier = Modifier,
+    service: AutoCompleteService<Q> = AutoCompleteService.Fake(),
     isError: Boolean = false,
-    state: AutoCompleteTextFieldState<T> = rememberAutoCompleteTextFieldState(emptyList()),
+    numberOfResults: Int = 5,
+    state: AutoCompleteTextFieldState = rememberAutoCompleteTextFieldState(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    onSearch: (String) -> Unit,
-    onSuggestionSelected: (T) -> Unit,
+    onSearch: (String) -> Q,
+    onSuggestionSelected: (R) -> Unit,
+    closeSessionKey: @Composable () -> Any = { true },
     onSearchSuggestionSelected: () -> Unit = {},
     label: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
-    suggestionContent: @Composable (T) -> Unit,
+    suggestionContent: @Composable (R) -> Unit,
 ) {
-    val suggestions by state.suggestionsState.collectAsState(emptyList())
+    val suggestions = remember {
+        mutableStateListOf<R>()
+    }
+
+    var resultState: AutoCompleteService.ResultState by remember {
+        mutableStateOf(AutoCompleteService.ResultState.Idle)
+    }
+
+    LaunchedEffect(resultState) {
+        when (@Suppress("LocalVariableName") val _state = resultState) {
+            is AutoCompleteService.ResultState.Failure -> {
+                suggestions.clear()
+            }
+
+            is AutoCompleteService.ResultState.Success<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                val results = _state.data as List<R>
+                suggestions.clear()
+                suggestions.addAll(results)
+            }
+
+            AutoCompleteService.ResultState.Idle -> {
+
+            }
+
+            AutoCompleteService.ResultState.Loading -> {
+
+            }
+        }
+    }
+
+    AutoCompleteSearchResults(service = service, closeSessionKey = closeSessionKey) {
+        resultState = it
+    }
+
     var nameSearchActive by remember {
         mutableStateOf(false)
     }
@@ -95,14 +122,24 @@ fun <T> AutoCompleteTextField(
         if (wasSuggestionSelected) {
             wasSuggestionSelected = false
         } else {
-            nameSearchActive = state.query.isNotBlank() && suggestions.isNotEmpty()
+            (state.query.isNotBlank() && suggestions.isNotEmpty()).let {
+                if (!it) {
+                    delay(800.milliseconds) // Delay hiding the soft keyboard
+                }
+                nameSearchActive = it
+            }
         }
     }
+    val coroutineScope = rememberCoroutineScope()
+
     ke.co.xently.features.core.ui.autocomplete.AutoCompleteTextField(
         query = state.query,
         onQueryChange = {
             state.updateQuery(it)
-            onSearch(it)
+            val query = onSearch(it)
+            coroutineScope.launch {
+                service.search(query, numberOfResults)
+            }
         },
         isError = isError,
         active = nameSearchActive,
@@ -142,10 +179,15 @@ private fun AutoCompleteTextFieldPreview() {
             }
         }
         Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
-            AutoCompleteTextField(
+            AutoCompleteTextField<String, String>(
                 modifier = Modifier.fillMaxWidth(),
-                state = rememberAutoCompleteTextFieldState(suggestions = suggestions),
-                onSearch = {},
+                state = rememberAutoCompleteTextFieldState(),
+                service = AutoCompleteService.Fake(
+                    AutoCompleteService.ResultState.Success(
+                        suggestions
+                    )
+                ),
+                onSearch = { "" },
                 onSuggestionSelected = {},
                 onSearchSuggestionSelected = {},
                 label = {

@@ -6,11 +6,18 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.KotlinxSerializer
+import io.ktor.client.features.logging.Logging
+import io.ktor.client.features.websocket.WebSockets
 import ke.co.xently.BuildConfig
 import ke.co.xently.remotedatasource.Serialization
 import ke.co.xently.remotedatasource.di.qualifiers.CacheInterceptor
 import ke.co.xently.remotedatasource.di.qualifiers.RequestHeadersInterceptor
 import ke.co.xently.remotedatasource.di.qualifiers.RequestQueriesInterceptor
+import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.Interceptor
@@ -133,4 +140,24 @@ object NetworkModule {
         .addConverterFactory(GsonConverterFactory.create(Serialization.JSON_CONVERTER))
         .client(okHttpClient)
         .build()
+
+    @Provides
+    @Singleton
+    fun provideJson(): Json {
+        return Json(from = KotlinxSerializer.DefaultJson) {
+            ignoreUnknownKeys = true
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideHttpClient(json: Json): HttpClient {
+        return HttpClient(CIO) {
+            install(Logging)
+            install(WebSockets)
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(json = json)
+            }
+        }
+    }
 }

@@ -21,16 +21,14 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
-import ke.co.xently.features.core.ui.AutoCompleteTextField
 import ke.co.xently.features.core.ui.LabeledCheckbox
+import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.UIState
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
+import ke.co.xently.features.products.datasources.remoteservices.ProductAutoCompleteService
 import ke.co.xently.features.products.models.Product
-import ke.co.xently.features.products.models.ProductName
-import ke.co.xently.features.products.ui.components.AddProductPage
+import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 private sealed class ProductNameUIState(message: Int) : UIState(message) {
     object OK : ProductNameUIState(android.R.string.ok)
@@ -43,16 +41,13 @@ private sealed class ProductNameUIState(message: Int) : UIState(message) {
 fun AddProductNamePage(
     modifier: Modifier,
     product: Product,
-    suggestionsState: Flow<List<Product>>,
-    search: (ProductName) -> Unit,
+    service: ProductAutoCompleteService,
     saveDraft: (Product) -> Unit,
-    onSearchSuggestionSelected: () -> Unit,
     onPreviousClick: () -> Unit,
     onContinueClick: (Product) -> Unit,
 ) {
     val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
-        query = product.name.name,
-        suggestionsState = suggestionsState
+        query = product.name.name
     )
 
     var namePlural by remember(product.name.namePlural) {
@@ -89,7 +84,7 @@ fun AddProductNamePage(
         }
     }
 
-    AddProductPage(
+    MultiStepScreen(
         modifier = modifier,
         heading = R.string.xently_product_name_page_title,
         onBackClick = onPreviousClick,
@@ -118,15 +113,16 @@ fun AddProductNamePage(
             }
         },
     ) {
-        AutoCompleteTextField(
+        AddProductAutoCompleteTextField(
             modifier = Modifier.fillMaxWidth(),
+            service = service,
             state = nameAutoCompleteState,
             onSearch = { query ->
-                ProductName.LocalViewModel.default.copy(name = query)
-                    .let(search)
+                Product.LocalViewModel.default.run {
+                    copy(name = name.copy(name = query))
+                }
             },
             onSuggestionSelected = saveDraft,
-            onSearchSuggestionSelected = onSearchSuggestionSelected,
             suggestionContent = {
                 Text(text = it.descriptiveName.ifBlank { it.name.name })
             },
@@ -172,12 +168,9 @@ private fun AddProductNamePagePreview() {
         AddProductNamePage(
             modifier = Modifier.fillMaxSize(),
             product = Product.LocalViewModel.default,
-            suggestionsState = MutableStateFlow(emptyList()),
-            search = {},
+            service = ProductAutoCompleteService.Fake,
             saveDraft = {},
             onPreviousClick = {},
-            onContinueClick = {},
-            onSearchSuggestionSelected = {},
-        )
+        ) {}
     }
 }

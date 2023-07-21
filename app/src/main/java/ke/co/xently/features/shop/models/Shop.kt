@@ -2,6 +2,7 @@ package ke.co.xently.features.shop.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 sealed interface Shop {
     val id: Long
@@ -18,6 +19,7 @@ sealed interface Shop {
         override val ecommerceSiteUrl: String?,
     ) : Shop
 
+    @Serializable
     data class RemoteResponse(
         override val id: Long,
         override val name: String,
