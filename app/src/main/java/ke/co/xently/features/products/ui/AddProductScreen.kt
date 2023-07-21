@@ -53,20 +53,19 @@ fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
     CompositionLocalProvider(LocalAddProductStep provides currentlyActiveStep) {
         AddProductScreen(
             modifier = modifier,
-            currentlyActiveStep = currentlyActiveStep,
             locationPermissionsState = LocationPermissionsState.CoarseAndFine,
             product = product,
             shopAutoCompleteService = viewModel.shopAutoCompleteService,
-
             storeAutoCompleteService = viewModel.storeAutoCompleteService,
+
             brandAutoCompleteService = viewModel.brandAutoCompleteService,
             productAutoCompleteService = viewModel.productAutoCompleteService,
             attributeAutoCompleteService = viewModel.attributeAutoCompleteService,
             attributeValueAutoCompleteService = viewModel.attributeValueAutoCompleteService,
             measurementUnitAutoCompleteService = viewModel.measurementUnitAutoCompleteService,
             traversedSteps = viewModel.traversedSteps,
-
             addProductState = viewModel.saveProductStateFlow,
+
             savePermanently = viewModel::savePermanently,
             saveDraft = viewModel::saveDraft,
             saveCurrentlyActiveStep = viewModel::saveCurrentlyActiveStep,
@@ -77,24 +76,24 @@ fun AddProductScreen(modifier: Modifier, viewModel: ProductViewModel) {
 @Composable
 fun AddProductScreen(
     modifier: Modifier,
-    currentlyActiveStep: AddProductStep,
     locationPermissionsState: LocationPermissionsState,
     product: Product.LocalViewModel,
     shopAutoCompleteService: ShopAutoCompleteService,
-
     storeAutoCompleteService: StoreAutoCompleteService,
+
     brandAutoCompleteService: BrandAutoCompleteService,
     productAutoCompleteService: ProductAutoCompleteService,
     attributeAutoCompleteService: AttributeAutoCompleteService,
     attributeValueAutoCompleteService: AttributeValueAutoCompleteService,
     measurementUnitAutoCompleteService: MeasurementUnitAutoCompleteService,
     traversedSteps: Flow<Set<AddProductStep>>,
-
     addProductState: Flow<State>,
+
     savePermanently: (Array<AddProductStep>) -> Unit,
     saveDraft: (Product.LocalViewModel) -> Unit,
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
 ) {
+    val currentlyActiveStep = LocalAddProductStep.current
     val navigateToNext: () -> Unit by rememberUpdatedState {
         AddProductStep.valueOfOrdinalOrFirstByOrdinal(currentlyActiveStep.ordinal + 1)
             .also(saveCurrentlyActiveStep)
@@ -310,28 +309,31 @@ fun AddProductScreen(
 @Composable
 private fun AddProductScreenPreview() {
     XentlyTheme {
-        AddProductScreen(
-            modifier = Modifier.fillMaxSize(),
-            currentlyActiveStep = AddProductStep.valueOfOrdinalOrFirstByOrdinal(
+        CompositionLocalProvider(
+            LocalAddProductStep provides AddProductStep.valueOfOrdinalOrFirstByOrdinal(
                 Random.nextInt(
                     AddProductStep.values().size
                 )
             ),
-            locationPermissionsState = LocationPermissionsState.Simulated,
-            product = Product.LocalViewModel.default,
-            shopAutoCompleteService = ShopAutoCompleteService.Fake,
+        ) {
+            AddProductScreen(
+                modifier = Modifier.fillMaxSize(),
+                locationPermissionsState = LocationPermissionsState.Simulated,
+                product = Product.LocalViewModel.default,
+                shopAutoCompleteService = ShopAutoCompleteService.Fake,
+                storeAutoCompleteService = StoreAutoCompleteService.Fake,
 
-            storeAutoCompleteService = StoreAutoCompleteService.Fake,
-            brandAutoCompleteService = BrandAutoCompleteService.Fake,
-            productAutoCompleteService = ProductAutoCompleteService.Fake,
-            attributeAutoCompleteService = AttributeAutoCompleteService.Fake,
-            attributeValueAutoCompleteService = AttributeValueAutoCompleteService.Fake,
-            measurementUnitAutoCompleteService = MeasurementUnitAutoCompleteService.Fake,
-            traversedSteps = MutableStateFlow(emptySet()),
+                brandAutoCompleteService = BrandAutoCompleteService.Fake,
+                productAutoCompleteService = ProductAutoCompleteService.Fake,
+                attributeAutoCompleteService = AttributeAutoCompleteService.Fake,
+                attributeValueAutoCompleteService = AttributeValueAutoCompleteService.Fake,
+                measurementUnitAutoCompleteService = MeasurementUnitAutoCompleteService.Fake,
+                traversedSteps = MutableStateFlow(emptySet()),
+                addProductState = flowOf(State.Idle),
 
-            addProductState = flowOf(State.Idle),
-            savePermanently = {},
-            saveDraft = {},
-        ) {}
+                savePermanently = {},
+                saveDraft = {},
+            ) {}
+        }
     }
 }
