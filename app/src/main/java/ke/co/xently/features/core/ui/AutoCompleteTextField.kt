@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +27,6 @@ import ke.co.xently.features.core.ui.components.AutoCompleteSearchResults
 import ke.co.xently.remotedatasource.services.AutoCompleteService
 import ke.co.xently.ui.theme.XentlyTheme
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -117,7 +115,7 @@ fun <Q, R> AutoCompleteTextField(
 
     val shouldReportEmojiProhibition by remember(allowImojis, state.query) {
         derivedStateOf {
-            allowImojis && state.query.hasEmojis
+            !allowImojis && state.query.hasEmojis
         }
     }
 
@@ -132,8 +130,11 @@ fun <Q, R> AutoCompleteTextField(
 
     LaunchedEffect(state.query, suggestions, hasErrors) {
         if (wasSuggestionSelected || hasErrors) {
-            searchActive = false
             wasSuggestionSelected = false
+            if (hasErrors) {
+                delay(800.milliseconds) // Delay hiding the soft keyboard
+            }
+            searchActive = false
         } else {
             (state.query.isNotBlank() && suggestions.isNotEmpty()).let {
                 if (!it) {
@@ -143,20 +144,18 @@ fun <Q, R> AutoCompleteTextField(
             }
         }
     }
-    val coroutineScope = rememberCoroutineScope()
+
+    if (!hasErrors) {
+        LaunchedEffect(state.query) {
+            // No need to send an unnecessary search request if an error was encountered
+            val query = onSearch(state.query)
+            service.search(query, numberOfResults)
+        }
+    }
 
     ke.co.xently.features.core.ui.autocomplete.AutoCompleteTextField(
         query = state.query,
-        onQueryChange = {
-            if (!hasErrors) {
-                // No need to send an unnecessary search request if an error was encountered
-                state.updateQuery(it)
-                val query = onSearch(it)
-                coroutineScope.launch {
-                    service.search(query, numberOfResults)
-                }
-            }
-        },
+        onQueryChange = state::updateQuery,
         isError = hasErrors,
         active = searchActive,
         onActiveChange = {},
