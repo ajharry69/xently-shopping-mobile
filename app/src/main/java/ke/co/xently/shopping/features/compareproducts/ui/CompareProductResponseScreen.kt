@@ -29,7 +29,7 @@ import ke.co.xently.shopping.features.compareproducts.models.CompareProduct
 import ke.co.xently.shopping.features.compareproducts.models.ComparisonListItem
 import ke.co.xently.shopping.features.core.OrderBy
 import ke.co.xently.shopping.features.core.currencyNumberFormat
-import ke.co.xently.shopping.ui.theme.XentlyTheme
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import kotlin.random.Random
 
 @Composable

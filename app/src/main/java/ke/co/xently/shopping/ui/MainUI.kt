@@ -45,6 +45,7 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.compareproducts.repositories.CompareProductRepository
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductViewModel
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductsRequestScreen
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.core.visitUriPage
 import ke.co.xently.shopping.features.products.repositories.ProductRepository
 import ke.co.xently.shopping.features.products.ui.AddProductScreen
@@ -54,7 +55,6 @@ import ke.co.xently.shopping.features.recommendations.repositories.Recommendatio
 import ke.co.xently.shopping.features.recommendations.ui.RecommendationRequestScreen
 import ke.co.xently.shopping.features.recommendations.ui.RecommendationViewModel
 import ke.co.xently.shopping.ui.components.ModalBottomSheet
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainUI"

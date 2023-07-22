@@ -13,6 +13,7 @@ import ke.co.xently.shopping.features.attributesvalues.datasources.remoteservice
 import ke.co.xently.shopping.features.attributesvalues.ui.LocalAttributeValueAutoCompleteService
 import ke.co.xently.shopping.features.brands.datasources.remoteservices.BrandAutoCompleteService
 import ke.co.xently.shopping.features.brands.ui.LocalBrandAutoCompleteService
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.LocalLocationPermissionsState
 import ke.co.xently.shopping.features.locationtracker.LocationPermissionsState
 import ke.co.xently.shopping.features.measurementunit.datasources.remoteservices.MeasurementUnitAutoCompleteService
@@ -24,7 +25,6 @@ import ke.co.xently.shopping.features.shop.ui.LocalShopAutoCompleteService
 import ke.co.xently.shopping.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.shopping.features.store.ui.LocalStoreAutoCompleteService
 import ke.co.xently.shopping.ui.MainUI
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint

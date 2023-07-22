@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.ui.theme
+package ke.co.xently.shopping.features.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

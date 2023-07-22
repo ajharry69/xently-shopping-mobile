@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.ui.theme
+package ke.co.xently.shopping.features.core.ui.theme
 
 import android.app.Activity
 import android.os.Build

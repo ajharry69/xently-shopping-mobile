@@ -48,8 +48,8 @@ import ke.co.xently.shopping.features.core.cleansedForNumberParsing
 import ke.co.xently.shopping.features.core.javaLocale
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.UIState
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.models.Product
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 import java.math.BigDecimal
 import java.time.Clock
 import java.time.DateTimeException
