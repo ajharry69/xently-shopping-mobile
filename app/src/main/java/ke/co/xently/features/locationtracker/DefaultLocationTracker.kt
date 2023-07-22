@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
 import android.location.Location
-import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import ke.co.xently.features.locationtracker.exceptions.GPSNotEnabledException
@@ -13,6 +12,7 @@ import ke.co.xently.features.locationtracker.exceptions.MissingLocationTrackingP
 import ke.co.xently.features.locationtracker.exceptions.NullLocationResultsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,7 +44,7 @@ class DefaultLocationTracker @Inject constructor(
             return Result.failure(GPSNotEnabledException())
         }
 
-        Log.i(TAG, "Getting current device location...")
+        Timber.tag(TAG).i("Getting current device location...")
         return suspendCancellableCoroutine { cont ->
             fusedLocationProviderClient.lastLocation.apply {
                 addOnSuccessListener {

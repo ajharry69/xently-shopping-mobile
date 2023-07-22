@@ -7,7 +7,6 @@ import android.content.Intent
 import android.icu.text.NumberFormat
 import android.icu.util.Currency
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.intl.Locale
 import ke.co.xently.R
 import kotlinx.coroutines.delay
+import timber.log.Timber
 import java.net.ConnectException
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -63,7 +63,7 @@ inline fun Context.visitUriPage(
     try {
         startActivity(Intent(Intent.ACTION_VIEW, uri))
     } catch (ex: ActivityNotFoundException) {
-        Log.e(logTag, "An error was encountered when visiting: $uri", ex)
+        Timber.tag(logTag).e(ex, "An error was encountered when visiting: %s", uri)
         onActivityNotFound()
     }
 }

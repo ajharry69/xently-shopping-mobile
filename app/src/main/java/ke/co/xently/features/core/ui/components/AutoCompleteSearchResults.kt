@@ -1,6 +1,5 @@
 package ke.co.xently.features.core.ui.components
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -11,6 +10,7 @@ import ke.co.xently.features.core.ui.utils.CallOnLifecycleEvent
 import ke.co.xently.remotedatasource.services.AutoCompleteService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -39,9 +39,9 @@ fun <Q> AutoCompleteSearchResults(
                 val initState = service.initSession()
                 while (initState !is AutoCompleteService.InitState.Success && initState !is AutoCompleteService.InitState.Failure) {
                     delay(100.milliseconds)
-                    Log.i(
-                        "AutoCompleteSearchResults",
-                        "Response: ${initState}. Retrying service initialization. Please wait...",
+                    Timber.tag("AutoCompleteSearchResults").i(
+                        "Response: %s. Retrying service initialization. Please wait...",
+                        initState,
                     )
                 }
                 service.getSearchResults()

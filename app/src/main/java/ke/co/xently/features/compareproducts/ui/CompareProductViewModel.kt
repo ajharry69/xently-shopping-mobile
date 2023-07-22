@@ -1,6 +1,5 @@
 package ke.co.xently.features.compareproducts.ui
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +10,7 @@ import ke.co.xently.features.compareproducts.repositories.CompareProductReposito
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,7 +66,7 @@ class CompareProductViewModel @Inject constructor(
                 result.onSuccess {
                     compareProductsStateChannel.send(State.Success(it))
                 }.onFailure {
-                    Log.e(TAG, "compareProducts: ${it.localizedMessage}", it)
+                    Timber.tag(TAG).e(it, "compareProducts: %s", it.localizedMessage)
                     compareProductsStateChannel.send(State.Failure(it))
                 }
             }

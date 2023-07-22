@@ -1,6 +1,5 @@
 package ke.co.xently.features.recommendations.ui
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +10,7 @@ import ke.co.xently.features.recommendations.repositories.RecommendationReposito
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,7 +67,7 @@ class RecommendationViewModel @Inject constructor(
                     result.onSuccess {
                         recommendationsStateChannel.send(State.Success(it))
                     }.onFailure {
-                        Log.e(TAG, "getRecommendations: ${it.localizedMessage}", it)
+                        Timber.tag(TAG).e(it, "getRecommendations: %s", it.localizedMessage)
                         recommendationsStateChannel.send(State.Failure(it))
                     }
                 }
