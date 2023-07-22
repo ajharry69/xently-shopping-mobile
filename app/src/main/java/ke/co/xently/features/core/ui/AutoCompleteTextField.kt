@@ -11,6 +11,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,8 +20,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ke.co.xently.features.core.hasEmojis
 import ke.co.xently.features.core.ui.components.AutoCompleteSearchResults
 import ke.co.xently.remotedatasource.services.AutoCompleteService
 import ke.co.xently.ui.theme.XentlyTheme
@@ -63,6 +66,7 @@ fun <Q, R> AutoCompleteTextField(
     modifier: Modifier = Modifier,
     service: AutoCompleteService<Q> = AutoCompleteService.Fake(),
     isError: Boolean = false,
+    allowImojis: Boolean = false,
     numberOfResults: Int = 5,
     state: AutoCompleteTextFieldState = rememberAutoCompleteTextFieldState(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -111,22 +115,31 @@ fun <Q, R> AutoCompleteTextField(
         resultState = it
     }
 
-    var nameSearchActive by remember {
+    val shouldReportEmojiProhibition by remember(allowImojis, state.query) {
+        derivedStateOf {
+            allowImojis && state.query.hasEmojis
+        }
+    }
+
+    var searchActive by remember {
         mutableStateOf(false)
     }
     var wasSuggestionSelected by remember {
         mutableStateOf(false)
     }
 
-    LaunchedEffect(state.query, suggestions) {
-        if (wasSuggestionSelected) {
+    val hasErrors = isError || shouldReportEmojiProhibition
+
+    LaunchedEffect(state.query, suggestions, hasErrors) {
+        if (wasSuggestionSelected || hasErrors) {
+            searchActive = false
             wasSuggestionSelected = false
         } else {
             (state.query.isNotBlank() && suggestions.isNotEmpty()).let {
                 if (!it) {
                     delay(800.milliseconds) // Delay hiding the soft keyboard
                 }
-                nameSearchActive = it
+                searchActive = it
             }
         }
     }
@@ -135,19 +148,26 @@ fun <Q, R> AutoCompleteTextField(
     ke.co.xently.features.core.ui.autocomplete.AutoCompleteTextField(
         query = state.query,
         onQueryChange = {
-            state.updateQuery(it)
-            val query = onSearch(it)
-            coroutineScope.launch {
-                service.search(query, numberOfResults)
+            if (!hasErrors) {
+                // No need to send an unnecessary search request if an error was encountered
+                state.updateQuery(it)
+                val query = onSearch(it)
+                coroutineScope.launch {
+                    service.search(query, numberOfResults)
+                }
             }
         },
-        isError = isError,
-        active = nameSearchActive,
+        isError = hasErrors,
+        active = searchActive,
         onActiveChange = {},
         modifier = Modifier.then(modifier),
         label = label,
         trailingIcon = trailingIcon,
-        supportingText = supportingText,
+        supportingText = if (!shouldReportEmojiProhibition) supportingText else {
+            {
+                Text(text = stringResource(ke.co.xently.R.string.xently_error_imojis_not_allowed))
+            }
+        },
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
     ) {
@@ -159,7 +179,6 @@ fun <Q, R> AutoCompleteTextField(
                 modifier = Modifier.clickable {
                     onSuggestionSelected(suggestion)
                     wasSuggestionSelected = true
-                    nameSearchActive = false
                     onSearchSuggestionSelected()
                 },
             )

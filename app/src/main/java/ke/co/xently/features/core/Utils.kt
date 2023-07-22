@@ -32,6 +32,9 @@ fun String.cleansedForNumberParsing(): String {
     return trim().replace(",", "")
 }
 
+val CharSequence.hasEmojis: Boolean
+    get() = any(Char::isSurrogate)
+
 private val RETRYABLE_ERRORS = arrayOf(
     ConnectException::class,
 )
