@@ -8,7 +8,6 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -38,6 +37,7 @@ import com.google.android.gms.location.Priority
 import ke.co.xently.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 
 private const val TAG = "ForegroundLocationTracker"
@@ -248,7 +248,7 @@ fun ForegroundLocationTracker(
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
                 p0.lastLocation?.also(onLocationUpdates)?.also {
-                    Log.i(TAG, "Current location: $it")
+                    Timber.tag(TAG).i("Current location: %s", it)
                 }
             }
         }

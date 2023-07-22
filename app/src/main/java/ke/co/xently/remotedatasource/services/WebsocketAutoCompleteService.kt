@@ -1,6 +1,5 @@
 package ke.co.xently.remotedatasource.services
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.webSocketSession
 import io.ktor.client.request.url
@@ -26,6 +25,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -61,9 +61,10 @@ open class WebsocketAutoCompleteService<in Q>(
             var retryCountDown = waitActiveRetryCount
             var newWaitDuration = waitDuration
             while (!socket!!.isActive && retryCountDown > 0) {
-                Log.i(
-                    TAG,
-                    "[$urlString]: waiting for $newWaitDuration for the session to be active...",
+                Timber.tag(TAG).i(
+                    "[%s]: waiting for %s for the session to be active...",
+                    urlString,
+                    newWaitDuration,
                 )
                 delay(newWaitDuration)
                 retryCountDown -= 1
@@ -73,14 +74,14 @@ open class WebsocketAutoCompleteService<in Q>(
             if (socket!!.isActive) {
                 AutoCompleteService.InitState.Success.also {
                     if (logSuccessfulInitialization) {
-                        Log.i(TAG, "[$urlString]: successfully initialised session")
+                        Timber.tag(TAG).i("[%s]: successfully initialised session", urlString)
                     }
                 }
             } else {
                 AutoCompleteService.InitState.Failure(WebsocketConnectionFailedException())
             }
         } catch (e: Exception) {
-            Log.e(TAG, "[$urlString]: error initialising session", e)
+            Timber.tag(TAG).e(e, "[%s]: error initialising session", urlString)
             AutoCompleteService.InitState.Failure(WebsocketException(e))
         }
     }
@@ -94,7 +95,7 @@ open class WebsocketAutoCompleteService<in Q>(
 
         if (q.isBlank()) {
             currentQuery = null
-            Log.i(TAG, "[$urlString]: skipping search of blank query...")
+            Timber.tag(TAG).i("[%s]: skipping search of blank query...", urlString)
             return
         }
 
@@ -105,20 +106,23 @@ open class WebsocketAutoCompleteService<in Q>(
 
         val state = initSession(logSuccessfulInitialization = false)
         if (state !is AutoCompleteService.InitState.Success) {
-            Log.i(
-                TAG,
-                "[$urlString]: skipping search propagation for ${content}. Search session is not successfully initialised!",
-            )
+            Timber.tag(TAG)
+                .i(
+                    "[%s]: skipping search propagation for %s. Search session is not successfully initialised!",
+                    urlString,
+                    content,
+                )
             return
         }
 
         try {
             socket?.run {
                 send(content)
-                Log.i(TAG, "[$urlString]: sent a search request for: $content")
+                Timber.tag(TAG)
+                    .i("[%s]: sent a search request for: %s", urlString, content)
             }
         } catch (ex: Exception) {
-            Log.e(TAG, "[$urlString]: error searching for '$content'", ex)
+            Timber.tag(TAG).e(ex, "[%s]: error searching for '%s'", urlString, content)
         }
     }
 
@@ -130,7 +134,7 @@ open class WebsocketAutoCompleteService<in Q>(
                 .filter { it is Frame.Text }
                 .map { frame ->
                     val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
-                        Log.i(TAG, "[$urlString]: results: $it")
+                        Timber.tag(TAG).i("[%s]: results: %s", urlString, it)
                     }
                     val json = Json {
                         ignoreUnknownKeys = true
@@ -139,28 +143,28 @@ open class WebsocketAutoCompleteService<in Q>(
                 }
                 .onStart {
                     emit(AutoCompleteService.ResultState.Loading)
-                    Log.i(
-                        TAG,
-                        "[$urlString]: session was successfully initialised. Getting search results..."
+                    Timber.tag(TAG).i(
+                        "[%s]: session was successfully initialised. Getting search results...",
+                        urlString
                     )
                 }
                 .catch {
                     emit(AutoCompleteService.ResultState.Failure(it))
-                    Log.e(TAG, "[$urlString]: error getting search results", it)
+                    Timber.tag(TAG).e(it, "[%s]: error getting search results", urlString)
                 }
         } ?: flowOf<AutoCompleteService.ResultState>().onEach {
-            Log.i(TAG, "[$urlString]: getSearchResults: returned default flow...")
+            Timber.tag(TAG).i("[%s]: getSearchResults: returned default flow...", urlString)
         }
     }
 
     override suspend fun closeSession() {
-        Log.i(TAG, "[$urlString]: requested session closure...")
+        Timber.tag(TAG).i("[%s]: requested session closure...", urlString)
         try {
             socket?.close()?.also {
-                Log.i(TAG, "[$urlString]: successfully closed websocket session.")
+                Timber.tag(TAG).i("[%s]: successfully closed websocket session.", urlString)
             }
         } catch (ex: Exception) {
-            Log.e(TAG, "[$urlString]: error closing session", ex)
+            Timber.tag(TAG).e(ex, "[%s]: error closing session", urlString)
         } finally {
             socket = null
             currentQuery = null

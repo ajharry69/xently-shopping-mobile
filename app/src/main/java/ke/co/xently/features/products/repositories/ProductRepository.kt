@@ -1,8 +1,8 @@
 package ke.co.xently.features.products.repositories
 
-import android.util.Log
 import ke.co.xently.features.products.datasources.ProductDataSource
 import ke.co.xently.features.products.models.Product
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,7 +26,7 @@ sealed interface ProductRepository {
         private val localDataSource: ProductDataSource<Product.LocalEntityRequest, Product.LocalEntityResponse>,
     ) : ProductRepository {
         override suspend fun addProduct(product: Product): Result<Product.LocalViewModel> {
-            Log.i(TAG, "addProduct: $product")
+            Timber.tag(TAG).i("addProduct: %s", product)
             return try {
                 remoteDataSource.addProduct(product.toRemoteRequest()).let {
                     localDataSource.addProduct(it.toLocalEntityRequest())
