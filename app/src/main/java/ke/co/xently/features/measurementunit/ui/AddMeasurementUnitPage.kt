@@ -1,6 +1,5 @@
 package ke.co.xently.features.measurementunit.ui
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +25,7 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
 import ke.co.xently.features.core.cleansedForNumberParsing
+import ke.co.xently.features.core.hasEmojis
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.rememberAutoCompleteTextFieldState
@@ -33,24 +33,6 @@ import ke.co.xently.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.features.products.models.Product
 import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
-
-private sealed interface MeasurementUIState {
-    operator fun invoke(context: Context): String
-
-    sealed interface QuantityError : MeasurementUIState
-
-    object OK : MeasurementUIState {
-        override operator fun invoke(context: Context): String {
-            return context.getString(android.R.string.ok)
-        }
-    }
-
-    object InvalidQuantity : QuantityError {
-        override operator fun invoke(context: Context): String {
-            return context.getString(R.string.xently_button_label_invalid_unit_quantity)
-        }
-    }
-}
 
 @Composable
 fun AddMeasurementUnitPage(
@@ -117,11 +99,23 @@ fun AddMeasurementUnitPage(
         mutableStateOf<MeasurementUIState>(MeasurementUIState.OK)
     }
 
-    LaunchedEffect(unitQuantity.text) {
+    LaunchedEffect(unitQuantity.text, namePlural.text, symbol.text, symbolPlural.text) {
         uiState = when {
+            namePlural.text.hasEmojis -> {
+                MeasurementUIState.NamePluralError.ImojiNotAllowedError
+            }
+
+            symbol.text.hasEmojis -> {
+                MeasurementUIState.SymbolError.ImojiNotAllowedError
+            }
+
+            symbolPlural.text.hasEmojis -> {
+                MeasurementUIState.SymbolPluralError.ImojiNotAllowedError
+            }
+
             unitQuantity.text.isNotBlank() && unitQuantity.text.cleansedForNumberParsing()
                 .toFloatOrNull() == null -> {
-                MeasurementUIState.InvalidQuantity
+                MeasurementUIState.QuantityError.InvalidQuantity
             }
 
             else -> {
@@ -203,6 +197,12 @@ fun AddMeasurementUnitPage(
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            isError = uiState is MeasurementUIState.NamePluralError,
+            supportingText = if (uiState is MeasurementUIState.NamePluralError) {
+                {
+                    Text(text = uiState(context = LocalContext.current))
+                }
+            } else null,
         )
         TextField(
             value = symbol,
@@ -212,6 +212,12 @@ fun AddMeasurementUnitPage(
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            isError = uiState is MeasurementUIState.SymbolError,
+            supportingText = if (uiState is MeasurementUIState.SymbolError) {
+                {
+                    Text(text = uiState(context = LocalContext.current))
+                }
+            } else null,
         )
 
         LabeledCheckbox(
@@ -233,14 +239,21 @@ fun AddMeasurementUnitPage(
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            isError = uiState is MeasurementUIState.SymbolPluralError,
+            supportingText = if (uiState is MeasurementUIState.SymbolPluralError) {
+                {
+                    Text(text = uiState(context = LocalContext.current))
+                }
+            } else null,
         )
+
         TextField(
             value = unitQuantity,
-            isError = uiState is MeasurementUIState.QuantityError,
             onValueChange = { unitQuantity = it },
             label = {
                 Text(stringResource(R.string.xently_text_field_label_unit_quantity))
             },
+            isError = uiState is MeasurementUIState.QuantityError,
             supportingText = if (uiState is MeasurementUIState.QuantityError) {
                 {
                     Text(text = uiState(context = LocalContext.current))
@@ -256,7 +269,7 @@ fun AddMeasurementUnitPage(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun AddMeasurementUnitPagePreview() {
+private fun AddMeasurementUnitPagePreview() {
     XentlyTheme {
         AddMeasurementUnitPage(
             modifier = Modifier.fillMaxSize(),

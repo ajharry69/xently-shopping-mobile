@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import ke.co.xently.BottomSheet
 import ke.co.xently.LocalSnackbarHostState
 import ke.co.xently.R
+import ke.co.xently.features.core.hasEmojis
 import ke.co.xently.features.core.isRetryable
 import ke.co.xently.features.core.loadingIndicatorLabel
 import ke.co.xently.features.core.models.toLocation
@@ -116,6 +117,23 @@ fun RecommendationRequestScreen(
     var shoppingListItemValue by remember(draftShoppingListItem.name) {
         mutableStateOf(TextFieldValue(draftShoppingListItem.name))
     }
+
+    var uiState by remember {
+        mutableStateOf<RecommendationRequestUIState>(RecommendationRequestUIState.OK)
+    }
+
+    LaunchedEffect(shoppingListItemValue.text) {
+        uiState = when {
+            shoppingListItemValue.text.hasEmojis -> {
+                RecommendationRequestUIState.NameError.ImojisNotAllowed
+            }
+
+            else -> {
+                RecommendationRequestUIState.OK
+            }
+        }
+    }
+
     val shoppingList = remember(request.shoppingList) {
         mutableStateListOf(*request.shoppingList.toTypedArray())
     }
@@ -126,9 +144,10 @@ fun RecommendationRequestScreen(
         }
     }
 
-    val showAddButton by remember(shoppingListItemValue) {
+    val showAddButton by remember(shoppingListItemValue, uiState) {
         derivedStateOf {
-            shoppingListItemValue.text.isNotBlank()
+            uiState is RecommendationRequestUIState.OK
+                    && shoppingListItemValue.text.isNotBlank()
         }
     }
 
@@ -213,8 +232,13 @@ fun RecommendationRequestScreen(
                     label = {
                         Text(text = stringResource(R.string.xently_text_field_label_shopping_list_item_name))
                     },
+                    isError = uiState is RecommendationRequestUIState.NameError,
                     supportingText = {
-                        Text(text = stringResource(R.string.xently_text_field_help_text_shopping_list_item_name))
+                        if (uiState is RecommendationRequestUIState.NameError) {
+                            Text(text = uiState(context = LocalContext.current))
+                        } else {
+                            Text(text = stringResource(R.string.xently_text_field_help_text_shopping_list_item_name))
+                        }
                     },
                     keyboardActions = KeyboardActions(
                         onDone = {
