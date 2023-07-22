@@ -35,6 +35,8 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import ke.co.xently.shopping.BottomSheet
@@ -160,6 +162,7 @@ fun MainUI(
                     Text(
                         stringResource(R.string.app_name),
                         fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = TextUnit(4f, TextUnitType.Sp),
                     )
                 },
             )
