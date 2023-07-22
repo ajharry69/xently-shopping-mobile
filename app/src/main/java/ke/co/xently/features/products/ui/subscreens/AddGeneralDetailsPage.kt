@@ -333,7 +333,7 @@ fun AddGeneralDetailsPage(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-fun AddGeneralDetailsPagePreview() {
+private fun AddGeneralDetailsPagePreview() {
     XentlyTheme {
         AddGeneralDetailsPage(
             modifier = Modifier.fillMaxSize(),

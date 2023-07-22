@@ -21,6 +21,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.R
+import ke.co.xently.features.core.hasEmojis
 import ke.co.xently.features.core.ui.LabeledCheckbox
 import ke.co.xently.features.core.ui.MultiStepScreen
 import ke.co.xently.features.core.ui.UIState
@@ -30,11 +31,15 @@ import ke.co.xently.features.products.ui.LocalProductAutoCompleteService
 import ke.co.xently.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.ui.theme.XentlyTheme
 
-private sealed class ProductNameUIState(message: Int) : UIState(message) {
+internal sealed class ProductNameUIState(message: Int) : UIState(message) {
     object OK : ProductNameUIState(android.R.string.ok)
 
     object MissingProductName :
         ProductNameUIState(R.string.xently_button_label_missing_product_name)
+
+    sealed class NamePluralError(message: Int) : ProductNameUIState(message) {
+        object ImojisNotAllowed : NamePluralError(R.string.xently_error_imojis_not_allowed)
+    }
 }
 
 @Composable
@@ -57,11 +62,19 @@ fun AddProductNamePage(
         mutableStateOf<ProductNameUIState>(ProductNameUIState.OK)
     }
 
-    LaunchedEffect(nameAutoCompleteState.query) {
-        uiState = if (nameAutoCompleteState.query.isBlank()) {
-            ProductNameUIState.MissingProductName
-        } else {
-            ProductNameUIState.OK
+    LaunchedEffect(nameAutoCompleteState.query, namePlural.text) {
+        uiState = when {
+            nameAutoCompleteState.query.isBlank() -> {
+                ProductNameUIState.MissingProductName
+            }
+
+            namePlural.text.hasEmojis -> {
+                ProductNameUIState.NamePluralError.ImojisNotAllowed
+            }
+
+            else -> {
+                ProductNameUIState.OK
+            }
         }
     }
 
@@ -155,6 +168,12 @@ fun AddProductNamePage(
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            isError = uiState is ProductNameUIState.NamePluralError,
+            supportingText = if (uiState is ProductNameUIState.NamePluralError) {
+                {
+                    Text(text = uiState(context = LocalContext.current))
+                }
+            } else null,
         )
     }
 }
