@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace 'ke.co.xently'
+    namespace 'ke.co.xently.shopping'
     compileSdk 33
 
     defaultConfig {
