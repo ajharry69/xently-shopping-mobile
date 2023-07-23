@@ -1,48 +1,54 @@
 plugins {
-    id 'kotlin-kapt'
-    id 'com.google.dagger.hilt.android'
     id 'com.android.application'
 
     id 'com.google.gms.google-services'
     id 'com.google.firebase.firebase-perf'
     id 'com.google.firebase.crashlytics'
 
-    id 'org.jetbrains.kotlin.android'
-    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id 'kotlin-kapt'
     id 'kotlin-parcelize'
+
+    id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
+
+    id 'com.google.dagger.hilt.android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+}
+
+apply from: "$rootDir/config.common.gradle"
+apply from: "$rootDir/dependencies.firebase.gradle"
+
+def localProperties = new Properties()
+try {
+    localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+} catch (Exception ignored) {
 }
 
 android {
     namespace 'ke.co.xently.shopping'
-    compileSdk 33
 
     defaultConfig {
         applicationId "ke.co.xently.shopping"
-        minSdk 26
-        targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName localProperties.get("versionName", "1.0")
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
         }
     }
 
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        debug {
+            applicationIdSuffix ".debug"
+        }
+        alpha {
+            applicationIdSuffix ".alpha"
+        }
+        beta {
+            applicationIdSuffix ".beta"
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
+
     buildFeatures {
         compose true
     }
@@ -97,12 +103,6 @@ dependencies {
     implementation "io.ktor:ktor-client-websockets:$ktor_version"
     implementation "io.ktor:ktor-client-logging:$ktor_version"
     implementation "ch.qos.logback:logback-classic:1.2.6"
-
-    // Firebase
-    implementation platform('com.google.firebase:firebase-bom:32.2.0')
-    implementation 'com.google.firebase:firebase-crashlytics-ktx'
-    implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'com.google.firebase:firebase-perf-ktx'
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
 

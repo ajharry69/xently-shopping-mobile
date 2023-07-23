@@ -10,6 +10,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
+
       - name: Decrypting dependencies
         run: |
           sudo apt update && sudo apt install -y git-crypt
@@ -32,6 +36,7 @@ jobs:
           cat > local.properties <<EOF
           MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
           API_BASE_URL=https://shopping.xently.co.ke/api/
+          AUTO_COMPLETE_BASE_URL=wss://shopping.xently.co.ke/
           EOF
 
       - name: Get tag version
@@ -80,11 +85,11 @@ jobs:
       - name: Deploy to Play Store
         id: deploy
         # Reference doc: https://github.com/marketplace/actions/upload-android-release-to-play-store
-        uses: r0adkll/upload-google-play@v1.0.18
+        uses: r0adkll/upload-google-play@v1.1.1
         with:
           track: ${{ steps.track.outputs.name }}
           whatsNewDirectory: whatsnew/
-          packageName: co.ke.xently.shopping${{ steps.aab.outputs.packageNameSuffix }}
+          packageName: ke.co.xently.shopping${{ steps.aab.outputs.packageNameSuffix }}
           releaseName: ${{ steps.tagVersion.outputs.TAG }}
           serviceAccountJson: secrets/service-account.json
           mappingFile: app/build/outputs/mapping/${{ steps.aab.outputs.track }}/mapping.txt
