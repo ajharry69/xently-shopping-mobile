@@ -55,7 +55,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import ke.co.xently.shopping.ui.theme.XentlyTheme
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import kotlinx.coroutines.delay
 
 

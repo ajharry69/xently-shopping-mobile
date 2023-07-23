@@ -1,0 +1,64 @@
+feature:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/**
+
+attributes:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/attributes/**
+  - app/src/main/java/ke/co/xently/shopping/ui/features/attributevalues/**
+
+brands:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/brands/**
+
+compare-products:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/compareproducts/**
+
+core-ui:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/core
+
+location-tracker:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/locationtracker/**
+
+measurement-units:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/measurementunit/**
+
+products:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/products/**
+
+recommendations:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/recommendations/**
+
+shop:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/shop/**
+
+store:
+  - app/src/main/java/ke/co/xently/shopping/ui/features/store/**
+
+remote-data-source:
+  - app/src/main/java/ke/co/xently/shopping/ui/remotedatasource/**
+
+app:
+  - app/src/main/java/ke/co/xently/shopping/ui/**
+  - app/src/main/java/ke/co/xently/shopping/ui/*.kt
+
+resources:
+  - app/src/*/res
+
+dependencies:
+  - '**/build.gradle'
+
+properties:
+  - '**/*.properties'
+
+ignore:
+  - '**/.gitignore'
+
+gradle:
+  - gradle/**
+  - 'settings.gradle'
+  - 'gradlew'
+  - 'gradlew.bat'
+
+documentation:
+  - 'README.md'
+
+CI:
+  - '.github/workflows/'

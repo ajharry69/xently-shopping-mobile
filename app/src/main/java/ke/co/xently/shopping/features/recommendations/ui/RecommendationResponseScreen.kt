@@ -44,12 +44,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.OrderBy
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
 import ke.co.xently.shopping.features.recommendations.ui.components.RecommendationResponseSortBy
 import ke.co.xently.shopping.features.recommendations.ui.components.RecommendationResponseSortOptions
 import ke.co.xently.shopping.features.recommendations.ui.components.RecommendationSummaryItemDropdownMenu
 import ke.co.xently.shopping.features.recommendations.ui.components.StoreRecommendationSummaryItem
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
