@@ -22,6 +22,7 @@ import ke.co.xently.shopping.features.attributesvalues.models.AttributeValue
 import ke.co.xently.shopping.features.attributesvalues.ui.AddAttributesPage
 import ke.co.xently.shopping.features.brands.models.Brand
 import ke.co.xently.shopping.features.brands.ui.AddBrandsPage
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.LocalFlowOfSaveProductState
 import ke.co.xently.shopping.features.locationtracker.LocalFlowOfTraversedSteps
 import ke.co.xently.shopping.features.measurementunit.ui.AddMeasurementUnitPage
@@ -33,7 +34,6 @@ import ke.co.xently.shopping.features.shop.models.Shop
 import ke.co.xently.shopping.features.shop.ui.AddShopPage
 import ke.co.xently.shopping.features.store.models.Store
 import ke.co.xently.shopping.features.store.ui.AddStorePage
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 import kotlin.random.Random
 
 @Composable

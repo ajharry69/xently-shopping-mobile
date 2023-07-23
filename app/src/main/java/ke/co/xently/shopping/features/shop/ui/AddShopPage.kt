@@ -24,9 +24,9 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.UIState
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.shopping.features.shop.models.Shop
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 
 
 private sealed class ShopUIState(message: Int) : UIState(message) {

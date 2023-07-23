@@ -30,9 +30,9 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.brands.models.Brand
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

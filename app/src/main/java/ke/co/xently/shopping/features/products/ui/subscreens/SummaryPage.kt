@@ -41,12 +41,12 @@ import ke.co.xently.shopping.features.core.javaLocale
 import ke.co.xently.shopping.features.core.loadingIndicatorLabel
 import ke.co.xently.shopping.features.core.ui.LabeledCheckbox
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.LocalFlowOfSaveProductState
 import ke.co.xently.shopping.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.AddProductStep
 import ke.co.xently.shopping.features.products.ui.State
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 import java.math.BigDecimal
 
 @Composable

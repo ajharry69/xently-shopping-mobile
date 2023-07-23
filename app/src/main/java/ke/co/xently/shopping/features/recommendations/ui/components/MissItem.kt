@@ -8,8 +8,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 import kotlin.random.Random
 
 

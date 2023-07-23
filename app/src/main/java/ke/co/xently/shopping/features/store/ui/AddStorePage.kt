@@ -36,11 +36,11 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.models.toLocation
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.ForegroundLocationTracker
 import ke.co.xently.shopping.features.locationtracker.LocalLocationPermissionsState
 import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.shopping.features.store.models.Store
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

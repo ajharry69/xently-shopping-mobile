@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.R
-import ke.co.xently.shopping.ui.theme.XentlyTheme
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 
 enum class RecommendationResponseSortBy(@StringRes val label: Int) {
     Default(R.string.xently_recommendation_Response_sort_by_default),

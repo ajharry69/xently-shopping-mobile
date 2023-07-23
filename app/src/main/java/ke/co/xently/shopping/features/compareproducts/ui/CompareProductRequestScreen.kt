@@ -66,7 +66,7 @@ import ke.co.xently.shopping.features.core.cleansedForNumberParsing
 import ke.co.xently.shopping.features.core.currencyNumberFormat
 import ke.co.xently.shopping.features.core.isRetryable
 import ke.co.xently.shopping.features.core.loadingIndicatorLabel
-import ke.co.xently.shopping.ui.theme.XentlyTheme
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 
 @Composable
 fun CompareProductsRequestScreen(

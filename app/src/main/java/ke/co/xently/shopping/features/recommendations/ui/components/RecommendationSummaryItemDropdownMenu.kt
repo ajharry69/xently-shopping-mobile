@@ -16,8 +16,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.shopping.R
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 
 @Composable
 fun RecommendationSummaryItemDropdownMenu(

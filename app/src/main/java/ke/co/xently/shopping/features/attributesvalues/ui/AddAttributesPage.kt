@@ -35,9 +35,9 @@ import ke.co.xently.shopping.features.attributesvalues.models.AttributeValue
 import ke.co.xently.shopping.features.core.javaLocale
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

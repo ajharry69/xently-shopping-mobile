@@ -60,9 +60,9 @@ import ke.co.xently.shopping.features.core.isRetryable
 import ke.co.xently.shopping.features.core.loadingIndicatorLabel
 import ke.co.xently.shopping.features.core.models.toLocation
 import ke.co.xently.shopping.features.core.ui.LabeledCheckbox
+import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.ForegroundLocationTracker
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
-import ke.co.xently.shopping.ui.theme.XentlyTheme
 
 @Composable
 fun RecommendationRequestScreen(
