@@ -83,6 +83,9 @@ jobs:
   instrumentation-test:
     runs-on: macos-latest
 
+    env:
+      NONINTERACTIVE=1
+
     strategy:
       matrix:
         api-level: [ 28, 29, 30, 31, 32, 33 ]
@@ -97,7 +100,7 @@ jobs:
 
       - name: Decrypting dependencies
         run: |
-          sudo apt update && sudo apt install -y git-crypt
+          brew update && brew install git-crypt
           echo "${{ secrets.GIT_CRYPT_KEY }}" | base64 -d > ./git-crypt-key
           git-crypt unlock ./git-crypt-key
           rm ./git-crypt-key
