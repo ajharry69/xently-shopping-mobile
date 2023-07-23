@@ -1,5 +1,6 @@
 *.iml
 .gradle
+git-crypt-key
 /local.properties
 /.idea/caches
 /.idea/libraries

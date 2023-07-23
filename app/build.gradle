@@ -2,6 +2,11 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
     id 'com.android.application'
+
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.firebase-perf'
+    id 'com.google.firebase.crashlytics'
+
     id 'org.jetbrains.kotlin.android'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'kotlin-parcelize'
@@ -92,6 +97,12 @@ dependencies {
     implementation "io.ktor:ktor-client-websockets:$ktor_version"
     implementation "io.ktor:ktor-client-logging:$ktor_version"
     implementation "ch.qos.logback:logback-classic:1.2.6"
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:32.2.0')
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-perf-ktx'
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
 

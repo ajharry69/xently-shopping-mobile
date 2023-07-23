@@ -2,11 +2,17 @@ package ke.co.xently.shopping
 
 import android.app.Application
 import android.util.Log
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
 @HiltAndroidApp
 class Xently : Application() {
+    companion object {
+        private val CRASHLYTICS_LOGGABLE_ERROR_TAGS = setOf(Log.ERROR, Log.ASSERT, Log.WARN)
+    }
+
     override fun onCreate() {
         super.onCreate()
         val tree = if (BuildConfig.DEBUG) {
@@ -18,13 +24,12 @@ class Xently : Application() {
         } else {
             object : Timber.Tree() {
                 override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-                    if (priority == Log.ERROR || priority == Log.WARN) {
-                        /*t?.also(Firebase.crashlytics::recordException)
+                    if (priority in CRASHLYTICS_LOGGABLE_ERROR_TAGS) {
+                        t?.also(Firebase.crashlytics::recordException)
                             ?: tag?.also {
                                 Firebase.crashlytics.setCustomKey(it, message)
                             }
-                            ?: Firebase.crashlytics.log(message)*/
-                        TODO("Send to crashlytics")
+                            ?: Firebase.crashlytics.log(message)
                     }
                 }
             }
