@@ -83,9 +83,6 @@ jobs:
   instrumentation-test:
     runs-on: macos-latest
 
-    env:
-      NONINTERACTIVE=1
-
     strategy:
       matrix:
         api-level: [ 28, 29, 30, 31, 32, 33 ]
