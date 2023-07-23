@@ -56,3 +56,9 @@ gradle:
   - 'settings.gradle'
   - 'gradlew'
   - 'gradlew.bat'
+
+documentation:
+  - 'README.md'
+
+CI:
+  - '.github/workflows/'
