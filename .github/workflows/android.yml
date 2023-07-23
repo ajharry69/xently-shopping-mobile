@@ -76,7 +76,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 26 ]
+        api-level: [ 29 ]
         target: [ google_apis_playstore ]
         architecture: [ x86_64 ]
 
