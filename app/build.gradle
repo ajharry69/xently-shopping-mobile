@@ -40,6 +40,12 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
+            FirebasePerformance {
+                // Set this flag to 'false' to disable @AddTrace annotation processing and
+                // automatic monitoring of HTTP/S network requests
+                // for a specific build variant at compile time.
+                instrumentationEnabled false
+            }
         }
         alpha {
             applicationIdSuffix ".alpha"
