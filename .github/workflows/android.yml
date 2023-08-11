@@ -37,8 +37,8 @@ jobs:
         run: |
           cat > local.properties <<EOF
           MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
-          API_BASE_URL=https://shopping.xently.co.ke/api/
-          AUTO_COMPLETE_BASE_URL=wss://shopping.xently.co.ke/
+          DEBUG_API_BASE_URL=http://localhost/api/
+          DEBUG_WEB_SOCKET_BASE_URL=ws://localhost/
           EOF
 
       - name: Run build
@@ -74,8 +74,8 @@ jobs:
         run: |
           cat > local.properties <<EOF
           MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
-          API_BASE_URL=https://shopping.xently.co.ke/api/
-          AUTO_COMPLETE_BASE_URL=wss://shopping.xently.co.ke/
+          DEBUG_API_BASE_URL=http://localhost/api/
+          DEBUG_WEB_SOCKET_BASE_URL=ws://localhost/
           EOF
       - name: Run tests
         run: ./gradlew test
@@ -116,8 +116,8 @@ jobs:
         run: |
           cat > local.properties <<EOF
           MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
-          API_BASE_URL=https://shopping.xently.co.ke/api/
-          AUTO_COMPLETE_BASE_URL=wss://shopping.xently.co.ke/
+          DEBUG_API_BASE_URL=http://localhost/api/
+          DEBUG_WEB_SOCKET_BASE_URL=ws://localhost/
           EOF
 
       - name: AVD cache

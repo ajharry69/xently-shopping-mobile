@@ -8,7 +8,7 @@ import io.ktor.http.cio.websocket.WebSocketSession
 import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readText
 import io.ktor.http.cio.websocket.send
-import ke.co.xently.shopping.BuildConfig
+import ke.co.xently.shopping.BaseURL
 import ke.co.xently.shopping.remotedatasource.exceptions.WebsocketConnectionFailedException
 import ke.co.xently.shopping.remotedatasource.exceptions.WebsocketException
 import kotlinx.coroutines.delay
@@ -43,7 +43,7 @@ open class WebsocketAutoCompleteService<in Q>(
     }
 
     private val urlString: String = buildString {
-        append(BuildConfig.AUTO_COMPLETE_BASE_URL.removeSuffix("/"))
+        append(BaseURL.WEB_SOCKET.removeSuffix("/"))
         append('/')
         append(endpoint.removePrefix("/"))
     }

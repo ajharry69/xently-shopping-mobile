@@ -12,6 +12,7 @@ import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.Logging
 import io.ktor.client.features.websocket.WebSockets
+import ke.co.xently.shopping.BaseURL
 import ke.co.xently.shopping.BuildConfig
 import ke.co.xently.shopping.remotedatasource.Serialization
 import ke.co.xently.shopping.remotedatasource.di.qualifiers.CacheInterceptor
@@ -136,7 +137,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl(BuildConfig.API_BASE_URL)
+        .baseUrl(BaseURL.API)
         .addConverterFactory(GsonConverterFactory.create(Serialization.JSON_CONVERTER))
         .client(okHttpClient)
         .build()
