@@ -6,6 +6,7 @@ import ke.co.xently.shopping.features.authentication.models.ResetPasswordRequest
 import ke.co.xently.shopping.features.authentication.models.SignInRequest
 import ke.co.xently.shopping.features.authentication.models.SignUpRequest
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 sealed interface AuthenticationRepository {
@@ -34,7 +35,9 @@ sealed interface AuthenticationRepository {
 
     @Singleton
     class Actual @Inject constructor(
+        @Named("localAuthenticationDataSource")
         private val localDataSource: AuthenticationDataSource,
+        @Named("remoteAuthenticationDataSource")
         private val remoteDataSource: AuthenticationDataSource,
     ) : AuthenticationRepository {
         override suspend fun signUp(request: SignUpRequest): Result<Unit> {
