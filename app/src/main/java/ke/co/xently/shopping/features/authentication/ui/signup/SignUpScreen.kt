@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
@@ -93,11 +94,14 @@ private fun SignUpScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Sign up")
+                    Text(text = stringResource(R.string.xently_page_title_sign_up))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Navigate back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.xently_content_description_navigate_back_icon),
+                        )
                     }
                 },
             )
@@ -117,7 +121,7 @@ private fun SignUpScreen(
                     value = firstName,
                     onValueChange = { firstName = it },
                     label = {
-                        Text(text = "First name")
+                        Text(text = stringResource(R.string.xently_text_field_label_first_name))
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -128,7 +132,7 @@ private fun SignUpScreen(
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = {
-                        Text(text = "Last name")
+                        Text(text = stringResource(R.string.xently_text_field_label_last_name))
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -139,7 +143,7 @@ private fun SignUpScreen(
                     value = email,
                     onValueChange = { email = it },
                     label = {
-                        Text(text = "Email*")
+                        Text(text = stringResource(R.string.xently_text_field_label_email_required))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
@@ -150,7 +154,7 @@ private fun SignUpScreen(
                 }
                 PasswordTextField(
                     password = password,
-                    label = "Password*",
+                    label = stringResource(R.string.xently_text_field_label_password_required),
                     onValueChange = { password = it },
                 )
 
@@ -169,8 +173,9 @@ private fun SignUpScreen(
                     Text(
                         text = loadingIndicatorLabel(
                             loading = loading,
-                            label = "Sign up".toUpperCase(Locale.current),
-                            loadingLabelPrefix = "Signing up",
+                            label = stringResource(R.string.xently_page_title_sign_up)
+                                .toUpperCase(Locale.current),
+                            loadingLabelPrefix = stringResource(R.string.xently_button_label_sign_up_in_process),
                             keys = arrayOf(state),
                         ),
                     )

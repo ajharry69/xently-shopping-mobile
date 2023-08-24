@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
@@ -92,11 +93,14 @@ private fun RequestPasswordResetScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Request password reset")
+                    Text(text = stringResource(R.string.xently_page_title_request_password_reset))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Navigate back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.xently_content_description_navigate_back_icon),
+                        )
                     }
                 },
             )
@@ -116,7 +120,7 @@ private fun RequestPasswordResetScreen(
                     value = email,
                     onValueChange = { email = it },
                     label = {
-                        Text(text = "Email*")
+                        Text(text = stringResource(R.string.xently_text_field_label_email_required))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
@@ -133,8 +137,9 @@ private fun RequestPasswordResetScreen(
                     Text(
                         text = loadingIndicatorLabel(
                             loading = loading,
-                            label = "Request password reset".toUpperCase(Locale.current),
-                            loadingLabelPrefix = "Requesting password reset",
+                            label = stringResource(R.string.xently_page_title_request_password_reset)
+                                .toUpperCase(Locale.current),
+                            loadingLabelPrefix = stringResource(R.string.xently_button_label_request_password_reset_in_process),
                             keys = arrayOf(state),
                         ),
                     )

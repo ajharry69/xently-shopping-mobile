@@ -16,10 +16,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 
 @Composable
@@ -45,10 +47,13 @@ fun PasswordTextField(password: String, label: String, onValueChange: (String) -
                 if (isPasswordVisible) {
                     Icon(
                         Icons.Default.VisibilityOff,
-                        contentDescription = "Hide password",
+                        contentDescription = stringResource(R.string.xently_content_description_hide_password),
                     )
                 } else {
-                    Icon(Icons.Default.Visibility, contentDescription = "Show password")
+                    Icon(
+                        Icons.Default.Visibility,
+                        contentDescription = stringResource(R.string.xently_content_description_show_password),
+                    )
                 }
             }
         },

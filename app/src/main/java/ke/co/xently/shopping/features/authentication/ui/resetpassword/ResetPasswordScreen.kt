@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
@@ -90,11 +91,14 @@ private fun ResetPasswordScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Reset password")
+                    Text(text = stringResource(R.string.xently_page_title_reset_password))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Navigate back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.xently_content_description_navigate_back_icon),
+                        )
                     }
                 },
             )
@@ -112,7 +116,7 @@ private fun ResetPasswordScreen(
                 }
                 PasswordTextField(
                     password = temporaryPassword,
-                    label = "Temporary password*",
+                    label = stringResource(R.string.xently_text_field_label_temporary_password_required),
                     onValueChange = { temporaryPassword = it },
                 )
 
@@ -121,7 +125,7 @@ private fun ResetPasswordScreen(
                 }
                 PasswordTextField(
                     password = newPassword,
-                    label = "New password*",
+                    label = stringResource(R.string.xently_text_field_label_new_password_required),
                     onValueChange = { newPassword = it },
                 )
 
@@ -138,8 +142,9 @@ private fun ResetPasswordScreen(
                     Text(
                         text = loadingIndicatorLabel(
                             loading = loading,
-                            label = "Reset password".toUpperCase(Locale.current),
-                            loadingLabelPrefix = "Resetting password",
+                            label = stringResource(R.string.xently_page_title_reset_password)
+                                .toUpperCase(Locale.current),
+                            loadingLabelPrefix = stringResource(R.string.xently_button_label_reset_password_in_process),
                             keys = arrayOf(state),
                         ),
                     )

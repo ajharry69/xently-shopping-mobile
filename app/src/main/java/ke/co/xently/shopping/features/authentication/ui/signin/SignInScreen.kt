@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
@@ -103,11 +104,14 @@ private fun SignInScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Sign in")
+                    Text(text = stringResource(R.string.xently_page_title_sign_in))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Navigate back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.xently_content_description_navigate_back_icon),
+                        )
                     }
                 },
             )
@@ -127,7 +131,7 @@ private fun SignInScreen(
                     value = email,
                     onValueChange = { email = it },
                     label = {
-                        Text(text = "Email*")
+                        Text(text = stringResource(R.string.xently_text_field_label_email_required))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
@@ -138,12 +142,12 @@ private fun SignInScreen(
                 }
                 PasswordTextField(
                     password = password,
-                    label = "Password*",
+                    label = stringResource(R.string.xently_text_field_label_password_required),
                     onValueChange = { password = it },
                 )
 
                 TextButton(onClick = forgotPassword, modifier = Modifier.align(Alignment.End)) {
-                    Text(text = "Forgot password?")
+                    Text(text = stringResource(R.string.xently_button_label_forgot_password))
                 }
 
                 Button(
@@ -157,8 +161,9 @@ private fun SignInScreen(
                     Text(
                         text = loadingIndicatorLabel(
                             loading = loading,
-                            label = "Sign in".toUpperCase(Locale.current),
-                            loadingLabelPrefix = "Signing in",
+                            label = stringResource(R.string.xently_page_title_sign_in)
+                                .toUpperCase(Locale.current),
+                            loadingLabelPrefix = stringResource(R.string.xently_button_label_sign_in_in_process),
                             keys = arrayOf(state),
                         ),
                     )
@@ -166,15 +171,15 @@ private fun SignInScreen(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Divider(modifier = Modifier.weight(1f))
-                    Text(text = "or", modifier = Modifier.padding(horizontal = 8.dp))
+                    Text(
+                        text = stringResource(R.string.xently_or),
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    )
                     Divider(modifier = Modifier.weight(1f))
                 }
 
-                TextButton(
-                    onClick = requestRegistration,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(text = "Sign up for a new account")
+                TextButton(onClick = requestRegistration, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = stringResource(R.string.xently_button_label_sign_in_register_new_account))
                 }
             }
         }
