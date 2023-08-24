@@ -106,6 +106,9 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor")
     implementation 'com.squareup.okio:okio:3.2.0'
 
+    // Navigation
+    implementation 'androidx.navigation:navigation-compose:2.6.0'
+
     // Room
     implementation "androidx.room:room-runtime:2.5.2"
     implementation "androidx.room:room-ktx:2.5.2"

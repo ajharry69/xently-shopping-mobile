@@ -16,6 +16,8 @@ import javax.inject.Singleton
 class LocalAuthenticationDataSource @Inject constructor(
     private val database: Database,
 ) : AuthenticationDataSource() {
+    override fun getCurrentlySignedInUser() = database.userDao.get()
+
     override suspend fun signUp(request: SignUpRequest): SignUpResponse {
         TODO("Not yet implemented")
     }

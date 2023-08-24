@@ -8,6 +8,7 @@ import java.time.Instant
 data class User(
     @PrimaryKey(autoGenerate = true)
     val uid: Int = -1,
+    val id: Long = -1,
     val firstName: String? = null,
     val lastName: String? = null,
     val token: String? = null,

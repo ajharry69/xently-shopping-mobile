@@ -5,17 +5,23 @@ import ke.co.xently.shopping.features.authentication.models.RequestPasswordReset
 import ke.co.xently.shopping.features.authentication.models.ResetPasswordRequest
 import ke.co.xently.shopping.features.authentication.models.SignInRequest
 import ke.co.xently.shopping.features.authentication.models.SignUpRequest
+import ke.co.xently.shopping.features.users.User
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
 sealed interface AuthenticationRepository {
+    fun getCurrentlySignedInUser(): Flow<User?>
     suspend fun signUp(request: SignUpRequest): Result<Unit>
     suspend fun signIn(request: SignInRequest): Result<Unit>
     suspend fun requestPasswordReset(request: RequestPasswordResetRequest): Result<Unit>
     suspend fun resetPassword(request: ResetPasswordRequest): Result<Unit>
 
     object Fake : AuthenticationRepository {
+        override fun getCurrentlySignedInUser() = emptyFlow<User>()
+
         override suspend fun signUp(request: SignUpRequest): Result<Unit> {
             return Result.success(Unit)
         }
@@ -40,6 +46,8 @@ sealed interface AuthenticationRepository {
         @Named("remoteAuthenticationDataSource")
         private val remoteDataSource: AuthenticationDataSource,
     ) : AuthenticationRepository {
+        override fun getCurrentlySignedInUser() = localDataSource.getCurrentlySignedInUser()
+
         override suspend fun signUp(request: SignUpRequest): Result<Unit> {
             return try {
                 remoteDataSource.signUp(request).let {

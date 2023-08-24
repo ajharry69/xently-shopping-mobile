@@ -8,8 +8,12 @@ import ke.co.xently.shopping.features.authentication.models.SignInRequest
 import ke.co.xently.shopping.features.authentication.models.SignInResponse
 import ke.co.xently.shopping.features.authentication.models.SignUpRequest
 import ke.co.xently.shopping.features.authentication.models.SignUpResponse
+import ke.co.xently.shopping.features.users.User
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 abstract class AuthenticationDataSource {
+    open fun getCurrentlySignedInUser(): Flow<User?> = emptyFlow()
     abstract suspend fun signUp(request: SignUpRequest): SignUpResponse
     open suspend fun saveSignUpResponse(response: SignUpResponse) {}
 

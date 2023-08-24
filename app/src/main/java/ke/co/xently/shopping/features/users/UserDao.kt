@@ -12,5 +12,5 @@ interface UserDao {
     suspend fun save(user: User)
 
     @Query("SELECT * FROM user LIMIT 1")
-    fun get(): Flow<User>
+    fun get(): Flow<User?>
 }

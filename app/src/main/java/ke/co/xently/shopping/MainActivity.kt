@@ -3,9 +3,18 @@ package ke.co.xently.shopping
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ke.co.xently.shopping.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
 import ke.co.xently.shopping.features.attributes.ui.LocalAttributeAutoCompleteService
@@ -24,7 +33,8 @@ import ke.co.xently.shopping.features.shop.datasources.remoteservices.ShopAutoCo
 import ke.co.xently.shopping.features.shop.ui.LocalShopAutoCompleteService
 import ke.co.xently.shopping.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.shopping.features.store.ui.LocalStoreAutoCompleteService
-import ke.co.xently.shopping.ui.MainUI
+import ke.co.xently.shopping.ui.NavigationRoute
+import ke.co.xently.shopping.ui.XentlyNavHost
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,9 +65,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             XentlyTheme {
                 val snackbarHostState = remember { SnackbarHostState() }
+                val navController = rememberNavController()
+
+                val viewModel = hiltViewModel<MainViewModel>()
+
+                val currentlySignInUser by viewModel.currentlySignInUser.collectAsState()
 
                 CompositionLocalProvider(
+                    LocalNavController provides navController,
                     LocalSnackbarHostState provides snackbarHostState,
+                    LocalCurrentlySignInUser provides currentlySignInUser,
                     LocalLocationPermissionsState provides LocationPermissionsState.CoarseAndFine,
                     LocalProductAutoCompleteService provides productAutoCompleteService,
                     LocalStoreAutoCompleteService provides storeAutoCompleteService,
@@ -67,7 +84,7 @@ class MainActivity : ComponentActivity() {
                     LocalAttributeAutoCompleteService provides attributeAutoCompleteService,
                     LocalAttributeValueAutoCompleteService provides attributeValueAutoCompleteService,
                 ) {
-                    MainUI()
+                    XentlyNavHost()
                 }
             }
         }
