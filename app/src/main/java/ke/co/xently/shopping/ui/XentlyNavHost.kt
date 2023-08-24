@@ -16,7 +16,12 @@ import ke.co.xently.shopping.features.authentication.ui.signup.SignUpScreen
 fun XentlyNavHost() {
     val navController = LocalNavController.current
     val onSuccess: () -> Unit by rememberUpdatedState {
-        navController.navigate(NavigationRoute.Main())
+        navController.navigate(NavigationRoute.Main()) {
+            launchSingleTop = true
+            popUpTo(NavigationRoute.Main()) {
+                inclusive = true
+            }
+        }
     }
 
     val onNavigateBack: () -> Unit by rememberUpdatedState {

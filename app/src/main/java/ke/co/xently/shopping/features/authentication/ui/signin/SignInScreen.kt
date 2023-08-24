@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
@@ -99,6 +101,9 @@ private fun SignInScreen(
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -143,12 +148,14 @@ private fun SignInScreen(
                     Text(text = stringResource(R.string.xently_button_label_forgot_password))
                 }
 
+                val focusManager = LocalFocusManager.current
                 Button(
                     enabled = !loading,
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         SignInRequest(email = email, password = password)
                             .let(signIn)
+                        focusManager.clearFocus()
                     },
                 ) {
                     Text(

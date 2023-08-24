@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.intl.Locale
@@ -89,6 +91,9 @@ private fun RequestPasswordResetScreen(
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -120,12 +125,14 @@ private fun RequestPasswordResetScreen(
                     email = it
                 }
 
+                val focusManager = LocalFocusManager.current
                 Button(
                     enabled = !loading,
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         RequestPasswordResetRequest(email = email)
                             .let(requestPasswordReset)
+                        focusManager.clearFocus()
                     },
                 ) {
                     Text(

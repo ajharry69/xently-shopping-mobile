@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -93,6 +95,9 @@ private fun SignUpScreen(
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -153,6 +158,7 @@ private fun SignUpScreen(
                     onValueChange = { password = it },
                 )
 
+                val focusManager = LocalFocusManager.current
                 Button(
                     enabled = !loading,
                     modifier = Modifier.fillMaxWidth(),
@@ -163,6 +169,7 @@ private fun SignUpScreen(
                             email = email,
                             password = password,
                         ).let(signUp)
+                        focusManager.clearFocus()
                     },
                 ) {
                     Text(
