@@ -12,8 +12,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,8 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.authentication.models.SignInRequest
+import ke.co.xently.shopping.features.authentication.ui.components.PasswordTextField
 import ke.co.xently.shopping.features.core.loadingIndicatorLabel
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 
@@ -135,43 +132,17 @@ private fun SignInScreen(
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 )
-                var isPasswordVisible by remember {
-                    mutableStateOf(false)
-                }
+
                 var password by remember {
                     mutableStateOf("")
                 }
-                TextField(
-                    value = password,
+                PasswordTextField(
+                    password = password,
+                    label = "Password*",
                     onValueChange = { password = it },
-                    label = {
-                        Text(text = "Password*")
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = if (isPasswordVisible) {
-                        VisualTransformation.None
-                    } else {
-                        PasswordVisualTransformation()
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                            if (isPasswordVisible) {
-                                Icon(
-                                    Icons.Default.VisibilityOff,
-                                    contentDescription = "Hide password",
-                                )
-                            } else {
-                                Icon(Icons.Default.Visibility, contentDescription = "Show password")
-                            }
-                        }
-                    },
                 )
 
-                TextButton(
-                    onClick = forgotPassword,
-                    modifier = Modifier.align(Alignment.End),
-                ) {
+                TextButton(onClick = forgotPassword, modifier = Modifier.align(Alignment.End)) {
                     Text(text = "Forgot password?")
                 }
 
