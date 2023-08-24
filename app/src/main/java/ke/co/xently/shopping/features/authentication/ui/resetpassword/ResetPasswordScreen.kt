@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,6 +109,7 @@ private fun ResetPasswordScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
@@ -116,6 +118,7 @@ private fun ResetPasswordScreen(
                 }
                 PasswordTextField(
                     password = temporaryPassword,
+                    imeAction = ImeAction.Next,
                     label = stringResource(R.string.xently_text_field_label_temporary_password_required),
                     onValueChange = { temporaryPassword = it },
                 )

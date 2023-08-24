@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -25,7 +26,12 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 
 @Composable
-fun PasswordTextField(password: String, label: String, onValueChange: (String) -> Unit) {
+fun PasswordTextField(
+    password: String,
+    label: String,
+    imeAction: ImeAction = ImeAction.Done,
+    onValueChange: (String) -> Unit,
+) {
     var isPasswordVisible by remember {
         mutableStateOf(false)
     }
@@ -41,7 +47,12 @@ fun PasswordTextField(password: String, label: String, onValueChange: (String) -
         } else {
             PasswordVisualTransformation()
         },
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = imeAction,
+            keyboardType = KeyboardType.Password,
+        ),
+        singleLine = true,
+        maxLines = 1,
         trailingIcon = {
             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                 if (isPasswordVisible) {

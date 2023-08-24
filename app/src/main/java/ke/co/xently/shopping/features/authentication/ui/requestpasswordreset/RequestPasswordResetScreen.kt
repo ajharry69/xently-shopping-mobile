@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -18,7 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.authentication.models.RequestPasswordResetRequest
+import ke.co.xently.shopping.features.authentication.ui.components.RequiredEmailTextField
 import ke.co.xently.shopping.features.core.loadingIndicatorLabel
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 
@@ -110,21 +109,16 @@ private fun RequestPasswordResetScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 var email by remember {
                     mutableStateOf("")
                 }
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = {
-                        Text(text = stringResource(R.string.xently_text_field_label_email_required))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                )
+                RequiredEmailTextField(email, imeAction = ImeAction.Done) {
+                    email = it
+                }
 
                 Button(
                     enabled = !loading,

@@ -31,7 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +42,7 @@ import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.authentication.models.SignUpRequest
 import ke.co.xently.shopping.features.authentication.ui.components.PasswordTextField
+import ke.co.xently.shopping.features.authentication.ui.components.RequiredEmailTextField
 import ke.co.xently.shopping.features.core.loadingIndicatorLabel
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 
@@ -111,43 +113,36 @@ private fun SignUpScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 var firstName by remember {
                     mutableStateOf("")
                 }
-                TextField(
-                    value = firstName,
-                    onValueChange = { firstName = it },
-                    label = {
-                        Text(text = stringResource(R.string.xently_text_field_label_first_name))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                NameTextField(
+                    name = firstName,
+                    label = stringResource(R.string.xently_text_field_label_first_name),
+                ) {
+                    firstName = it
+                }
+
                 var lastName by remember {
                     mutableStateOf("")
                 }
-                TextField(
-                    value = lastName,
-                    onValueChange = { lastName = it },
-                    label = {
-                        Text(text = stringResource(R.string.xently_text_field_label_last_name))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                NameTextField(
+                    name = lastName,
+                    label = stringResource(R.string.xently_text_field_label_last_name),
+                ) {
+                    lastName = it
+                }
+
                 var email by remember {
                     mutableStateOf("")
                 }
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = {
-                        Text(text = stringResource(R.string.xently_text_field_label_email_required))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                )
+                RequiredEmailTextField(email) {
+                    email = it
+                }
 
                 var password by remember {
                     mutableStateOf("")
@@ -183,6 +178,24 @@ private fun SignUpScreen(
             }
         }
     }
+}
+
+@Composable
+private fun NameTextField(name: String, label: String, onValueChange: (String) -> Unit) {
+    TextField(
+        value = name,
+        onValueChange = onValueChange,
+        label = {
+            Text(text = label)
+        },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Words,
+        ),
+        singleLine = true,
+        maxLines = 1,
+    )
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
