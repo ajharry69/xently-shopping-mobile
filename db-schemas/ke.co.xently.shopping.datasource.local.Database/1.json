@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6402f03e43e9959196f695202897442c",
+    "identityHash": "199f9681fb820c5661b60a5c69e7a59d",
     "entities": [
       {
         "tableName": "User",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `firstName` TEXT, `lastName` TEXT, `token` TEXT, `expiry` INTEGER NOT NULL, `expiryUnit` TEXT, `dateAddedEpochSecond` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `id` INTEGER NOT NULL, `firstName` TEXT, `lastName` TEXT, `token` TEXT, `expiry` INTEGER NOT NULL, `expiryUnit` TEXT, `dateAddedEpochSecond` INTEGER NOT NULL, PRIMARY KEY(`uid`))",
         "fields": [
           {
             "fieldPath": "uid",
@@ -58,7 +58,7 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
             "uid"
           ]
@@ -70,7 +70,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6402f03e43e9959196f695202897442c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '199f9681fb820c5661b60a5c69e7a59d')"
     ]
   }
 }

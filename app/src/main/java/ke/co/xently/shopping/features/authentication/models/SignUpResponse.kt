@@ -4,7 +4,7 @@ import ke.co.xently.shopping.features.users.User
 
 data class SignUpResponse(
     val token: String,
-    val expiry: Long = -1,
+    val expiry: Long = User.DEFAULT_EXPIRY,
     val expiryUnit: String? = null,
 ) {
     val user: User

@@ -49,4 +49,8 @@ class LocalAuthenticationDataSource @Inject constructor(
     override suspend fun saveResetPasswordResponse(response: ResetPasswordResponse) {
         database.userDao.save(response.user)
     }
+
+    override suspend fun deleteCurrentlySignedInUserOnSessionExpiration() {
+        database.userDao.deleteCurrentlySignedInUserOnSessionExpiration()
+    }
 }
