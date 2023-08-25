@@ -2,28 +2,91 @@ package ke.co.xently.shopping.features.recommendations.repositories
 
 import ke.co.xently.shopping.features.recommendations.datasources.RecommendationDataSource
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
+import ke.co.xently.shopping.features.recommendations.models.RecommendationResponse
+import ke.co.xently.shopping.features.recommendations.models.toLocalCache
+import ke.co.xently.shopping.features.recommendations.models.toViewModel
+import ke.co.xently.shopping.features.security.DataEncryption
+import ke.co.xently.shopping.features.store.models.Store
+import ke.co.xently.shopping.remotedatasource.Serialization
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.mapLatest
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 sealed interface RecommendationRepository {
-    suspend fun getRecommendations(request: Recommendation.Request): Result<List<Recommendation.Response>>
+    fun getLatestRecommendations(): Flow<RecommendationResponse.ViewModel?>
+    suspend fun requestRecommendations(request: Recommendation.Request): Result<Unit>
+    suspend fun getDecryptionCredentials(): Result<Unit>
 
     object Fake : RecommendationRepository {
-        override suspend fun getRecommendations(request: Recommendation.Request): Result<List<Recommendation.Response>> {
-            return Result.success(emptyList())
+        override fun getLatestRecommendations(): Flow<RecommendationResponse.ViewModel?> {
+            return emptyFlow()
+        }
+
+        override suspend fun requestRecommendations(request: Recommendation.Request): Result<Unit> {
+            return Result.success(Unit)
+        }
+
+        override suspend fun getDecryptionCredentials(): Result<Unit> {
+            return Result.success(Unit)
         }
     }
 
     @Singleton
     class Actual @Inject constructor(
-        private val remoteDataSource: RecommendationDataSource<Recommendation.Request, Recommendation.Response>,
+        @Named("remoteRecommendationDataSource")
+        private val remoteDataSource: RecommendationDataSource,
+        @Named("localRecommendationDataSource")
+        private val localDataSource: RecommendationDataSource,
     ) : RecommendationRepository {
-        override suspend fun getRecommendations(request: Recommendation.Request) = try {
-            remoteDataSource.getRecommendations(request).let {
-                Result.success(it)
+        override fun getLatestRecommendations(): Flow<RecommendationResponse.ViewModel?> {
+            return localDataSource.getLatestRecommendations().mapLatest { recommendationResponse ->
+                val decryptionCredentials =
+                    recommendationResponse?.toLocalCache()?.decryptionCredentials
+
+                recommendationResponse?.toViewModel()?.run {
+                    if (decryptionCredentials == null) {
+                        this
+                    } else {
+                        val recs = recommendations.map {
+                            val decryptedStoreJson = DataEncryption.decrypt(
+                                cipherText = it.encryptedStoreJson,
+                                key = DataEncryption.getKeyFromPassword(
+                                    password = decryptionCredentials.secretKeyPassword,
+                                    salt = "", // TODO: Replace with actual salt
+                                ),
+                                iv = DataEncryption.generateIv(decryptionCredentials.base64EncodedIVParameterSpec),
+                            )
+                            val store = Serialization.JSON_CONVERTER.fromJson(
+                                decryptedStoreJson,
+                                Store.LocalViewModel::class.java,
+                            )
+                            it.copy(store = store)
+                        }
+                        copy(recommendations = recs)
+                    }
+                }
             }
+        }
+
+        override suspend fun requestRecommendations(request: Recommendation.Request) = try {
+            val response = remoteDataSource.getRecommendations(request)
+            localDataSource.saveRecommendationResponse(response)
+            Result.success(Unit)
         } catch (ex: Exception) {
             Result.failure(ex)
+        }
+
+        override suspend fun getDecryptionCredentials(): Result<Unit> {
+            return try {
+                val requestId = localDataSource.getLatestUnprocessedRecommendationRequestId()
+                remoteDataSource.getDecryptionCredentials(requestId)
+                Result.success(Unit)
+            } catch (ex: Exception) {
+                Result.failure(ex)
+            }
         }
     }
 }

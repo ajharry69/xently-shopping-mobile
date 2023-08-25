@@ -93,7 +93,9 @@ sealed interface Recommendation {
 
     data class Response(
         val estimatedExpenditure: EstimatedExpenditure,
+        @SerializedName("redactedStore")
         val store: Store.LocalViewModel,
+        val encryptedStoreJson: String,
         val hit: Hit,
         val miss: Miss,
     ) : Recommendation {
@@ -226,6 +228,7 @@ sealed interface Recommendation {
             val default = Response(
                 estimatedExpenditure = EstimatedExpenditure.default,
                 store = Store.LocalViewModel.default,
+                encryptedStoreJson = "",
                 hit = Hit.default,
                 miss = Miss.default,
             )

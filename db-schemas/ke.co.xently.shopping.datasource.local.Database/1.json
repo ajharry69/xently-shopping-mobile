@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "199f9681fb820c5661b60a5c69e7a59d",
+    "identityHash": "452cd37668aee4547dc300e15b066230",
     "entities": [
       {
         "tableName": "User",
@@ -65,12 +65,68 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "recommendations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`requestId` INTEGER NOT NULL, `serviceCharge` REAL NOT NULL, `recommendationsJson` TEXT NOT NULL, `dateAddedEpochSeconds` INTEGER NOT NULL, `dateUpdatedEpochSeconds` INTEGER NOT NULL, `secretKeyPassword` TEXT, `base64EncodedIVParameterSpec` TEXT, PRIMARY KEY(`requestId`))",
+        "fields": [
+          {
+            "fieldPath": "requestId",
+            "columnName": "requestId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serviceCharge",
+            "columnName": "serviceCharge",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recommendationsJson",
+            "columnName": "recommendationsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateAddedEpochSeconds",
+            "columnName": "dateAddedEpochSeconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateUpdatedEpochSeconds",
+            "columnName": "dateUpdatedEpochSeconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "decryptionCredentials.secretKeyPassword",
+            "columnName": "secretKeyPassword",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "decryptionCredentials.base64EncodedIVParameterSpec",
+            "columnName": "base64EncodedIVParameterSpec",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "requestId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '199f9681fb820c5661b60a5c69e7a59d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '452cd37668aee4547dc300e15b066230')"
     ]
   }
 }

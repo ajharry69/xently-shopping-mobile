@@ -62,10 +62,10 @@ class RecommendationViewModel @Inject constructor(
         viewModelScope.launch {
             recommendationsStateChannel.send(State.Loading)
 
-            repository.getRecommendations(recommendationRequest.value.copy(currentLocation = location))
+            repository.requestRecommendations(recommendationRequest.value.copy(currentLocation = location))
                 .also { result ->
                     result.onSuccess {
-                        recommendationsStateChannel.send(State.Success(it))
+                        recommendationsStateChannel.send(State.Success)
                     }.onFailure {
                         Timber.tag(TAG).e(it, "getRecommendations: %s", it.localizedMessage)
                         recommendationsStateChannel.send(State.Failure(it))

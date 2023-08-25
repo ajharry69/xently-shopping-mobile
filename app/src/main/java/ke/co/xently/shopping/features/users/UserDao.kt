@@ -14,6 +14,9 @@ interface UserDao {
     @Query("SELECT * FROM user LIMIT 1")
     fun get(): Flow<User?>
 
+    @Query("SELECT token FROM user LIMIT 1")
+    suspend fun getAuthorizationToken(): String?
+
     @Query("DELETE FROM user") // We expect to have 1 record anyway
     fun deleteCurrentlySignedInUserOnSessionExpiration()
 }

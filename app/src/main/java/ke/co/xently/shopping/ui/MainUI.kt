@@ -147,6 +147,9 @@ fun MainUI() {
             stackOfBottomSheets.removeFirstOrNull() == null
         },
         onTabClicked = viewModel::saveCurrentlyActiveTab,
+        onRecommendationRequestSuccess = {
+            navController.navigate(NavigationRoute.Recommendations())
+        },
         navigateToStore = navigateToStore,
         visitOnlineStore = { response ->
             response.store.shop.ecommerceSiteUrl.takeIf { !it.isNullOrBlank() }?.also {
@@ -165,6 +168,7 @@ fun MainUI(
     selectedTab: HomeTab,
     bottomSheet: () -> BottomSheet,
     hideBottomSheet: () -> Boolean,
+    onRecommendationRequestSuccess: () -> Unit,
     onTabClicked: (HomeTab) -> Unit,
     navigateToStore: (Recommendation.Response) -> Unit,
     visitOnlineStore: (Recommendation.Response) -> Unit,
@@ -228,7 +232,7 @@ fun MainUI(
                     RecommendationRequestScreen(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = recommendationViewModel,
-                        bottomSheetPeek = updateBottomSheetPeek,
+                        onSuccess = onRecommendationRequestSuccess,
                     )
                 }
 
@@ -269,6 +273,7 @@ private fun MainUIPreview() {
             navigateToStore = {},
             visitOnlineStore = {},
             updateBottomSheetPeek = {},
+            onRecommendationRequestSuccess = {},
             productViewModel = ProductViewModel(
                 stateHandle = stateHandle,
                 productRepository = ProductRepository.Fake,

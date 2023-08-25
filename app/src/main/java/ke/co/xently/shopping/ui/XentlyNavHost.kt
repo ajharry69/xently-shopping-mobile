@@ -10,6 +10,8 @@ import ke.co.xently.shopping.features.authentication.ui.requestpasswordreset.Req
 import ke.co.xently.shopping.features.authentication.ui.resetpassword.ResetPasswordScreen
 import ke.co.xently.shopping.features.authentication.ui.signin.SignInScreen
 import ke.co.xently.shopping.features.authentication.ui.signup.SignUpScreen
+import ke.co.xently.shopping.features.collectpayments.ui.MpesaPaymentRequestScreen
+import java.math.BigDecimal
 
 
 @Composable
@@ -60,6 +62,30 @@ fun XentlyNavHost() {
             ResetPasswordScreen(
                 onSuccess = onSuccess,
                 onNavigateBack = onNavigateBack,
+            )
+        }
+
+        composable(NavigationRoute.Recommendations.route) {
+            val serviceCharge = it.arguments!!
+                .getString(NavigationRoute.CheckoutWithMpesa.Argument.ServiceCharge.name)
+            // TODO: Replace with RecommendationResponseScreen...
+            MpesaPaymentRequestScreen(
+                onSuccess = onSuccess,
+                onNavigateBack = onNavigateBack,
+                serviceCharge = BigDecimal(serviceCharge),
+            )
+        }
+
+        composable(
+            NavigationRoute.CheckoutWithMpesa.route,
+            arguments = NavigationRoute.CheckoutWithMpesa.Argument.arguments,
+        ) {
+            val serviceCharge = it.arguments!!
+                .getString(NavigationRoute.CheckoutWithMpesa.Argument.ServiceCharge.name)
+            MpesaPaymentRequestScreen(
+                onSuccess = onSuccess,
+                onNavigateBack = onNavigateBack,
+                serviceCharge = BigDecimal(serviceCharge),
             )
         }
     }
