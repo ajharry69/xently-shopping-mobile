@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.remotedatasource.services
+package ke.co.xently.shopping.datasource.remote.services
 
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.webSocketSession
@@ -9,8 +9,8 @@ import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readText
 import io.ktor.http.cio.websocket.send
 import ke.co.xently.shopping.BaseURL
-import ke.co.xently.shopping.remotedatasource.exceptions.WebsocketConnectionFailedException
-import ke.co.xently.shopping.remotedatasource.exceptions.WebsocketException
+import ke.co.xently.shopping.datasource.remote.exceptions.WebsocketConnectionFailedException
+import ke.co.xently.shopping.datasource.remote.exceptions.WebsocketException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

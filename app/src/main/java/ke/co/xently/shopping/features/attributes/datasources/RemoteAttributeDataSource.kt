@@ -2,7 +2,7 @@ package ke.co.xently.shopping.features.attributes.datasources
 
 import ke.co.xently.shopping.features.attributes.datasources.remoteservices.AttributeService
 import ke.co.xently.shopping.features.attributes.models.Attribute
-import ke.co.xently.shopping.remotedatasource.SendHttpRequest
+import ke.co.xently.shopping.datasource.remote.SendHttpRequest
 import javax.inject.Inject
 import javax.inject.Singleton
 

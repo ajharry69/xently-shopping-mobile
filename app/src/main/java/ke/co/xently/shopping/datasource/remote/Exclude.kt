@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.remotedatasource
+package ke.co.xently.shopping.datasource.remote
 
 @Retention(value = AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD)

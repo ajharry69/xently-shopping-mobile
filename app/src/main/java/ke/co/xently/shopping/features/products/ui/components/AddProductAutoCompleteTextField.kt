@@ -8,7 +8,7 @@ import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.AutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.products.ui.LocalAddProductStep
-import ke.co.xently.shopping.remotedatasource.services.AutoCompleteService
+import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 
 
 @Composable

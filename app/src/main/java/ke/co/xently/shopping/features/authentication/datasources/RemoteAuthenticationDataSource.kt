@@ -9,7 +9,7 @@ import ke.co.xently.shopping.features.authentication.models.SignInRequest
 import ke.co.xently.shopping.features.authentication.models.SignInResponse
 import ke.co.xently.shopping.features.authentication.models.SignUpRequest
 import ke.co.xently.shopping.features.authentication.models.SignUpResponse
-import ke.co.xently.shopping.remotedatasource.SendHttpRequest
+import ke.co.xently.shopping.datasource.remote.SendHttpRequest
 import java.util.Base64
 import javax.inject.Inject
 import javax.inject.Singleton

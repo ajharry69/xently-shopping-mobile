@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.remotedatasource.services
+package ke.co.xently.shopping.datasource.remote.services
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
