@@ -1,9 +1,12 @@
 package ke.co.xently.shopping.features.recommendations.models
 
-import com.google.gson.reflect.TypeToken
-import ke.co.xently.shopping.remotedatasource.Serialization
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
+@OptIn(ExperimentalSerializationApi::class)
 fun RecommendationResponse.toViewModel(): RecommendationResponse.ViewModel {
     return when (this) {
         is RecommendationResponse.ViewModel -> this
@@ -16,12 +19,11 @@ fun RecommendationResponse.toViewModel(): RecommendationResponse.ViewModel {
         }
 
         is RecommendationResponse.LocalCache -> {
-            val recommendations: List<Recommendation.Response> =
-                Serialization.JSON_CONVERTER.fromJson(
-                    recommendationsJson,
-                    object : TypeToken<List<Recommendation.Response>>() {
-                    }.type,
-                )
+            val json = Json {
+                ignoreUnknownKeys = true
+            }
+            val recommendations =
+                json.decodeFromString<List<Recommendation.Response>>(recommendationsJson)
             RecommendationResponse.ViewModel(
                 requestId = requestId,
                 serviceCharge = serviceCharge,
@@ -32,11 +34,15 @@ fun RecommendationResponse.toViewModel(): RecommendationResponse.ViewModel {
 }
 
 
+@OptIn(ExperimentalSerializationApi::class)
 fun RecommendationResponse.toLocalCache(): RecommendationResponse.LocalCache {
     return when (this) {
         is RecommendationResponse.LocalCache -> this
         is RecommendationResponse.ServerSide -> {
-            val recommendationsJson = Serialization.JSON_CONVERTER.toJson(recommendations)
+            val json = Json {
+                ignoreUnknownKeys = true
+            }
+            val recommendationsJson = json.encodeToString(recommendations)
             RecommendationResponse.LocalCache(
                 requestId = requestId,
                 serviceCharge = serviceCharge,
@@ -45,40 +51,15 @@ fun RecommendationResponse.toLocalCache(): RecommendationResponse.LocalCache {
         }
 
         is RecommendationResponse.ViewModel -> {
-            val recommendationsJson = Serialization.JSON_CONVERTER.toJson(recommendations)
+            val json = Json {
+                ignoreUnknownKeys = true
+            }
+            val recommendationsJson = json.encodeToString(recommendations)
             RecommendationResponse.LocalCache(
                 requestId = requestId,
                 serviceCharge = serviceCharge,
                 recommendationsJson = recommendationsJson,
             )
         }
-    }
-}
-
-fun RecommendationResponse.toServerSide(): RecommendationResponse.ServerSide {
-    return when (this) {
-        is RecommendationResponse.ServerSide -> this
-        is RecommendationResponse.ViewModel -> {
-            RecommendationResponse.ServerSide(
-                requestId = requestId,
-                serviceCharge = serviceCharge,
-                recommendations = recommendations,
-            )
-        }
-
-        is RecommendationResponse.LocalCache -> {
-            val recommendations: List<Recommendation.Response> =
-                Serialization.JSON_CONVERTER.fromJson(
-                    recommendationsJson,
-                    object : TypeToken<List<Recommendation.Response>>() {
-                    }.type,
-                )
-            RecommendationResponse.ServerSide(
-                requestId = requestId,
-                serviceCharge = serviceCharge,
-                recommendations = recommendations,
-            )
-        }
-
     }
 }

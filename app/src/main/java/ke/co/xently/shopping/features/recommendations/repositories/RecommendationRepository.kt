@@ -7,10 +7,12 @@ import ke.co.xently.shopping.features.recommendations.models.toLocalCache
 import ke.co.xently.shopping.features.recommendations.models.toViewModel
 import ke.co.xently.shopping.features.security.DataEncryption
 import ke.co.xently.shopping.features.store.models.Store
-import ke.co.xently.shopping.remotedatasource.Serialization
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -41,6 +43,7 @@ sealed interface RecommendationRepository {
         @Named("localRecommendationDataSource")
         private val localDataSource: RecommendationDataSource,
     ) : RecommendationRepository {
+        @OptIn(ExperimentalSerializationApi::class)
         override fun getLatestRecommendations(): Flow<RecommendationResponse.ViewModel?> {
             return localDataSource.getLatestRecommendations().mapLatest { recommendationResponse ->
                 val decryptionCredentials =
@@ -59,10 +62,11 @@ sealed interface RecommendationRepository {
                                 ),
                                 iv = DataEncryption.generateIv(decryptionCredentials.base64EncodedIVParameterSpec),
                             )
-                            val store = Serialization.JSON_CONVERTER.fromJson(
-                                decryptedStoreJson,
-                                Store.LocalViewModel::class.java,
-                            )
+                            val json = Json {
+                                ignoreUnknownKeys = true
+                            }
+                            val store =
+                                json.decodeFromString<Store.LocalViewModel>(decryptedStoreJson)
                             it.copy(store = store)
                         }
                         copy(recommendations = recs)

@@ -1,7 +1,6 @@
 package ke.co.xently.shopping.features.recommendations.ui
 
 import android.content.res.Configuration
-import android.icu.math.BigDecimal
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +39,7 @@ import ke.co.xently.shopping.features.recommendations.ui.components.HitItem
 import ke.co.xently.shopping.features.recommendations.ui.components.MissItem
 import ke.co.xently.shopping.features.recommendations.ui.components.RecommendationSummaryItemDropdownMenu
 import ke.co.xently.shopping.features.recommendations.ui.components.StoreRecommendationSummaryItem
+import java.math.BigDecimal
 import kotlin.random.Random
 
 @Composable
@@ -72,7 +72,10 @@ fun RecommendationResponseDetailsScreen(
             }
         }
 
-        AnimatedContent(targetState = areHitsEmpty && areMissesEmpty) { areHitsAndMissesEmpty ->
+        AnimatedContent(
+            targetState = areHitsEmpty && areMissesEmpty,
+            label = "RecommendationDetailsAnimatedContent",
+        ) { areHitsAndMissesEmpty ->
             if (areHitsAndMissesEmpty) {
                 Box(modifier = Modifier.then(modifier), contentAlignment = Alignment.Center) {
                     Text(text = stringResource(R.string.xently_empty_recommendation_details))
@@ -111,7 +114,10 @@ private fun RecommendationSummaryItemTrailingContent(
     onNavigate: (Recommendation.Response) -> Unit,
     visitOnlineStore: (Recommendation.Response) -> Unit
 ) {
-    AnimatedContent(targetState = response.hasAnOnlineStore()) { hasAnOnlineStore ->
+    AnimatedContent(
+        targetState = response.hasAnOnlineStore(),
+        label = "TrailingContentAnimatedContent",
+    ) { hasAnOnlineStore ->
         if (hasAnOnlineStore) {
             var showComparisonListItemMenu by remember {
                 mutableStateOf(false)
@@ -187,8 +193,8 @@ private fun RecommendationResponseDetailsScreenPreview() {
                     )
                 },
                 estimatedExpenditure = Recommendation.Response.EstimatedExpenditure.default.copy(
-                    unit = Random.nextInt(1000, 5000),
-                    total = Random.nextInt(1500, 10000),
+                    unit = Random.nextDouble(1000.0, 5000.0),
+                    total = Random.nextDouble(1500.0, 10000.0),
                 ),
                 hit = Recommendation.Response.Hit.default.copy(count = Random.nextInt(5)).run {
                     val items = List(count) {

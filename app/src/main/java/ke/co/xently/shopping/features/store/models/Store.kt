@@ -46,6 +46,7 @@ sealed interface Store {
     ) : Store
 
     @Parcelize
+    @Serializable
     data class LocalViewModel(
         override val id: Long,
         override val name: String,
@@ -62,6 +63,13 @@ sealed interface Store {
                     append(context.numberFormat.format(it.roundToInt()))
                     append('m')
                 }
+            }
+        }
+
+        fun isRedacted(): Boolean {
+            return toString().let {
+                it.startsWith("xxx")
+                        && it.endsWith("xxx")
             }
         }
 

@@ -341,8 +341,8 @@ private fun RecommendationResponseScreenPreview() {
                         )
                     },
                     estimatedExpenditure = Recommendation.Response.EstimatedExpenditure.default.copy(
-                        unit = Random.nextInt(1000, 5000),
-                        total = Random.nextInt(1500, 10000),
+                        unit = Random.nextInt(1000, 5000).toDouble(),
+                        total = Random.nextInt(1500, 10000).toDouble(),
                     ),
                     hit = Recommendation.Response.Hit.default.copy(count = Random.nextInt(5)),
                     miss = Recommendation.Response.Miss.default.copy(count = Random.nextInt(3)),

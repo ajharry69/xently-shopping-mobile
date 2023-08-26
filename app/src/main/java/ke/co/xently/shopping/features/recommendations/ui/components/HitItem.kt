@@ -1,7 +1,6 @@
 package ke.co.xently.shopping.features.recommendations.ui.components
 
 import android.content.res.Configuration
-import android.icu.math.BigDecimal
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,11 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.currencyNumberFormat
-import ke.co.xently.shopping.features.core.toSystemDefaultZonedDateTime
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlin.random.Random
@@ -42,11 +40,10 @@ fun HitItem(item: Recommendation.Response.Hit.Item) {
                     text = stringResource(
                         R.string.xently_recommendation_response_approximate_unit_selling_price,
                         LocalContext.current.currencyNumberFormat.format(item.bestMatched.unitPrice),
-                        LocalDateTime.parse(
-                            item.bestMatched.latestDateOfPurchaseUTCString,
+                        OffsetDateTime.parse(
+                            item.bestMatched.latestDateOfPurchaseZonedDateTimeString,
                             Recommendation.Response.Hit.Item.BestMatched.LATEST_DATE_OF_PURCHASE_FORMAT,
-                        ).toSystemDefaultZonedDateTime(ZoneOffset.UTC)
-                            .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)),
+                        ).format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)),
                     ),
                 )
             }

@@ -15,7 +15,7 @@ interface RecommendationDao {
     @Query("SELECT * FROM recommendations ORDER BY requestId DESC")
     fun getLatestRecommendationResponse(): Flow<RecommendationResponse.LocalCache?>
 
-    @Query("SELECT requestId FROM recommendations")
+    @Query("SELECT requestId FROM recommendations ORDER BY requestId DESC LIMIT 1")
     suspend fun getLatestUnprocessedRecommendationRequestId(): Long
 
     @Query(
