@@ -30,7 +30,6 @@ sealed interface MpesaPaymentRepository {
                     request = request.copy(
                         recommendationRequestId = recommendationRequestId,
                     ),
-                    authorizationToken = localDataSource.getAuthorizationToken(),
                 )
                 Result.success(Unit)
             } catch (ex: Exception) {

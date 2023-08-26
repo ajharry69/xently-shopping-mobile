@@ -24,7 +24,7 @@ sealed class NavigationRoute(val route: String) {
         enum class Argument(
             val type: NavType<*>,
             val defaultValue: Any? = null,
-            val nullable: Boolean = false,
+            val nullable: Boolean = true,
         ) {
             ServiceCharge(NavType.StringType);
 
