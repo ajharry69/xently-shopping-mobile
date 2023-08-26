@@ -81,6 +81,7 @@ private fun MpesaPaymentRequestScreen(
     val loading by remember(state) {
         derivedStateOf {
             state is MpesaPaymentRequestState.Loading
+                    || state is MpesaPaymentRequestState.ConfirmingPayment
         }
     }
 
@@ -134,6 +135,8 @@ private fun MpesaPaymentRequestScreen(
                     style = MaterialTheme.typography.headlineSmall,
                 )
 
+                Text(text = stringResource(R.string.xently_checkout_mpesa_description))
+
                 var phoneNumber by rememberSaveable {
                     mutableStateOf("")
                 }
@@ -164,21 +167,30 @@ private fun MpesaPaymentRequestScreen(
                         focusManager.clearFocus()
                     },
                 ) {
-                    Text(
-                        text = loadingIndicatorLabel(
-                            loading = loading,
-                            label = stringResource(
-                                R.string.xently_pay,
-                                context.currencyNumberFormat
-                                    .format(serviceCharge)
-                                    .removeSuffix(".00"),
-                            ).toUpperCase(Locale.current),
-                            loadingLabelPrefix = stringResource(R.string.xently_button_label_payment_in_progress),
-                            keys = arrayOf(state),
-                        ),
-                    )
+                    if (state is MpesaPaymentRequestState.ConfirmingPayment) {
+                        Text(
+                            text = loadingIndicatorLabel(
+                                loading = loading,
+                                label = stringResource(R.string.xently_button_label_confirming_payment),
+                                keys = arrayOf(state),
+                            ),
+                        )
+                    } else {
+                        Text(
+                            text = loadingIndicatorLabel(
+                                loading = loading,
+                                label = stringResource(
+                                    R.string.xently_pay_service_charge,
+                                    context.currencyNumberFormat
+                                        .format(serviceCharge)
+                                        .removeSuffix(".00"),
+                                ).toUpperCase(Locale.current),
+                                loadingLabelPrefix = stringResource(R.string.xently_button_label_payment_in_progress),
+                                keys = arrayOf(state),
+                            ),
+                        )
+                    }
                 }
-
             }
         }
     }

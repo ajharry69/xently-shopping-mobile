@@ -180,7 +180,7 @@ private fun RecommendationResponseScreen(
                     text = {
                         Text(
                             text = stringResource(
-                                R.string.xently_fab_label_request_service_charge_payment,
+                                R.string.xently_pay_service_charge,
                                 context.currencyNumberFormat
                                     .format(state.data.serviceCharge)
                                     .removeSuffix(".00"),
