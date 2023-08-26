@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.ui
+package ke.co.xently.shopping
 
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
@@ -19,7 +19,7 @@ sealed class NavigationRoute(val route: String) {
     object RequestPasswordReset : NavigationRoute(route = "request-password-reset")
     object ResetPassword : NavigationRoute(route = "reset-password")
     object Recommendations : NavigationRoute(route = "recommendations")
-    object CheckoutWithMpesa :
+    object MpesaCheckout :
         NavigationRoute(route = "checkout-with-mpesa/{${Argument.ServiceCharge.name}}") {
         enum class Argument(
             val type: NavType<*>,

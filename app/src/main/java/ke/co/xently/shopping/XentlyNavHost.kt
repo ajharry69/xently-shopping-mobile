@@ -1,11 +1,10 @@
-package ke.co.xently.shopping.ui
+package ke.co.xently.shopping
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import ke.co.xently.shopping.LocalNavController
 import ke.co.xently.shopping.features.authentication.ui.requestpasswordreset.RequestPasswordResetScreen
 import ke.co.xently.shopping.features.authentication.ui.resetpassword.ResetPasswordScreen
 import ke.co.xently.shopping.features.authentication.ui.signin.SignInScreen
@@ -14,6 +13,7 @@ import ke.co.xently.shopping.features.collectpayments.ui.MpesaPaymentRequestScre
 import ke.co.xently.shopping.features.recommendations.ui.response.RecommendationResponseScreen
 import ke.co.xently.shopping.features.recommendations.ui.response.navigateToStore
 import ke.co.xently.shopping.features.recommendations.ui.response.visitOnlineStore
+import ke.co.xently.shopping.ui.MainUI
 import java.math.BigDecimal
 
 
@@ -73,17 +73,20 @@ fun XentlyNavHost() {
                 navigateToStore = navigateToStore(),
                 visitOnlineStore = visitOnlineStore(),
                 onNavigateBack = onNavigateBack,
+                onPaymentRequest = {
+                    navController.navigate(NavigationRoute.MpesaCheckout(NavigationRoute.MpesaCheckout.Argument.ServiceCharge.name to it))
+                },
             )
         }
 
         composable(
-            NavigationRoute.CheckoutWithMpesa.route,
-            arguments = NavigationRoute.CheckoutWithMpesa.Argument.arguments,
+            NavigationRoute.MpesaCheckout.route,
+            arguments = NavigationRoute.MpesaCheckout.Argument.arguments,
         ) {
             val serviceCharge = it.arguments!!
-                .getString(NavigationRoute.CheckoutWithMpesa.Argument.ServiceCharge.name)
+                .getString(NavigationRoute.MpesaCheckout.Argument.ServiceCharge.name)
             MpesaPaymentRequestScreen(
-                onSuccess = onSuccess,
+                onSuccess = onNavigateBack,
                 onNavigateBack = onNavigateBack,
                 serviceCharge = BigDecimal(serviceCharge),
             )

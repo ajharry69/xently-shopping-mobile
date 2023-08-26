@@ -80,6 +80,7 @@ fun RecommendationResponseScreen(
     viewModel: RecommendationResponseViewModel = hiltViewModel(),
     navigateToStore: (Recommendation.Response) -> Unit,
     visitOnlineStore: (Recommendation.Response) -> Unit,
+    onPaymentRequest: (serviceCharge: Number) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     val state by viewModel.stateFlow.collectAsState()
@@ -89,6 +90,7 @@ fun RecommendationResponseScreen(
         onNavigateBack = onNavigateBack,
         visitOnlineStore = visitOnlineStore,
         navigateToStore = navigateToStore,
+        onPaymentRequest = onPaymentRequest,
         changeSortParameter = viewModel::changeSortParameter,
     )
 }
@@ -101,6 +103,7 @@ private fun RecommendationResponseScreen(
     navigateToStore: (Recommendation.Response) -> Unit,
     visitOnlineStore: (Recommendation.Response) -> Unit,
     changeSortParameter: (SortParameter) -> Unit,
+    onPaymentRequest: (serviceCharge: Number) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     var showSortByDialog by rememberSaveable {
@@ -128,7 +131,6 @@ private fun RecommendationResponseScreen(
         }
     }
 
-    val onPaymentRequest: () -> Unit = {}
     val context = LocalContext.current
     val snackbarHostState = LocalSnackbarHostState.current
 
@@ -174,7 +176,7 @@ private fun RecommendationResponseScreen(
         floatingActionButton = {
             if (state is RecommendationResponseState.Success && !state.data.isPaid) {
                 ExtendedFloatingActionButton(
-                    onClick = onPaymentRequest,
+                    onClick = { onPaymentRequest(state.data.serviceCharge) },
                     text = {
                         Text(
                             text = stringResource(
@@ -258,7 +260,10 @@ private fun RecommendationResponseScreen(
                                     val onClick by rememberUpdatedState {
                                         showComparisonListItemMenu = !showComparisonListItemMenu
                                     }
-                                    AnimatedContent(showComparisonListItemMenu) {
+                                    AnimatedContent(
+                                        showComparisonListItemMenu,
+                                        label = "StoreAnimatedContent",
+                                    ) {
                                         if (it) {
                                             Icon(
                                                 Icons.Default.KeyboardArrowDown,
@@ -350,6 +355,7 @@ private fun RecommendationResponseScreenPreview() {
             visitOnlineStore = {},
             onNavigateBack = {},
             changeSortParameter = {},
+            onPaymentRequest = {},
             state = RecommendationResponseState.Success(
                 data = RecommendationResponse.ViewModel(
                     requestId = -1,

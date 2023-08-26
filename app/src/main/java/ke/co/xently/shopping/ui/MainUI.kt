@@ -42,6 +42,7 @@ import ke.co.xently.shopping.LocalCurrentlySignInUser
 import ke.co.xently.shopping.LocalNavController
 import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.MainViewModel
+import ke.co.xently.shopping.NavigationRoute
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.compareproducts.repositories.CompareProductRepository
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductViewModel

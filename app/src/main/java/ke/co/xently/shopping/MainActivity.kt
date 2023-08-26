@@ -31,7 +31,6 @@ import ke.co.xently.shopping.features.shop.datasources.remoteservices.ShopAutoCo
 import ke.co.xently.shopping.features.shop.ui.LocalShopAutoCompleteService
 import ke.co.xently.shopping.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.shopping.features.store.ui.LocalStoreAutoCompleteService
-import ke.co.xently.shopping.ui.XentlyNavHost
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
