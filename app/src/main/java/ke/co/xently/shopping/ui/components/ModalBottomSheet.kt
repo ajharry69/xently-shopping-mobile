@@ -19,9 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.BottomSheet
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductResponseScreen
-import ke.co.xently.shopping.features.recommendations.models.Recommendation
-import ke.co.xently.shopping.features.recommendations.ui.RecommendationResponseDetailsScreen
-import ke.co.xently.shopping.features.recommendations.ui.RecommendationResponseScreen
 import ke.co.xently.shopping.open
 import kotlinx.coroutines.launch
 
@@ -30,9 +27,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 fun ModalBottomSheet(
     bottomSheet: () -> BottomSheet,
-    navigateToStore: (Recommendation.Response) -> Unit,
-    visitOnlineStore: (Recommendation.Response) -> Unit,
-    updateBottomSheet: (BottomSheet) -> Unit,
     hideBottomSheet: () -> Boolean,
 ) {
     var openBottomSheet by rememberSaveable {
@@ -78,27 +72,6 @@ fun ModalBottomSheet(
                     CompareProductResponseScreen(
                         modifier = Modifier,
                         response = sheet.data,
-                    )
-                }
-
-                is BottomSheet.RecommendationResponse.Many -> {
-                    RecommendationResponseScreen(
-                        modifier = Modifier,
-                        responses = sheet.data,
-                        onNavigate = navigateToStore,
-                        visitOnlineStore = visitOnlineStore,
-                        onViewProduct = {
-                            updateBottomSheet(BottomSheet.RecommendationResponse.Single(it))
-                        },
-                    )
-                }
-
-                is BottomSheet.RecommendationResponse.Single -> {
-                    RecommendationResponseDetailsScreen(
-                        modifier = Modifier,
-                        response = sheet.data,
-                        onNavigate = navigateToStore,
-                        visitOnlineStore = visitOnlineStore,
                     )
                 }
             }

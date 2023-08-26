@@ -14,6 +14,7 @@ sealed interface RecommendationResponse {
         override val requestId: Long,
         override val serviceCharge: Double,
         val recommendations: List<Recommendation.Response>,
+        val isPaid: Boolean = false,
     ) : RecommendationResponse
 
     data class ServerSide(

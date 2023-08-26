@@ -1,8 +1,6 @@
 package ke.co.xently.shopping.ui
 
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,8 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -51,82 +47,29 @@ import ke.co.xently.shopping.features.compareproducts.repositories.CompareProduc
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductViewModel
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductsRequestScreen
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
-import ke.co.xently.shopping.features.core.visitUriPage
 import ke.co.xently.shopping.features.products.repositories.ProductRepository
 import ke.co.xently.shopping.features.products.ui.AddProductScreen
 import ke.co.xently.shopping.features.products.ui.ProductViewModel
-import ke.co.xently.shopping.features.recommendations.models.Recommendation
 import ke.co.xently.shopping.features.recommendations.repositories.RecommendationRepository
 import ke.co.xently.shopping.features.recommendations.ui.RecommendationRequestScreen
 import ke.co.xently.shopping.features.recommendations.ui.RecommendationViewModel
 import ke.co.xently.shopping.ui.components.ModalBottomSheet
-import kotlinx.coroutines.launch
-
-private const val TAG = "MainUI"
 
 @Composable
 fun MainUI() {
     val viewModel = hiltViewModel<MainViewModel>()
     val selectedTab by viewModel.currentlyActiveTab.collectAsState()
 
-    val scope = rememberCoroutineScope()
-
     val snackbarHostState = LocalSnackbarHostState.current
 
     val context = LocalContext.current
-    val navigateToStore: (Recommendation.Response) -> Unit by rememberUpdatedState { recommendation ->
-        val navigationQuery = recommendation.store.run {
-            location.let {
-                "${it.latitude},${it.longitude}"
-            }
-        }
-        val googleMapsPackageName = "com.google.android.apps.maps"
-        val uri = Uri.parse("google.navigation:q=$navigationQuery")
-        val mapIntent = Intent(Intent.ACTION_VIEW, uri)
-        if (mapIntent.resolveActivity(context.packageManager) == null) {
-            scope.launch {
-                val result = snackbarHostState.showSnackbar(
-                    context.getString(R.string.xently_error_navigation_app_not_found),
-                    actionLabel = context.getString(R.string.xently_install)
-                        .toUpperCase(Locale.current),
-                    duration = SnackbarDuration.Long,
-                )
-
-                if (result == SnackbarResult.ActionPerformed) {
-                    context.visitUriPage(
-                        "market://details?id=$googleMapsPackageName",
-                        logTag = TAG,
-                        onActivityNotFound = {
-                            context.visitUriPage(
-                                "https://play.google.com/store/apps/details?id=$googleMapsPackageName",
-                                logTag = TAG,
-                            )
-                        },
-                    )
-                }
-            }
-        } else {
-            mapIntent.run {
-                setPackage(googleMapsPackageName)
-                if (resolveActivity(context.packageManager) != null) {
-                    // Prefer Google Maps over other apps
-                    context.startActivity(this)
-                } else {
-                    context.startActivity(mapIntent)
-                }
-            }
-        }
-    }
-
-    val stackOfBottomSheets = remember {
-        mutableStateListOf<BottomSheet>()
-    }
 
     val navController = LocalNavController.current
 
     val user = LocalCurrentlySignInUser.current
+
     LaunchedEffect(user) {
-        if (user == null){
+        if (user == null) {
             val snackbarResult = snackbarHostState.showSnackbar(
                 message = context.getString(R.string.xently_notification_auth_session_expired),
                 actionLabel = context.getString(R.string.xently_page_title_sign_in)
@@ -140,22 +83,20 @@ fun MainUI() {
         }
     }
 
+    val stackOfBottomSheets = remember {
+        mutableStateListOf<BottomSheet>()
+    }
+
     MainUI(
         selectedTab = selectedTab,
         bottomSheet = { stackOfBottomSheets.firstOrNull() ?: BottomSheet.Ignore },
         hideBottomSheet = {
             stackOfBottomSheets.removeFirstOrNull() == null
         },
-        onTabClicked = viewModel::saveCurrentlyActiveTab,
         onRecommendationRequestSuccess = {
             navController.navigate(NavigationRoute.Recommendations())
         },
-        navigateToStore = navigateToStore,
-        visitOnlineStore = { response ->
-            response.store.shop.ecommerceSiteUrl.takeIf { !it.isNullOrBlank() }?.also {
-                context.visitUriPage(it.trim(), logTag = TAG)
-            }
-        },
+        onTabClicked = viewModel::saveCurrentlyActiveTab,
         updateBottomSheetPeek = {
             stackOfBottomSheets.add(0, it)
         },
@@ -170,8 +111,6 @@ fun MainUI(
     hideBottomSheet: () -> Boolean,
     onRecommendationRequestSuccess: () -> Unit,
     onTabClicked: (HomeTab) -> Unit,
-    navigateToStore: (Recommendation.Response) -> Unit,
-    visitOnlineStore: (Recommendation.Response) -> Unit,
     updateBottomSheetPeek: (BottomSheet) -> Unit,
     productViewModel: ProductViewModel = hiltViewModel(),
     recommendationViewModel: RecommendationViewModel = hiltViewModel(),
@@ -247,13 +186,7 @@ fun MainUI(
         }
     }
 
-    ModalBottomSheet(
-        bottomSheet = bottomSheet,
-        navigateToStore = navigateToStore,
-        hideBottomSheet = hideBottomSheet,
-        visitOnlineStore = visitOnlineStore,
-        updateBottomSheet = updateBottomSheetPeek,
-    )
+    ModalBottomSheet(bottomSheet = bottomSheet, hideBottomSheet = hideBottomSheet)
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -269,11 +202,9 @@ private fun MainUIPreview() {
             selectedTab = selectedTab,
             bottomSheet = { BottomSheet.Ignore },
             hideBottomSheet = { true },
-            onTabClicked = { selectedTab = it },
-            navigateToStore = {},
-            visitOnlineStore = {},
-            updateBottomSheetPeek = {},
             onRecommendationRequestSuccess = {},
+            onTabClicked = { selectedTab = it },
+            updateBottomSheetPeek = {},
             productViewModel = ProductViewModel(
                 stateHandle = stateHandle,
                 productRepository = ProductRepository.Fake,

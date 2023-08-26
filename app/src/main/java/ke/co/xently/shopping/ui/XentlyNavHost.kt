@@ -11,6 +11,9 @@ import ke.co.xently.shopping.features.authentication.ui.resetpassword.ResetPassw
 import ke.co.xently.shopping.features.authentication.ui.signin.SignInScreen
 import ke.co.xently.shopping.features.authentication.ui.signup.SignUpScreen
 import ke.co.xently.shopping.features.collectpayments.ui.MpesaPaymentRequestScreen
+import ke.co.xently.shopping.features.recommendations.ui.response.RecommendationResponseScreen
+import ke.co.xently.shopping.features.recommendations.ui.response.navigateToStore
+import ke.co.xently.shopping.features.recommendations.ui.response.visitOnlineStore
 import java.math.BigDecimal
 
 
@@ -66,13 +69,10 @@ fun XentlyNavHost() {
         }
 
         composable(NavigationRoute.Recommendations.route) {
-            val serviceCharge = it.arguments!!
-                .getString(NavigationRoute.CheckoutWithMpesa.Argument.ServiceCharge.name)
-            // TODO: Replace with RecommendationResponseScreen...
-            MpesaPaymentRequestScreen(
-                onSuccess = onSuccess,
+            RecommendationResponseScreen(
+                navigateToStore = navigateToStore(),
+                visitOnlineStore = visitOnlineStore(),
                 onNavigateBack = onNavigateBack,
-                serviceCharge = BigDecimal(serviceCharge),
             )
         }
 

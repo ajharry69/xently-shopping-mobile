@@ -148,5 +148,6 @@
     <string name="xently_page_sub_title_pay_with_mpesa">Pay with M-Pesa</string>
     <string name="xently_text_field_label_phone_number_required">Phone number*</string>
     <string name="xently_pay">Pay %1$s</string>
+    <string name="xently_fab_label_request_service_charge_payment">Pay %1$s service charge</string>
     <string name="xently_button_label_payment_in_progress">Requesting payment</string>
 </resources>
