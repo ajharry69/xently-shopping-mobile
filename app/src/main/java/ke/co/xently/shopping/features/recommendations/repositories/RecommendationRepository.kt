@@ -73,7 +73,7 @@ sealed interface RecommendationRepository {
                                 json.decodeFromString<Store.LocalViewModel>(decryptedStoreJson)
                             it.copy(store = store)
                         }
-                        copy(recommendations = recommendations)
+                        copy(recommendations = recommendations, isPaid = true)
                     }
                 }
             }

@@ -34,11 +34,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -150,8 +152,13 @@ private fun RecommendationResponseScreen(
         mutableStateOf(null)
     }
 
+    var openBottomSheet by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     val onViewProduct: (Recommendation.Response) -> Unit = {
         response = it
+        openBottomSheet = true
     }
 
     Scaffold(
@@ -303,10 +310,19 @@ private fun RecommendationResponseScreen(
         }
     }
 
-    if (response != null) {
+    val bottomSheetState = rememberModalBottomSheetState { sheetValue ->
+        when (sheetValue) {
+            SheetValue.Hidden -> true
+            SheetValue.Expanded -> true
+            SheetValue.PartiallyExpanded -> true
+        }
+    }
+
+    if (openBottomSheet) {
         ModalBottomSheet(
+            sheetState = bottomSheetState,
             onDismissRequest = {
-                response = null
+                openBottomSheet = false
             },
         ) {
             RecommendationResponseDetailsScreen(
