@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.R
@@ -40,14 +41,20 @@ fun StoreRecommendationSummaryItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                val isRedacted = response.store.isRedacted()
                 Text(
-                    text = if (response.store.isRedacted()) {
+                    text = if (isRedacted) {
                         stringResource(R.string.xently_text_label_store_name_redacted)
                     } else {
                         response.store.toString()
                     },
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
+                    textDecoration = if (isRedacted) {
+                        TextDecoration.LineThrough
+                    } else {
+                        null
+                    },
                 )
                 trailingContent?.invoke()
             }
