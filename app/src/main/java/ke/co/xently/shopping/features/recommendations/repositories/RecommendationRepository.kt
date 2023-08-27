@@ -51,7 +51,16 @@ sealed interface RecommendationRepository {
 
                 recommendationResponse?.toViewModel()?.run {
                     if (decryptionCredentials == null) {
-                        this
+                        val recommendations = buildList {
+                            for ((index, response) in recommendations.withIndex()) {
+                                // Redacted/placeholder stores have same IDs, this will cause
+                                // issues when rendered on the UI, therefore we need to replace
+                                // the default with auto-generated - built from response positions
+                                val newStoreId = (index + 1).toLong()
+                                add(response.copy(store = response.store.copy(id = newStoreId)))
+                            }
+                        }
+                        copy(recommendations = recommendations)
                     } else {
                         val base64EncodedIvParameterSpec =
                             decryptionCredentials.base64EncodedIVParameterSpec
