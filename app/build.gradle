@@ -142,3 +142,7 @@ dependencies {
 kapt {
     correctErrorTypes true
 }
+
+secrets {
+    defaultPropertiesFileName = "local.defaults.properties"
+}
