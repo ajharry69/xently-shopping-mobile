@@ -154,7 +154,7 @@ fun AddProductScreen(
                         product.copy(
                             name = productViewModel.name,
                             brands = productViewModel.brands,
-                            attributes = productViewModel.attributes,
+                            attributeValues = productViewModel.attributeValues,
                             measurementUnit = productViewModel.measurementUnit,
                             measurementUnitQuantity = productViewModel.measurementUnitQuantity,
                             autoFillNamePlural = productViewModel.autoFillNamePlural,
@@ -181,7 +181,7 @@ fun AddProductScreen(
                         product.copy(
                             name = productViewModel.name,
                             brands = productViewModel.brands,
-                            attributes = productViewModel.attributes,
+                            attributeValues = productViewModel.attributeValues,
                             measurementUnit = productViewModel.measurementUnit,
                             measurementUnitQuantity = productViewModel.measurementUnitQuantity,
                             autoFillMeasurementUnitNamePlural = productViewModel.autoFillMeasurementUnitNamePlural,
@@ -236,11 +236,11 @@ fun AddProductScreen(
 
                 AddProductStep.Attributes -> {
                     val productDraft: (List<AttributeValue>) -> Product.LocalViewModel by rememberUpdatedState {
-                        product.copy(attributes = it.map(AttributeValue::toLocalViewModel))
+                        product.copy(attributeValues = it.map(AttributeValue::toLocalViewModel))
                     }
                     AddAttributesPage(
                         modifier = Modifier.fillMaxSize(),
-                        attributes = product.attributes,
+                        attributes = product.attributeValues,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)

@@ -266,7 +266,7 @@ private fun SummaryPage() {
                         Brand.LocalViewModel.default.copy(name = "Kabras"),
                         Brand.LocalViewModel.default.copy(name = "Techpak"),
                     ),
-                    attributes = listOf(AttributeValue.LocalViewModel.default.run {
+                    attributeValues = listOf(AttributeValue.LocalViewModel.default.run {
                         copy(
                             value = "Brown",
                             attribute = attribute.copy(name = "Kind")

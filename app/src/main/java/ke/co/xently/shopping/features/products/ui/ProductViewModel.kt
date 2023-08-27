@@ -89,7 +89,7 @@ class ProductViewModel @Inject constructor(
                             }
 
                             AddProductStep.Attributes -> {
-                                newDraftProduct = newDraftProduct.copy(attributes = it.attributes)
+                                newDraftProduct = newDraftProduct.copy(attributeValues = it.attributeValues)
                             }
 
                             AddProductStep.Summary -> {
