@@ -12,9 +12,7 @@ import ke.co.xently.shopping.features.store.models.Store
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import java.math.BigDecimal
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -116,7 +114,7 @@ sealed interface Product {
     ) : Product {
         companion object {
             val DATE_TIME_PURCHASED_FORMAT: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmXXX")
         }
     }
 
@@ -137,7 +135,7 @@ sealed interface Product {
     ) : Product {
         companion object {
             val DATE_TIME_PURCHASED_FORMAT: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmXXX")
         }
     }
 
@@ -152,7 +150,7 @@ sealed interface Product {
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalEntityRequest>,
         override val attributeValues: List<AttributeValue.LocalEntityRequest>,
-        val datePurchased: LocalDateTime,
+        val datePurchased: OffsetDateTime,
     ) : Product
 
     data class LocalEntityResponse(
@@ -166,7 +164,7 @@ sealed interface Product {
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalEntityResponse>,
         override val attributeValues: List<AttributeValue.LocalEntityResponse>,
-        val datePurchased: LocalDateTime,
+        val datePurchased: OffsetDateTime,
     ) : Product
 
     @Parcelize
@@ -181,7 +179,7 @@ sealed interface Product {
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalViewModel>,
         override val attributeValues: List<AttributeValue.LocalViewModel>,
-        val datePurchased: LocalDateTime,
+        val datePurchased: OffsetDateTime,
         val autoFillNamePlural: Boolean = false,
         val autoFillMeasurementUnitNamePlural: Boolean = false,
         val autoFillMeasurementUnitSymbolPlural: Boolean = false,
@@ -196,7 +194,7 @@ sealed interface Product {
                 measurementUnit = null,
                 measurementUnitQuantity = 1f,
                 unitPrice = BigDecimal.ZERO,
-                datePurchased = LocalDateTime.now(),
+                datePurchased = OffsetDateTime.now(),
                 brands = emptyList(),
                 attributeValues = emptyList(),
             )
@@ -215,9 +213,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
-                        .withZoneSameInstant(ZoneOffset.UTC)
-                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
                     attributeValues = attributeValues.map { it.toRemoteRequest() },
                 )
@@ -233,9 +229,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
-                        .withZoneSameInstant(ZoneOffset.UTC)
-                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
                     attributeValues = attributeValues.map { it.toRemoteRequest() },
                 )
@@ -251,9 +245,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
-                        .withZoneSameInstant(ZoneOffset.UTC)
-                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
                     attributeValues = attributeValues.map { it.toRemoteRequest() },
                 )
@@ -403,7 +395,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalEntityRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteRequest.DATE_TIME_PURCHASED_FORMAT,
                     ),
@@ -422,7 +414,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalEntityRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteResponse.DATE_TIME_PURCHASED_FORMAT,
                     ),
@@ -482,7 +474,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalEntityResponse(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteRequest.DATE_TIME_PURCHASED_FORMAT,
                     ),
@@ -501,7 +493,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalEntityResponse(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteResponse.DATE_TIME_PURCHASED_FORMAT
                     ),
@@ -561,7 +553,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalViewModel(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteRequest.DATE_TIME_PURCHASED_FORMAT,
                     ),
@@ -580,7 +572,7 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalViewModel(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteResponse.DATE_TIME_PURCHASED_FORMAT,
                     ),
