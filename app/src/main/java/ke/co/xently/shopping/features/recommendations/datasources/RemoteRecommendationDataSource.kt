@@ -1,10 +1,10 @@
 package ke.co.xently.shopping.features.recommendations.datasources
 
+import ke.co.xently.shopping.datasource.remote.SendHttpRequest
 import ke.co.xently.shopping.features.recommendations.datasources.remoteservices.RecommendationService
 import ke.co.xently.shopping.features.recommendations.models.DecryptionCredentials
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
 import ke.co.xently.shopping.features.recommendations.models.RecommendationResponse
-import ke.co.xently.shopping.remotedatasource.SendHttpRequest
 
 class RemoteRecommendationDataSource(private val service: RecommendationService) :
     RecommendationDataSource() {

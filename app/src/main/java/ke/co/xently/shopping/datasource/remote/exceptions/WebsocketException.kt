@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.remotedatasource.exceptions
+package ke.co.xently.shopping.datasource.remote.exceptions
 
 open class WebsocketException : RuntimeException {
     constructor(message: String) : super(message)

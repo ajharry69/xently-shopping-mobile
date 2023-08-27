@@ -22,10 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.features.core.hasEmojis
 import ke.co.xently.shopping.features.core.ui.components.AutoCompleteSearchResults
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
-import ke.co.xently.shopping.remotedatasource.services.AutoCompleteService
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds

@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.remotedatasource
+package ke.co.xently.shopping.datasource.remote
 
 import retrofit2.Response
 import kotlin.reflect.KClass

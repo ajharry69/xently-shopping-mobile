@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.remotedatasource.di
+package ke.co.xently.shopping.datasource.remote.di
 
 import android.content.Context
 import dagger.Module
@@ -15,10 +15,10 @@ import io.ktor.client.features.websocket.WebSockets
 import ke.co.xently.shopping.BaseURL
 import ke.co.xently.shopping.BuildConfig
 import ke.co.xently.shopping.datasource.local.Database
-import ke.co.xently.shopping.remotedatasource.Serialization
-import ke.co.xently.shopping.remotedatasource.di.qualifiers.CacheInterceptor
-import ke.co.xently.shopping.remotedatasource.di.qualifiers.RequestHeadersInterceptor
-import ke.co.xently.shopping.remotedatasource.di.qualifiers.RequestQueriesInterceptor
+import ke.co.xently.shopping.datasource.remote.Serialization
+import ke.co.xently.shopping.datasource.remote.di.qualifiers.CacheInterceptor
+import ke.co.xently.shopping.datasource.remote.di.qualifiers.RequestHeadersInterceptor
+import ke.co.xently.shopping.datasource.remote.di.qualifiers.RequestQueriesInterceptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json

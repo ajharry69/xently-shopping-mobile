@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.remotedatasource.di.qualifiers
+package ke.co.xently.shopping.datasource.remote.di.qualifiers
 
 import javax.inject.Qualifier
 

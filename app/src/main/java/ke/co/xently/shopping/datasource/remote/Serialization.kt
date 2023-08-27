@@ -1,4 +1,4 @@
-package ke.co.xently.shopping.remotedatasource
+package ke.co.xently.shopping.datasource.remote
 
 import android.net.Uri
 import com.google.gson.ExclusionStrategy
@@ -9,10 +9,10 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import ke.co.xently.shopping.datasource.remote.Exclude.During.BOTH
+import ke.co.xently.shopping.datasource.remote.Exclude.During.DESERIALIZATION
+import ke.co.xently.shopping.datasource.remote.Exclude.During.SERIALIZATION
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
-import ke.co.xently.shopping.remotedatasource.Exclude.During.BOTH
-import ke.co.xently.shopping.remotedatasource.Exclude.During.DESERIALIZATION
-import ke.co.xently.shopping.remotedatasource.Exclude.During.SERIALIZATION
 import java.math.BigDecimal
 
 object Serialization {
