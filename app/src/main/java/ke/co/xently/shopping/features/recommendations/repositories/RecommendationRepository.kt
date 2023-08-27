@@ -53,14 +53,18 @@ sealed interface RecommendationRepository {
                     if (decryptionCredentials == null) {
                         this
                     } else {
-                        val recs = recommendations.map {
+                        val base64EncodedIvParameterSpec =
+                            decryptionCredentials.base64EncodedIVParameterSpec
+                        val secretKeyPassword = decryptionCredentials.secretKeyPassword
+                        val secretKeySalt = "${secretKeyPassword}:${base64EncodedIvParameterSpec}"
+                        val recommendations = recommendations.map {
                             val decryptedStoreJson = DataEncryption.decrypt(
                                 cipherText = it.encryptedStoreJson,
                                 key = DataEncryption.getKeyFromPassword(
-                                    password = decryptionCredentials.secretKeyPassword,
-                                    salt = "", // TODO: Replace with actual salt
+                                    password = secretKeyPassword,
+                                    salt = secretKeySalt,
                                 ),
-                                iv = DataEncryption.generateIv(decryptionCredentials.base64EncodedIVParameterSpec),
+                                iv = DataEncryption.generateIv(base64EncodedIvParameterSpec),
                             )
                             val json = Json {
                                 ignoreUnknownKeys = true
@@ -69,7 +73,7 @@ sealed interface RecommendationRepository {
                                 json.decodeFromString<Store.LocalViewModel>(decryptedStoreJson)
                             it.copy(store = store)
                         }
-                        copy(recommendations = recs)
+                        copy(recommendations = recommendations)
                     }
                 }
             }
@@ -86,7 +90,9 @@ sealed interface RecommendationRepository {
         override suspend fun getDecryptionCredentials(): Result<Unit> {
             return try {
                 val requestId = localDataSource.getLatestUnprocessedRecommendationRequestId()
-                remoteDataSource.getDecryptionCredentials(requestId)
+                remoteDataSource.getDecryptionCredentials(requestId).let {
+                    localDataSource.saveDecryptionCredentials(requestId, it)
+                }
                 Result.success(Unit)
             } catch (ex: Exception) {
                 Result.failure(ex)
