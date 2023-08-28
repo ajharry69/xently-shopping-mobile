@@ -18,6 +18,7 @@ import java.util.Locale
 
 sealed interface Product {
     val id: Long
+    val slug: String
     val name: ProductName
     val descriptiveName: String
     val store: Store
@@ -101,6 +102,7 @@ sealed interface Product {
 
     data class RemoteRequest(
         override val id: Long,
+       override val slug: String,
         override val name: ProductName.RemoteRequest,
         override val descriptiveName: String,
         override val store: Store.RemoteRequest,
@@ -121,6 +123,7 @@ sealed interface Product {
     @Serializable
     data class RemoteResponse(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.RemoteResponse,
         override val descriptiveName: String,
         override val store: Store.RemoteResponse,
@@ -135,12 +138,13 @@ sealed interface Product {
     ) : Product {
         companion object {
             val DATE_TIME_PURCHASED_FORMAT: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmXXX")
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
         }
     }
 
     data class LocalEntityRequest(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.LocalEntityRequest,
         override val descriptiveName: String,
         override val store: Store.LocalEntityRequest,
@@ -155,6 +159,7 @@ sealed interface Product {
 
     data class LocalEntityResponse(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.LocalEntityResponse,
         override val descriptiveName: String,
         override val store: Store.LocalEntityResponse,
@@ -170,6 +175,7 @@ sealed interface Product {
     @Parcelize
     data class LocalViewModel(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.LocalViewModel,
         override val descriptiveName: String,
         override val store: Store.LocalViewModel,
@@ -187,6 +193,7 @@ sealed interface Product {
         companion object {
             val default = LocalViewModel(
                 id = -1,
+                slug = "",
                 name = ProductName.LocalViewModel.default,
                 descriptiveName = "",
                 store = Store.LocalViewModel.default,
@@ -206,6 +213,7 @@ sealed interface Product {
             is LocalEntityRequest -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteRequest(),
@@ -222,6 +230,7 @@ sealed interface Product {
             is LocalEntityResponse -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteRequest(),
@@ -238,6 +247,7 @@ sealed interface Product {
             is LocalViewModel -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteRequest(),
@@ -258,6 +268,7 @@ sealed interface Product {
             is RemoteResponse -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteRequest(),
@@ -279,6 +290,7 @@ sealed interface Product {
             is LocalEntityRequest -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteResponse(),
@@ -295,6 +307,7 @@ sealed interface Product {
             is LocalEntityResponse -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteResponse(),
@@ -311,6 +324,7 @@ sealed interface Product {
             is LocalViewModel -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteResponse(),
@@ -327,6 +341,7 @@ sealed interface Product {
             is RemoteRequest -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteResponse(),
@@ -356,6 +371,7 @@ sealed interface Product {
             is LocalEntityResponse -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityRequest(),
@@ -372,6 +388,7 @@ sealed interface Product {
             is LocalViewModel -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityRequest(),
@@ -388,6 +405,7 @@ sealed interface Product {
             is RemoteRequest -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityRequest(),
@@ -407,6 +425,7 @@ sealed interface Product {
             is RemoteResponse -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityRequest(),
@@ -431,6 +450,7 @@ sealed interface Product {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityResponse(),
@@ -451,6 +471,7 @@ sealed interface Product {
             is LocalViewModel -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityResponse(),
@@ -467,6 +488,7 @@ sealed interface Product {
             is RemoteRequest -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityResponse(),
@@ -486,6 +508,7 @@ sealed interface Product {
             is RemoteResponse -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityResponse(),
@@ -510,6 +533,7 @@ sealed interface Product {
             is LocalEntityRequest -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalViewModel(),
@@ -526,6 +550,7 @@ sealed interface Product {
             is LocalEntityResponse -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalViewModel(),
@@ -546,6 +571,7 @@ sealed interface Product {
             is RemoteRequest -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalViewModel(),
@@ -565,6 +591,7 @@ sealed interface Product {
             is RemoteResponse -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalViewModel(),

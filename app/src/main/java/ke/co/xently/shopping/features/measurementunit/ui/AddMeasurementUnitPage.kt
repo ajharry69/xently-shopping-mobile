@@ -49,14 +49,11 @@ fun AddMeasurementUnitPage(
         query = product.measurementUnit?.name ?: ""
     )
 
-    var namePlural by remember(product.measurementUnit?.namePlural) {
-        mutableStateOf(TextFieldValue(product.measurementUnit?.namePlural ?: ""))
+    var namePlural by remember(product.measurementUnit?.plural) {
+        mutableStateOf(TextFieldValue(product.measurementUnit?.plural ?: ""))
     }
     var symbol by remember(product.measurementUnit?.symbol) {
         mutableStateOf(TextFieldValue(product.measurementUnit?.symbol ?: ""))
-    }
-    var symbolPlural by remember(product.measurementUnit?.symbolPlural) {
-        mutableStateOf(TextFieldValue(product.measurementUnit?.symbolPlural ?: ""))
     }
 
     var autoFillMeasurementUnitNamePlural by rememberSaveable(product.toLocalViewModel().autoFillMeasurementUnitNamePlural) {
@@ -77,29 +74,11 @@ fun AddMeasurementUnitPage(
         }
     }
 
-    var autoFillMeasurementUnitSymbolPlural by rememberSaveable(product.toLocalViewModel().autoFillMeasurementUnitSymbolPlural) {
-        mutableStateOf(product.toLocalViewModel().autoFillMeasurementUnitSymbolPlural)
-    }
-
-    LaunchedEffect(symbol.text) {
-        if (autoFillMeasurementUnitSymbolPlural) {
-            symbolPlural = if (symbol.text.isBlank()) {
-                TextFieldValue()
-            } else {
-                val plural = buildString {
-                    append(symbol.text.trim())
-                    append('s')
-                }
-                symbolPlural.copy(plural, selection = TextRange(plural.lastIndex))
-            }
-        }
-    }
-
     var uiState by remember {
         mutableStateOf<MeasurementUIState>(MeasurementUIState.OK)
     }
 
-    LaunchedEffect(unitQuantity.text, namePlural.text, symbol.text, symbolPlural.text) {
+    LaunchedEffect(unitQuantity.text, namePlural.text, symbol.text) {
         uiState = when {
             namePlural.text.hasEmojis -> {
                 MeasurementUIState.NamePluralError.ImojiNotAllowedError
@@ -107,10 +86,6 @@ fun AddMeasurementUnitPage(
 
             symbol.text.hasEmojis -> {
                 MeasurementUIState.SymbolError.ImojiNotAllowedError
-            }
-
-            symbolPlural.text.hasEmojis -> {
-                MeasurementUIState.SymbolPluralError.ImojiNotAllowedError
             }
 
             unitQuantity.text.isNotBlank() && unitQuantity.text.cleansedForNumberParsing()
@@ -147,11 +122,9 @@ fun AddMeasurementUnitPage(
                                 .cleansedForNumberParsing()
                                 .toFloatOrNull() ?: 1f,
                             measurementUnit = unit?.copy(
-                                namePlural = namePlural.text.trim().toLowerCase(Locale.current)
+                                plural = namePlural.text.trim().toLowerCase(Locale.current)
                                     .takeIf { it.isNotBlank() },
                                 symbol = symbol.text.trim().toLowerCase(Locale.current)
-                                    .takeIf { it.isNotBlank() },
-                                symbolPlural = symbolPlural.text.trim().toLowerCase(Locale.current)
                                     .takeIf { it.isNotBlank() },
                             ),
                         )
@@ -214,33 +187,6 @@ fun AddMeasurementUnitPage(
             modifier = Modifier.fillMaxWidth(),
             isError = uiState is MeasurementUIState.SymbolError,
             supportingText = if (uiState is MeasurementUIState.SymbolError) {
-                {
-                    Text(text = uiState(context = LocalContext.current))
-                }
-            } else null,
-        )
-
-        LabeledCheckbox(
-            checked = autoFillMeasurementUnitSymbolPlural,
-            onCheckedChange = { autoFillMeasurementUnitSymbolPlural = it },
-        ) {
-            Text(text = stringResource(R.string.xently_checkbox_label_autofill_unit_symbol_plural))
-        }
-
-        TextField(
-            value = symbolPlural,
-            onValueChange = {
-                symbolPlural = it
-                // When a name plural was manually set or edited, disable autofill plural
-                autoFillMeasurementUnitSymbolPlural = false
-            },
-            label = {
-                Text(stringResource(R.string.xently_text_field_label_symbol_plural))
-            },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            isError = uiState is MeasurementUIState.SymbolPluralError,
-            supportingText = if (uiState is MeasurementUIState.SymbolPluralError) {
                 {
                     Text(text = uiState(context = LocalContext.current))
                 }

@@ -11,6 +11,7 @@ import kotlin.math.roundToInt
 
 sealed interface Store {
     val id: Long
+    val slug: String
     val name: String
     val location: Location
     val shop: Shop
@@ -18,6 +19,7 @@ sealed interface Store {
 
     data class RemoteRequest(
         override val id: Long,
+        override val slug: String,
         override val name: String,
         override val location: Location,
         override val shop: Shop.RemoteRequest,
@@ -26,6 +28,7 @@ sealed interface Store {
     @Serializable
     data class RemoteResponse(
         override val id: Long,
+        override val slug: String,
         override val name: String,
         override val location: Location,
         override val shop: Shop.RemoteResponse,
@@ -33,6 +36,7 @@ sealed interface Store {
 
     data class LocalEntityRequest(
         override val id: Long,
+        override val slug: String,
         override val name: String,
         override val location: Location,
         override val shop: Shop.LocalEntityRequest,
@@ -40,6 +44,7 @@ sealed interface Store {
 
     data class LocalEntityResponse(
         override val id: Long,
+        override val slug: String,
         override val name: String,
         override val location: Location,
         override val shop: Shop.LocalEntityResponse,
@@ -49,6 +54,7 @@ sealed interface Store {
     @Serializable
     data class LocalViewModel(
         override val id: Long,
+        override val slug: String,
         override val name: String,
         override val location: Location,
         override val shop: Shop.LocalViewModel,
@@ -91,6 +97,7 @@ sealed interface Store {
         companion object {
             val default = LocalViewModel(
                 id = -1,
+                slug = "",
                 name = "",
                 location = Location.default,
                 shop = Shop.LocalViewModel.default,
@@ -104,6 +111,7 @@ sealed interface Store {
             is LocalEntityRequest -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toRemoteRequest(),
@@ -113,6 +121,7 @@ sealed interface Store {
             is LocalEntityResponse -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toRemoteRequest(),
@@ -122,6 +131,7 @@ sealed interface Store {
             is LocalViewModel -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toRemoteRequest(),
@@ -135,6 +145,7 @@ sealed interface Store {
             is RemoteResponse -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toRemoteRequest(),
@@ -149,6 +160,7 @@ sealed interface Store {
             is LocalEntityRequest -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toRemoteResponse(),
@@ -158,6 +170,7 @@ sealed interface Store {
             is LocalEntityResponse -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toRemoteResponse(),
@@ -167,6 +180,7 @@ sealed interface Store {
             is LocalViewModel -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toRemoteResponse(),
@@ -176,6 +190,7 @@ sealed interface Store {
             is RemoteRequest -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toRemoteResponse(),
@@ -198,6 +213,7 @@ sealed interface Store {
             is LocalEntityResponse -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalEntityRequest(),
@@ -207,6 +223,7 @@ sealed interface Store {
             is LocalViewModel -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalEntityRequest(),
@@ -216,6 +233,7 @@ sealed interface Store {
             is RemoteRequest -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalEntityRequest(),
@@ -225,6 +243,7 @@ sealed interface Store {
             is RemoteResponse -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalEntityRequest(),
@@ -239,6 +258,7 @@ sealed interface Store {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalEntityResponse(),
@@ -252,6 +272,7 @@ sealed interface Store {
             is LocalViewModel -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalEntityResponse(),
@@ -261,6 +282,7 @@ sealed interface Store {
             is RemoteRequest -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalEntityResponse(),
@@ -270,6 +292,7 @@ sealed interface Store {
             is RemoteResponse -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalEntityResponse(),
@@ -284,6 +307,7 @@ sealed interface Store {
             is LocalEntityRequest -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalViewModel(),
@@ -294,6 +318,7 @@ sealed interface Store {
             is LocalEntityResponse -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalViewModel(),
@@ -308,6 +333,7 @@ sealed interface Store {
             is RemoteRequest -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalViewModel(),
@@ -318,6 +344,7 @@ sealed interface Store {
             is RemoteResponse -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name,
                     location = location,
                     shop = shop.toLocalViewModel(),

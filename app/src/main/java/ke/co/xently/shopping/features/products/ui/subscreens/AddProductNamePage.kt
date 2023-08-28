@@ -54,8 +54,8 @@ fun AddProductNamePage(
         query = product.name.name
     )
 
-    var namePlural by remember(product.name.namePlural) {
-        mutableStateOf(TextFieldValue(product.name.namePlural ?: ""))
+    var namePlural by remember(product.name.plural) {
+        mutableStateOf(TextFieldValue(product.name.plural ?: ""))
     }
 
     var uiState by remember {
@@ -115,7 +115,7 @@ fun AddProductNamePage(
                             autoFillNamePlural = autoFillPlural,
                             name = name.copy(
                                 name = nameAutoCompleteState.query,
-                                namePlural = namePlural.text.takeIf { it.isNotBlank() },
+                                plural = namePlural.text.takeIf { it.isNotBlank() },
                             ),
                         )
                     }.let(onContinueClick)
