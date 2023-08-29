@@ -9,7 +9,7 @@
     <string name="xently_product_name_page_title">Name of product</string>
     <string name="xently_text_field_label_name_required">Name*</string>
     <string name="xently_text_field_label_name_plural">Name plural</string>
-    <string name="xently_measurement_unit_page_title">Measurement unit of product</string>
+    <string name="xently_measurement_unit_page_title">Measurement unit name</string>
     <string name="xently_text_field_label_symbol">Symbol</string>
     <string name="xently_text_field_label_symbol_plural">Symbol plural</string>
     <string name="xently_add_store_page_title">Store/branch</string>
@@ -21,7 +21,7 @@
     <string name="xently_search_bar_placeholder_name">Name</string>
     <string name="xently_add_store_page_sub_heading">Details of the store where the product belongs. For example, Sarit centre store belongs to Hotpoint.</string>
     <string name="xently_text_field_label_unit_quantity">Quantity</string>
-    <string name="xently_measurement_unit_page_sub_heading">A face-value unit that affects the price of a product. For example, a 21-inch TV should be less expensive compared to a 32-inch TV. The same applies to a 200-liter refrigerator and a 300-liter refrigerator.</string>
+    <string name="xently_measurement_unit_page_sub_heading">A face-value unit that affects the price of a product. For example, a good value would be 32 inch TV instead of 1 piece TV.</string>
     <string name="xently_text_field_label_pack_count">Pack count/size</string>
     <string name="xently_text_field_label_unit_price">Unit price</string>
     <string name="xently_content_description_pick_date_of_purchase">Pick date of purchase</string>
@@ -152,4 +152,5 @@
     <string name="xently_text_label_store_name_redacted">Please pay the service charge to view the store/shop name</string>
     <string name="xently_checkout_mpesa_description">Please share your M-Pesa phone number. We will send a payment request to that number, and you can complete the transaction with your M-Pesa PIN.</string>
     <string name="xently_button_label_confirming_payment">Confirming payment</string>
+    <string name="xently_measurement_unit_quantity_page_title">Measurement unit quantity</string>
 </resources>
