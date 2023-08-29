@@ -79,13 +79,14 @@ sealed interface Product {
             append(' ')
             context.currencyNumberFormat
                 .format(unitPrice)
+                .replace(".00", "")
                 .let(::append)
             append("/=")
             if (measurementUnit != null) {
                 append(' ')
                 append(context.getString(R.string.xently_description_per))
                 append(' ')
-                append(measurementUnitQuantity)
+                append(measurementUnitQuantity.toString().replace(".0", ""))
                 append("-")
                 append(measurementUnit!!.name.lowercase(locale))
             }
