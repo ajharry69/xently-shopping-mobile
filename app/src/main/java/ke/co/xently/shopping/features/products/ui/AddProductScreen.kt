@@ -25,7 +25,7 @@ import ke.co.xently.shopping.features.brands.ui.AddBrandsPage
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.LocalFlowOfSaveProductState
 import ke.co.xently.shopping.features.locationtracker.LocalFlowOfTraversedSteps
-import ke.co.xently.shopping.features.measurementunit.ui.AddMeasurementUnitPage
+import ke.co.xently.shopping.features.measurementunit.ui.AddMeasurementUnitNamePage
 import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.subscreens.AddGeneralDetailsPage
 import ke.co.xently.shopping.features.products.ui.subscreens.AddProductNamePage
@@ -107,7 +107,7 @@ fun AddProductScreen(
                 )
             }
         }
-        AnimatedContent(targetState = currentlyActiveStep) { step ->
+        AnimatedContent(targetState = currentlyActiveStep, label = "AddProductAnimatedContent") { step ->
             when (step) {
                 AddProductStep.Store -> {
                     val productDraft: (Store) -> Product.LocalViewModel by rememberUpdatedState {
@@ -188,7 +188,7 @@ fun AddProductScreen(
                             autoFillMeasurementUnitSymbolPlural = productViewModel.autoFillMeasurementUnitSymbolPlural,
                         )
                     }
-                    AddMeasurementUnitPage(
+                    AddMeasurementUnitNamePage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
                         onSuggestionSelected = {

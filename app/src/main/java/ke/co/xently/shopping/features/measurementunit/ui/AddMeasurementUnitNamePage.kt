@@ -35,7 +35,7 @@ import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 
 @Composable
-fun AddMeasurementUnitPage(
+fun AddMeasurementUnitNamePage(
     modifier: Modifier,
     product: Product,
     onSuggestionSelected: (MeasurementUnit) -> Unit,
@@ -215,9 +215,9 @@ fun AddMeasurementUnitPage(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-private fun AddMeasurementUnitPagePreview() {
+private fun AddMeasurementUnitNamePagePreview() {
     XentlyTheme {
-        AddMeasurementUnitPage(
+        AddMeasurementUnitNamePage(
             modifier = Modifier.fillMaxSize(),
             product = Product.LocalViewModel.default,
             onSuggestionSelected = {},
