@@ -28,7 +28,7 @@ sealed interface Product {
     // a 21-inch TV should be less expensive compared to a 32-inch TV. The
     // same apply to 200-liter refrigerator and a 300-liter refrigerator.
     val measurementUnit: MeasurementUnit?
-    val measurementUnitQuantity: Float
+    val measurementUnitQuantity: MeasurementUnitQuantity
     val unitPrice: BigDecimal
     val brands: List<Brand>
     val attributeValues: List<AttributeValue>
@@ -86,7 +86,7 @@ sealed interface Product {
                 append(' ')
                 append(context.getString(R.string.xently_description_per))
                 append(' ')
-                append(measurementUnitQuantity.toString().replace(".0", ""))
+                append(measurementUnitQuantity)
                 append("-")
                 append(measurementUnit!!.name.lowercase(locale))
             }
@@ -103,13 +103,13 @@ sealed interface Product {
 
     data class RemoteRequest(
         override val id: Long,
-       override val slug: String,
+        override val slug: String,
         override val name: ProductName.RemoteRequest,
         override val descriptiveName: String,
         override val store: Store.RemoteRequest,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.RemoteRequest?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.RemoteRequest>,
         override val attributeValues: List<AttributeValue.RemoteRequest>,
@@ -130,7 +130,7 @@ sealed interface Product {
         override val store: Store.RemoteResponse,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.RemoteResponse?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         @Serializable(with = BigDecimalSerializer::class)
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.RemoteResponse>,
@@ -151,7 +151,7 @@ sealed interface Product {
         override val store: Store.LocalEntityRequest,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.LocalEntityRequest?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalEntityRequest>,
         override val attributeValues: List<AttributeValue.LocalEntityRequest>,
@@ -166,7 +166,7 @@ sealed interface Product {
         override val store: Store.LocalEntityResponse,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.LocalEntityResponse?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalEntityResponse>,
         override val attributeValues: List<AttributeValue.LocalEntityResponse>,
@@ -182,7 +182,7 @@ sealed interface Product {
         override val store: Store.LocalViewModel,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.LocalViewModel?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalViewModel>,
         override val attributeValues: List<AttributeValue.LocalViewModel>,
@@ -200,7 +200,7 @@ sealed interface Product {
                 store = Store.LocalViewModel.default,
                 packCount = 1,
                 measurementUnit = null,
-                measurementUnitQuantity = 1f,
+                measurementUnitQuantity = MeasurementUnitQuantity.default,
                 unitPrice = BigDecimal.ZERO,
                 datePurchased = OffsetDateTime.now(),
                 brands = emptyList(),

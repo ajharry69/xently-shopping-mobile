@@ -20,7 +20,7 @@
     <string name="xently_search_bar_placeholder_value">Value</string>
     <string name="xently_search_bar_placeholder_name">Name</string>
     <string name="xently_add_store_page_sub_heading">Details of the store where the product belongs. For example, Sarit centre store belongs to Hotpoint.</string>
-    <string name="xently_text_field_label_unit_quantity">Quantity</string>
+    <string name="xently_text_field_label_unit_quantity_standalone">Standalone</string>
     <string name="xently_measurement_unit_page_sub_heading">A face-value unit that affects the price of a product. For example, a good value would be 32 inch TV instead of 1 piece TV.</string>
     <string name="xently_text_field_label_pack_count">Pack count/size</string>
     <string name="xently_text_field_label_unit_price">Unit price</string>
@@ -62,7 +62,10 @@
     <string name="xently_button_label_invalid_unit_price">Invalid unit price</string>
     <string name="xently_checkbox_label_autofill_unit_name_plural">Autofill unit name plural?</string>
     <string name="xently_checkbox_label_autofill_unit_symbol_plural">Autofill unit symbol plural?</string>
-    <string name="xently_button_label_invalid_unit_quantity">Please provide a valid unit quantity</string>
+    <string name="xently_button_label_invalid_standalone_unit_quantity">Please provide a valid standalone unit quantity</string>
+    <string name="xently_button_label_invalid_length_unit_quantity">Please provide a valid length unit quantity</string>
+    <string name="xently_button_label_invalid_width_unit_quantity">Please provide a valid width unit quantity</string>
+    <string name="xently_button_label_invalid_height_unit_quantity">Please provide a valid height unit quantity</string>
     <string name="xently_add_brands_page_sub_heading">A list of manufacturers of the product</string>
     <string name="xently_summary_page_title">Summary</string>
     <string name="xently_checkbox_label_reuse_shop">Reuse the shop?</string>
@@ -153,4 +156,7 @@
     <string name="xently_checkout_mpesa_description">Please share your M-Pesa phone number. We will send a payment request to that number, and you can complete the transaction with your M-Pesa PIN.</string>
     <string name="xently_button_label_confirming_payment">Confirming payment</string>
     <string name="xently_measurement_unit_quantity_page_title">Measurement unit quantity</string>
+    <string name="xently_text_field_label_unit_quantity_length">Length</string>
+    <string name="xently_text_field_label_unit_quantity_width">Width</string>
+    <string name="xently_text_field_label_unit_quantity_height">Height</string>
 </resources>

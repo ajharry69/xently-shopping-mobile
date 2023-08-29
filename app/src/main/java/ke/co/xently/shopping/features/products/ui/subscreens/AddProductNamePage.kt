@@ -24,23 +24,11 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.hasEmojis
 import ke.co.xently.shopping.features.core.ui.LabeledCheckbox
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
-import ke.co.xently.shopping.features.core.ui.UIState
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.LocalProductAutoCompleteService
 import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
-
-internal sealed class ProductNameUIState(message: Int) : UIState(message) {
-    object OK : ProductNameUIState(android.R.string.ok)
-
-    object MissingProductName :
-        ProductNameUIState(R.string.xently_button_label_missing_product_name)
-
-    sealed class NamePluralError(message: Int) : ProductNameUIState(message) {
-        object ImojisNotAllowed : NamePluralError(R.string.xently_error_imojis_not_allowed)
-    }
-}
 
 @Composable
 fun AddProductNamePage(

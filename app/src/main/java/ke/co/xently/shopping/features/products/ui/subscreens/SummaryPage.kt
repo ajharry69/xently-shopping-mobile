@@ -44,6 +44,7 @@ import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.LocalFlowOfSaveProductState
 import ke.co.xently.shopping.features.measurementunit.models.MeasurementUnit
+import ke.co.xently.shopping.features.products.models.MeasurementUnitQuantity
 import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.AddProductStep
 import ke.co.xently.shopping.features.products.ui.State
@@ -261,7 +262,7 @@ private fun SummaryPage() {
                         name = "Kilogram",
                     ),
                     unitPrice = BigDecimal("420"),
-                    measurementUnitQuantity = 2f,
+                    measurementUnitQuantity = MeasurementUnitQuantity.default.copy(standalone = 2f),
                     brands = listOf(
                         Brand.LocalViewModel.default.copy(name = "Kabras"),
                         Brand.LocalViewModel.default.copy(name = "Techpak"),
