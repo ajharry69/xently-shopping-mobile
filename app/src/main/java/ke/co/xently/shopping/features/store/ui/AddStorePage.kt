@@ -1,6 +1,7 @@
 package ke.co.xently.shopping.features.store.ui
 
 import android.content.res.Configuration
+import android.location.Location
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,7 +64,12 @@ fun AddStorePage(
         }
     }
 
+    var currentLocation: Location? by remember {
+        mutableStateOf(null)
+    }
+
     ForegroundLocationTracker(snackbarHostState = LocalSnackbarHostState.current) {
+        currentLocation = it
         if (!isLocationUsable) {
             location = it.toLocation()
         }
@@ -94,7 +100,9 @@ fun AddStorePage(
             service = LocalStoreAutoCompleteService.current,
             state = nameAutoCompleteState,
             onSearch = { query ->
-                Store.LocalViewModel.default.copy(name = query)
+                Store.LocalViewModel.default.run {
+                    copy(name = query, location = currentLocation?.toLocation() ?: this.location)
+                }
             },
             onSuggestionSelected = saveDraft,
             suggestionContent = { Text(text = it.toLocalViewModel().toString()) },

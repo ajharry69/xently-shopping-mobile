@@ -15,7 +15,21 @@ sealed interface StoreAutoCompleteService : AutoCompleteService<Store> {
     class Actual @Inject constructor(client: HttpClient) : WebsocketAutoCompleteService<Store>(
         client = client,
         endpoint = "search/suggest/stores",
-        queryString = Store::name,
+        queryString = { store ->
+            val query = store.name
+            if (query.isBlank()) {
+                ""
+            } else {
+                var latitude: Double? = null
+                var longitude: Double? = null
+                if (store.location.isUsable()) {
+                    latitude = store.location.latitude
+                    longitude = store.location.longitude
+                }
+                //language=JSON
+                """{"q": "$query","lat": $latitude,"lon": $longitude}"""
+            }
+        },
         mapResponse = { response ->
             decodeFromString<List<Store.RemoteResponse>>(response.json)
                 .map { it.toLocalViewModel() }
