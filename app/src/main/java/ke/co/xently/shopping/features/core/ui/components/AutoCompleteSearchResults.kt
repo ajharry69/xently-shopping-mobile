@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import ke.co.xently.shopping.features.core.ui.utils.CallOnLifecycleEvent
-import ke.co.xently.shopping.remotedatasource.services.AutoCompleteService
+import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber

@@ -123,4 +123,25 @@
     <string name="xently_text_field_help_text_attribute_name">E.g. feature</string>
     <string name="xently_text_field_help_text_attribute_value">E.g. oled</string>
     <string name="xently_error_imojis_not_allowed">Sorry, imojis are not allowed.</string>
+    <string name="xently_page_title_sign_up">Sign up</string>
+    <string name="xently_content_description_navigate_back_icon">Navigate back</string>
+    <string name="xently_text_field_label_first_name">First name</string>
+    <string name="xently_text_field_label_last_name">Last name</string>
+    <string name="xently_text_field_label_email_required">Email*</string>
+    <string name="xently_text_field_label_password_required">Password*</string>
+    <string name="xently_button_label_sign_up_in_process">Signing up</string>
+    <string name="xently_page_title_sign_in">Sign in</string>
+    <string name="xently_button_label_sign_in_in_process">Signing in</string>
+    <string name="xently_or">or</string>
+    <string name="xently_button_label_sign_in_register_new_account">Sign up for a new account</string>
+    <string name="xently_button_label_forgot_password">Forgot password?</string>
+    <string name="xently_content_description_hide_password">Hide password</string>
+    <string name="xently_content_description_show_password">Show password</string>
+    <string name="xently_page_title_reset_password">Reset password</string>
+    <string name="xently_button_label_reset_password_in_process">Resetting password</string>
+    <string name="xently_text_field_label_temporary_password_required">Temporary password*</string>
+    <string name="xently_text_field_label_new_password_required">New password*</string>
+    <string name="xently_page_title_request_password_reset">Request password reset</string>
+    <string name="xently_button_label_request_password_reset_in_process">Requesting password reset</string>
+    <string name="xently_notification_auth_session_expired">Session expired, please sign in</string>
 </resources>

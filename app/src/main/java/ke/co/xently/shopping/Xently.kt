@@ -2,15 +2,24 @@ package ke.co.xently.shopping
 
 import android.app.Application
 import android.util.Log
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltAndroidApp
-class Xently : Application() {
-    companion object {
-        private val CRASHLYTICS_LOGGABLE_ERROR_TAGS = setOf(Log.ERROR, Log.ASSERT, Log.WARN)
+class Xently : Application(), Configuration.Provider {
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
     }
 
     override fun onCreate() {
@@ -36,5 +45,9 @@ class Xently : Application() {
         }
 
         Timber.plant(tree)
+    }
+
+    companion object {
+        private val CRASHLYTICS_LOGGABLE_ERROR_TAGS = setOf(Log.ERROR, Log.ASSERT, Log.WARN)
     }
 }

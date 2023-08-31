@@ -19,6 +19,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -41,6 +42,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import ke.co.xently.shopping.BottomSheet
 import ke.co.xently.shopping.HomeTab
+import ke.co.xently.shopping.LocalCurrentlySignInUser
+import ke.co.xently.shopping.LocalNavController
 import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.MainViewModel
 import ke.co.xently.shopping.R
@@ -117,6 +120,24 @@ fun MainUI() {
 
     val stackOfBottomSheets = remember {
         mutableStateListOf<BottomSheet>()
+    }
+
+    val navController = LocalNavController.current
+
+    val user = LocalCurrentlySignInUser.current
+    LaunchedEffect(user) {
+        if (user == null){
+            val snackbarResult = snackbarHostState.showSnackbar(
+                message = context.getString(R.string.xently_notification_auth_session_expired),
+                actionLabel = context.getString(R.string.xently_page_title_sign_in)
+                    .toUpperCase(Locale.current),
+                duration = SnackbarDuration.Indefinite,
+            )
+
+            if (snackbarResult == SnackbarResult.ActionPerformed) {
+                navController.navigate(NavigationRoute.SignIn())
+            }
+        }
     }
 
     MainUI(

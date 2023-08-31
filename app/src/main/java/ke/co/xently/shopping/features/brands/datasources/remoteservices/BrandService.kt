@@ -2,7 +2,7 @@ package ke.co.xently.shopping.features.brands.datasources.remoteservices
 
 import ke.co.xently.shopping.features.brands.models.Brand
 import ke.co.xently.shopping.features.core.models.RemoteSearchResponse
-import ke.co.xently.shopping.remotedatasource.CacheControl
+import ke.co.xently.shopping.datasource.remote.CacheControl
 import retrofit2.Response
 import retrofit2.http.*
 
