@@ -72,7 +72,6 @@ fun <Q, R> AutoCompleteTextField(
     onSearch: (String) -> Q,
     onSuggestionSelected: (R) -> Unit,
     closeSessionKey: @Composable () -> Any = { true },
-    onSearchSuggestionSelected: () -> Unit = {},
     label: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
@@ -179,7 +178,6 @@ fun <Q, R> AutoCompleteTextField(
                     onSuggestionSelected(suggestion)
                     wasSuggestionSelected = true
                     searchActive = false
-                    onSearchSuggestionSelected()
                 },
             )
         }
@@ -208,7 +206,6 @@ private fun AutoCompleteTextFieldPreview() {
                 ),
                 onSearch = { "" },
                 onSuggestionSelected = {},
-                onSearchSuggestionSelected = {},
                 label = {
                     Text(text = "Search...")
                 },
