@@ -21,6 +21,7 @@ abstract class RecommendationDataSource {
     open suspend fun saveRecommendationResponse(response: RecommendationResponse) {
         TODO("Not implemented")
     }
+
     open suspend fun saveDecryptionCredentials(
         requestId: Long,
         credentials: DecryptionCredentials,

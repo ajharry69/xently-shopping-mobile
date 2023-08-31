@@ -24,6 +24,7 @@ object DatasourceModule {
             service = retrofit.create(RecommendationService::class.java),
         )
     }
+
     @Provides
     @Singleton
     @Named("localRecommendationDataSource")
