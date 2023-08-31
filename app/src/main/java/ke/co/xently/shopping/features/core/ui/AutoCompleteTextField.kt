@@ -178,6 +178,7 @@ fun <Q, R> AutoCompleteTextField(
                 modifier = Modifier.clickable {
                     onSuggestionSelected(suggestion)
                     wasSuggestionSelected = true
+                    searchActive = false
                     onSearchSuggestionSelected()
                 },
             )
