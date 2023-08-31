@@ -12,14 +12,13 @@ import ke.co.xently.shopping.features.store.models.Store
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import java.math.BigDecimal
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 sealed interface Product {
     val id: Long
+    val slug: String
     val name: ProductName
     val descriptiveName: String
     val store: Store
@@ -29,14 +28,14 @@ sealed interface Product {
     // a 21-inch TV should be less expensive compared to a 32-inch TV. The
     // same apply to 200-liter refrigerator and a 300-liter refrigerator.
     val measurementUnit: MeasurementUnit?
-    val measurementUnitQuantity: Float
+    val measurementUnitQuantity: MeasurementUnitQuantity
     val unitPrice: BigDecimal
     val brands: List<Brand>
-    val attributes: List<AttributeValue>
+    val attributeValues: List<AttributeValue>
 
     fun buildDescriptiveName(context: Context, locale: Locale): String {
         val descriptiveName = buildString {
-            attributes.map { it.value.lowercase(locale) }.sorted().also { attrs ->
+            attributeValues.map { it.value.lowercase(locale) }.sorted().also { attrs ->
                 if (attrs.isEmpty()) {
                     append(name.name.replaceFirstChar { it.uppercaseChar() })
                 } else {
@@ -80,6 +79,7 @@ sealed interface Product {
             append(' ')
             context.currencyNumberFormat
                 .format(unitPrice)
+                .replace(".00", "")
                 .let(::append)
             append("/=")
             if (measurementUnit != null) {
@@ -103,85 +103,90 @@ sealed interface Product {
 
     data class RemoteRequest(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.RemoteRequest,
         override val descriptiveName: String,
         override val store: Store.RemoteRequest,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.RemoteRequest?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.RemoteRequest>,
-        override val attributes: List<AttributeValue.RemoteRequest>,
+        override val attributeValues: List<AttributeValue.RemoteRequest>,
         val datePurchased: String,
     ) : Product {
         companion object {
             val DATE_TIME_PURCHASED_FORMAT: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmXXX")
         }
     }
 
     @Serializable
     data class RemoteResponse(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.RemoteResponse,
         override val descriptiveName: String,
         override val store: Store.RemoteResponse,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.RemoteResponse?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         @Serializable(with = BigDecimalSerializer::class)
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.RemoteResponse>,
-        override val attributes: List<AttributeValue.RemoteResponse>,
+        override val attributeValues: List<AttributeValue.RemoteResponse>,
         val datePurchased: String,
     ) : Product {
         companion object {
             val DATE_TIME_PURCHASED_FORMAT: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
         }
     }
 
     data class LocalEntityRequest(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.LocalEntityRequest,
         override val descriptiveName: String,
         override val store: Store.LocalEntityRequest,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.LocalEntityRequest?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalEntityRequest>,
-        override val attributes: List<AttributeValue.LocalEntityRequest>,
-        val datePurchased: LocalDateTime,
+        override val attributeValues: List<AttributeValue.LocalEntityRequest>,
+        val datePurchased: OffsetDateTime,
     ) : Product
 
     data class LocalEntityResponse(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.LocalEntityResponse,
         override val descriptiveName: String,
         override val store: Store.LocalEntityResponse,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.LocalEntityResponse?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalEntityResponse>,
-        override val attributes: List<AttributeValue.LocalEntityResponse>,
-        val datePurchased: LocalDateTime,
+        override val attributeValues: List<AttributeValue.LocalEntityResponse>,
+        val datePurchased: OffsetDateTime,
     ) : Product
 
     @Parcelize
     data class LocalViewModel(
         override val id: Long,
+        override val slug: String,
         override val name: ProductName.LocalViewModel,
         override val descriptiveName: String,
         override val store: Store.LocalViewModel,
         override val packCount: Int,
         override val measurementUnit: MeasurementUnit.LocalViewModel?,
-        override val measurementUnitQuantity: Float,
+        override val measurementUnitQuantity: MeasurementUnitQuantity,
         override val unitPrice: BigDecimal,
         override val brands: List<Brand.LocalViewModel>,
-        override val attributes: List<AttributeValue.LocalViewModel>,
-        val datePurchased: LocalDateTime,
+        override val attributeValues: List<AttributeValue.LocalViewModel>,
+        val datePurchased: OffsetDateTime,
         val autoFillNamePlural: Boolean = false,
         val autoFillMeasurementUnitNamePlural: Boolean = false,
         val autoFillMeasurementUnitSymbolPlural: Boolean = false,
@@ -189,16 +194,17 @@ sealed interface Product {
         companion object {
             val default = LocalViewModel(
                 id = -1,
+                slug = "",
                 name = ProductName.LocalViewModel.default,
                 descriptiveName = "",
                 store = Store.LocalViewModel.default,
                 packCount = 1,
                 measurementUnit = null,
-                measurementUnitQuantity = 1f,
+                measurementUnitQuantity = MeasurementUnitQuantity.default,
                 unitPrice = BigDecimal.ZERO,
-                datePurchased = LocalDateTime.now(),
+                datePurchased = OffsetDateTime.now(),
                 brands = emptyList(),
-                attributes = emptyList(),
+                attributeValues = emptyList(),
             )
         }
     }
@@ -208,6 +214,7 @@ sealed interface Product {
             is LocalEntityRequest -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteRequest(),
@@ -215,17 +222,16 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
-                        .withZoneSameInstant(ZoneOffset.UTC)
-                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
-                    attributes = attributes.map { it.toRemoteRequest() },
+                    attributeValues = attributeValues.map { it.toRemoteRequest() },
                 )
             }
 
             is LocalEntityResponse -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteRequest(),
@@ -233,17 +239,16 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
-                        .withZoneSameInstant(ZoneOffset.UTC)
-                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
-                    attributes = attributes.map { it.toRemoteRequest() },
+                    attributeValues = attributeValues.map { it.toRemoteRequest() },
                 )
             }
 
             is LocalViewModel -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteRequest(),
@@ -251,11 +256,9 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toRemoteRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = datePurchased.atZone(ZoneId.systemDefault())
-                        .withZoneSameInstant(ZoneOffset.UTC)
-                        .format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
+                    datePurchased = datePurchased.format(RemoteRequest.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteRequest() },
-                    attributes = attributes.map { it.toRemoteRequest() },
+                    attributeValues = attributeValues.map { it.toRemoteRequest() },
                 )
             }
 
@@ -266,6 +269,7 @@ sealed interface Product {
             is RemoteResponse -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteRequest(),
@@ -275,7 +279,7 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased,
                     brands = brands.map { it.toRemoteRequest() },
-                    attributes = attributes.map { it.toRemoteRequest() },
+                    attributeValues = attributeValues.map { it.toRemoteRequest() },
                 )
             }
         }
@@ -287,6 +291,7 @@ sealed interface Product {
             is LocalEntityRequest -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteResponse(),
@@ -296,13 +301,14 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased.format(RemoteResponse.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteResponse() },
-                    attributes = attributes.map { it.toRemoteResponse() },
+                    attributeValues = attributeValues.map { it.toRemoteResponse() },
                 )
             }
 
             is LocalEntityResponse -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteResponse(),
@@ -312,13 +318,14 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased.format(RemoteResponse.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteResponse() },
-                    attributes = attributes.map { it.toRemoteResponse() },
+                    attributeValues = attributeValues.map { it.toRemoteResponse() },
                 )
             }
 
             is LocalViewModel -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteResponse(),
@@ -328,13 +335,14 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased.format(RemoteResponse.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteResponse() },
-                    attributes = attributes.map { it.toRemoteResponse() },
+                    attributeValues = attributeValues.map { it.toRemoteResponse() },
                 )
             }
 
             is RemoteRequest -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toRemoteResponse(),
@@ -344,7 +352,7 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased.format(RemoteResponse.DATE_TIME_PURCHASED_FORMAT),
                     brands = brands.map { it.toRemoteResponse() },
-                    attributes = attributes.map { it.toRemoteResponse() },
+                    attributeValues = attributeValues.map { it.toRemoteResponse() },
                 )
             }
 
@@ -364,6 +372,7 @@ sealed interface Product {
             is LocalEntityResponse -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityRequest(),
@@ -373,13 +382,14 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased,
                     brands = brands.map { it.toLocalEntityRequest() },
-                    attributes = attributes.map { it.toLocalEntityRequest() },
+                    attributeValues = attributeValues.map { it.toLocalEntityRequest() },
                 )
             }
 
             is LocalViewModel -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityRequest(),
@@ -389,13 +399,14 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased,
                     brands = brands.map { it.toLocalEntityRequest() },
-                    attributes = attributes.map { it.toLocalEntityRequest() },
+                    attributeValues = attributeValues.map { it.toLocalEntityRequest() },
                 )
             }
 
             is RemoteRequest -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityRequest(),
@@ -403,18 +414,19 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalEntityRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteRequest.DATE_TIME_PURCHASED_FORMAT,
                     ),
                     brands = brands.map { it.toLocalEntityRequest() },
-                    attributes = attributes.map { it.toLocalEntityRequest() },
+                    attributeValues = attributeValues.map { it.toLocalEntityRequest() },
                 )
             }
 
             is RemoteResponse -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityRequest(),
@@ -422,12 +434,12 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalEntityRequest(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteResponse.DATE_TIME_PURCHASED_FORMAT,
                     ),
                     brands = brands.map { it.toLocalEntityRequest() },
-                    attributes = attributes.map { it.toLocalEntityRequest() },
+                    attributeValues = attributeValues.map { it.toLocalEntityRequest() },
                 )
             }
         }
@@ -439,6 +451,7 @@ sealed interface Product {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityResponse(),
@@ -448,7 +461,7 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased,
                     brands = brands.map { it.toLocalEntityResponse() },
-                    attributes = attributes.map { it.toLocalEntityResponse() },
+                    attributeValues = attributeValues.map { it.toLocalEntityResponse() },
                 )
             }
 
@@ -459,6 +472,7 @@ sealed interface Product {
             is LocalViewModel -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityResponse(),
@@ -468,13 +482,14 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased,
                     brands = brands.map { it.toLocalEntityResponse() },
-                    attributes = attributes.map { it.toLocalEntityResponse() },
+                    attributeValues = attributeValues.map { it.toLocalEntityResponse() },
                 )
             }
 
             is RemoteRequest -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityResponse(),
@@ -482,18 +497,19 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalEntityResponse(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteRequest.DATE_TIME_PURCHASED_FORMAT,
                     ),
                     brands = brands.map { it.toLocalEntityResponse() },
-                    attributes = attributes.map { it.toLocalEntityResponse() },
+                    attributeValues = attributeValues.map { it.toLocalEntityResponse() },
                 )
             }
 
             is RemoteResponse -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalEntityResponse(),
@@ -501,12 +517,12 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalEntityResponse(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteResponse.DATE_TIME_PURCHASED_FORMAT
                     ),
                     brands = brands.map { it.toLocalEntityResponse() },
-                    attributes = attributes.map { it.toLocalEntityResponse() },
+                    attributeValues = attributeValues.map { it.toLocalEntityResponse() },
                 )
             }
         }
@@ -518,6 +534,7 @@ sealed interface Product {
             is LocalEntityRequest -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalViewModel(),
@@ -527,13 +544,14 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased,
                     brands = brands.map { it.toLocalViewModel() },
-                    attributes = attributes.map { it.toLocalViewModel() },
+                    attributeValues = attributeValues.map { it.toLocalViewModel() },
                 )
             }
 
             is LocalEntityResponse -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalViewModel(),
@@ -543,7 +561,7 @@ sealed interface Product {
                     unitPrice = unitPrice,
                     datePurchased = datePurchased,
                     brands = brands.map { it.toLocalViewModel() },
-                    attributes = attributes.map { it.toLocalViewModel() },
+                    attributeValues = attributeValues.map { it.toLocalViewModel() },
                 )
             }
 
@@ -554,6 +572,7 @@ sealed interface Product {
             is RemoteRequest -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalViewModel(),
@@ -561,18 +580,19 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalViewModel(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteRequest.DATE_TIME_PURCHASED_FORMAT,
                     ),
                     brands = brands.map { it.toLocalViewModel() },
-                    attributes = attributes.map { it.toLocalViewModel() },
+                    attributeValues = attributeValues.map { it.toLocalViewModel() },
                 )
             }
 
             is RemoteResponse -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
                     store = store.toLocalViewModel(),
@@ -580,12 +600,12 @@ sealed interface Product {
                     measurementUnit = measurementUnit?.toLocalViewModel(),
                     measurementUnitQuantity = measurementUnitQuantity,
                     unitPrice = unitPrice,
-                    datePurchased = LocalDateTime.parse(
+                    datePurchased = OffsetDateTime.parse(
                         datePurchased,
                         RemoteResponse.DATE_TIME_PURCHASED_FORMAT,
                     ),
                     brands = brands.map { it.toLocalViewModel() },
-                    attributes = attributes.map { it.toLocalViewModel() },
+                    attributeValues = attributeValues.map { it.toLocalViewModel() },
                 )
             }
         }

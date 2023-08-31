@@ -77,9 +77,14 @@ class ProductViewModel @Inject constructor(
                                 )
                             }
 
-                            AddProductStep.MeasurementUnit -> {
+                            AddProductStep.MeasurementUnitName -> {
                                 newDraftProduct = newDraftProduct.copy(
                                     measurementUnit = it.measurementUnit,
+                                )
+                            }
+
+                            AddProductStep.MeasurementUnitQuantity -> {
+                                newDraftProduct = newDraftProduct.copy(
                                     measurementUnitQuantity = it.measurementUnitQuantity,
                                 )
                             }
@@ -89,7 +94,8 @@ class ProductViewModel @Inject constructor(
                             }
 
                             AddProductStep.Attributes -> {
-                                newDraftProduct = newDraftProduct.copy(attributes = it.attributes)
+                                newDraftProduct =
+                                    newDraftProduct.copy(attributeValues = it.attributeValues)
                             }
 
                             AddProductStep.Summary -> {

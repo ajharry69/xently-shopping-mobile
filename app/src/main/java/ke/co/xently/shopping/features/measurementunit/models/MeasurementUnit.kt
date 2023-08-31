@@ -1,52 +1,52 @@
 package ke.co.xently.shopping.features.measurementunit.models
 
 import android.os.Parcelable
-import ke.co.xently.shopping.features.core.models.IdNameSymbolAndPlural
+import ke.co.xently.shopping.features.core.models.SynonymStructure
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
-sealed interface MeasurementUnit : IdNameSymbolAndPlural {
+sealed interface MeasurementUnit : SynonymStructure {
 
     data class RemoteRequest(
         override val id: Long,
+        override val slug: String,
         override val name: String,
-        override val namePlural: String?,
+        override val plural: String?,
         override val symbol: String?,
-        override val symbolPlural: String?,
     ) : MeasurementUnit
 
     @Serializable
     data class RemoteResponse(
         override val id: Long,
+        override val slug: String,
         override val name: String,
-        override val namePlural: String?,
+        override val plural: String?,
         override val symbol: String?,
-        override val symbolPlural: String?,
     ) : MeasurementUnit
 
     data class LocalEntityRequest(
         override val id: Long,
+        override val slug: String,
         override val name: String,
-        override val namePlural: String?,
+        override val plural: String?,
         override val symbol: String?,
-        override val symbolPlural: String?,
     ) : MeasurementUnit
 
     data class LocalEntityResponse(
         override val id: Long,
+        override val slug: String,
         override val name: String,
-        override val namePlural: String?,
+        override val plural: String?,
         override val symbol: String?,
-        override val symbolPlural: String?,
     ) : MeasurementUnit
 
     @Parcelize
     data class LocalViewModel(
         override val id: Long,
+        override val slug: String,
         override val name: String,
-        override val namePlural: String?,
+        override val plural: String?,
         override val symbol: String?,
-        override val symbolPlural: String?,
     ) : MeasurementUnit, Parcelable {
         override fun toString(): String {
             return name
@@ -55,10 +55,10 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
         companion object {
             val default = LocalViewModel(
                 id = -1,
+                slug = "",
                 name = "",
-                namePlural = null,
+                plural = null,
                 symbol = null,
-                symbolPlural = null,
             )
         }
     }
@@ -68,30 +68,30 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
             is LocalEntityRequest -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is LocalEntityResponse -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is LocalViewModel -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
@@ -102,10 +102,10 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
             is RemoteResponse -> {
                 RemoteRequest(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
         }
@@ -117,40 +117,40 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
             is LocalEntityRequest -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is LocalEntityResponse -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is LocalViewModel -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is RemoteRequest -> {
                 RemoteResponse(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
@@ -170,40 +170,40 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
             is LocalEntityResponse -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is LocalViewModel -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is RemoteRequest -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is RemoteResponse -> {
                 LocalEntityRequest(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
         }
@@ -215,10 +215,10 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
@@ -229,30 +229,30 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
             is LocalViewModel -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is RemoteRequest -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is RemoteResponse -> {
                 LocalEntityResponse(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
         }
@@ -264,20 +264,20 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
             is LocalEntityRequest -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is LocalEntityResponse -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
@@ -288,20 +288,20 @@ sealed interface MeasurementUnit : IdNameSymbolAndPlural {
             is RemoteRequest -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
 
             is RemoteResponse -> {
                 LocalViewModel(
                     id = id,
+                    slug = slug,
                     name = name,
-                    namePlural = namePlural,
+                    plural = plural,
                     symbol = symbol,
-                    symbolPlural = symbolPlural,
                 )
             }
         }

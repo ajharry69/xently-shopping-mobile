@@ -8,7 +8,8 @@ enum class AddProductStep(@StringRes val title: Int) {
     Shop(R.string.xently_add_shop_page_title),
     ProductName(R.string.xently_product_name_page_title),
     GeneralDetails(R.string.xently_general_details_page_title),
-    MeasurementUnit(R.string.xently_measurement_unit_page_title),
+    MeasurementUnitName(R.string.xently_measurement_unit_page_title),
+    MeasurementUnitQuantity(R.string.xently_measurement_unit_quantity_page_title),
     Brands(R.string.xently_add_brands_page_title),
     Attributes(R.string.xently_add_attributes_page_title),
     Summary(R.string.xently_summary_page_title);

@@ -92,11 +92,11 @@ fun AddGeneralDetailsPage(
         try {
             ZoneOffset.from(product.datePurchased)
         } catch (ex: DateTimeException) {
-            ZoneOffset.ofHours(3)
+            ZoneOffset.ofHours(3)  // TODO: Get rid of zone offset completely
         }
     }
-    val datePurchasedEpochSeconds = remember(zoneOffset) {
-        product.datePurchased.toEpochSecond(zoneOffset)
+    val datePurchasedEpochSeconds = remember {
+        product.datePurchased.toEpochSecond()
     }
     var packCount by remember(product.packCount) {
         mutableStateOf(TextFieldValue(product.packCount.toString()))

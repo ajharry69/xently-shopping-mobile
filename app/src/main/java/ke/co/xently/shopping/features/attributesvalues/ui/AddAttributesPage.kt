@@ -246,7 +246,7 @@ private fun AddAttributesPagePreview() {
     XentlyTheme {
         AddAttributesPage(
             modifier = Modifier.fillMaxSize(),
-            attributes = Product.LocalViewModel.default.attributes,
+            attributes = Product.LocalViewModel.default.attributeValues,
             saveDraft = {},
             onPreviousClick = {},
         ) {}

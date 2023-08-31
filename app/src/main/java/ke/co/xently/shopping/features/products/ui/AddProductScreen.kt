@@ -25,7 +25,8 @@ import ke.co.xently.shopping.features.brands.ui.AddBrandsPage
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.LocalFlowOfSaveProductState
 import ke.co.xently.shopping.features.locationtracker.LocalFlowOfTraversedSteps
-import ke.co.xently.shopping.features.measurementunit.ui.AddMeasurementUnitPage
+import ke.co.xently.shopping.features.measurementunit.ui.AddMeasurementUnitNamePage
+import ke.co.xently.shopping.features.measurementunit.ui.AddMeasurementUnitQuantityPage
 import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.subscreens.AddGeneralDetailsPage
 import ke.co.xently.shopping.features.products.ui.subscreens.AddProductNamePage
@@ -107,7 +108,7 @@ fun AddProductScreen(
                 )
             }
         }
-        AnimatedContent(targetState = currentlyActiveStep) { step ->
+        AnimatedContent(targetState = currentlyActiveStep, label = "AddProductAnimatedContent") { step ->
             when (step) {
                 AddProductStep.Store -> {
                     val productDraft: (Store) -> Product.LocalViewModel by rememberUpdatedState {
@@ -154,7 +155,7 @@ fun AddProductScreen(
                         product.copy(
                             name = productViewModel.name,
                             brands = productViewModel.brands,
-                            attributes = productViewModel.attributes,
+                            attributeValues = productViewModel.attributeValues,
                             measurementUnit = productViewModel.measurementUnit,
                             measurementUnitQuantity = productViewModel.measurementUnitQuantity,
                             autoFillNamePlural = productViewModel.autoFillNamePlural,
@@ -175,26 +176,50 @@ fun AddProductScreen(
                     }
                 }
 
-                AddProductStep.MeasurementUnit -> {
+                AddProductStep.MeasurementUnitName -> {
                     val productDraft: (Product) -> Product.LocalViewModel by rememberUpdatedState {
                         val productViewModel = it.toLocalViewModel()
                         product.copy(
                             name = productViewModel.name,
                             brands = productViewModel.brands,
-                            attributes = productViewModel.attributes,
+                            attributeValues = productViewModel.attributeValues,
                             measurementUnit = productViewModel.measurementUnit,
                             measurementUnitQuantity = productViewModel.measurementUnitQuantity,
                             autoFillMeasurementUnitNamePlural = productViewModel.autoFillMeasurementUnitNamePlural,
                             autoFillMeasurementUnitSymbolPlural = productViewModel.autoFillMeasurementUnitSymbolPlural,
                         )
                     }
-                    AddMeasurementUnitPage(
+                    AddMeasurementUnitNamePage(
                         modifier = Modifier.fillMaxSize(),
                         product = product,
                         onSuggestionSelected = {
                             productDraft(product.copy(measurementUnit = it.toLocalViewModel()))
                                 .let(saveDraft)
                         },
+                        onPreviousClick = navigateToPrevious,
+                    ) {
+                        productDraft(it)
+                            .let(saveDraft)
+                        navigateToNext()
+                    }
+                }
+
+                AddProductStep.MeasurementUnitQuantity -> {
+                    val productDraft: (Product) -> Product.LocalViewModel by rememberUpdatedState {
+                        val productViewModel = it.toLocalViewModel()
+                        product.copy(
+                            name = productViewModel.name,
+                            brands = productViewModel.brands,
+                            attributeValues = productViewModel.attributeValues,
+                            measurementUnit = productViewModel.measurementUnit,
+                            measurementUnitQuantity = productViewModel.measurementUnitQuantity,
+                            autoFillMeasurementUnitNamePlural = productViewModel.autoFillMeasurementUnitNamePlural,
+                            autoFillMeasurementUnitSymbolPlural = productViewModel.autoFillMeasurementUnitSymbolPlural,
+                        )
+                    }
+                    AddMeasurementUnitQuantityPage(
+                        modifier = Modifier.fillMaxSize(),
+                        product = product,
                         onPreviousClick = navigateToPrevious,
                     ) {
                         productDraft(it)
@@ -236,11 +261,11 @@ fun AddProductScreen(
 
                 AddProductStep.Attributes -> {
                     val productDraft: (List<AttributeValue>) -> Product.LocalViewModel by rememberUpdatedState {
-                        product.copy(attributes = it.map(AttributeValue::toLocalViewModel))
+                        product.copy(attributeValues = it.map(AttributeValue::toLocalViewModel))
                     }
                     AddAttributesPage(
                         modifier = Modifier.fillMaxSize(),
-                        attributes = product.attributes,
+                        attributes = product.attributeValues,
                         saveDraft = {
                             productDraft(it)
                                 .let(saveDraft)
