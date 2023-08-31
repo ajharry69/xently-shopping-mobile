@@ -22,18 +22,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
-import ke.co.xently.shopping.features.core.ui.UIState
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.shopping.features.shop.models.Shop
 
-
-private sealed class ShopUIState(message: Int) : UIState(message) {
-    object OK : ShopUIState(android.R.string.ok)
-
-    object MissingShopName : ShopUIState(R.string.xently_error_missing_shop_name)
-}
 
 @Composable
 fun AddShopPage(
