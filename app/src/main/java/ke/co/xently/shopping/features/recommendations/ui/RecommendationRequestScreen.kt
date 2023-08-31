@@ -52,7 +52,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ke.co.xently.shopping.BottomSheet
 import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.hasEmojis
@@ -285,6 +284,7 @@ fun RecommendationRequestScreen(
             AnimatedContent(
                 modifier = Modifier.weight(1f),
                 targetState = showEmptyShoppingListMessage,
+                label = "RecommendationsAnimatedContent",
             ) { isShoppingListEmpty ->
                 if (isShoppingListEmpty) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
