@@ -9,10 +9,10 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import ke.co.xently.shopping.features.recommendations.models.Recommendation
 import ke.co.xently.shopping.datasource.remote.Exclude.During.BOTH
 import ke.co.xently.shopping.datasource.remote.Exclude.During.DESERIALIZATION
 import ke.co.xently.shopping.datasource.remote.Exclude.During.SERIALIZATION
+import ke.co.xently.shopping.features.recommendations.models.Recommendation
 import java.math.BigDecimal
 
 object Serialization {

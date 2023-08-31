@@ -1,5 +1,6 @@
 package ke.co.xently.shopping.features.authentication.datasources
 
+import ke.co.xently.shopping.datasource.remote.SendHttpRequest
 import ke.co.xently.shopping.features.authentication.datasources.remoteservices.AuthenticationService
 import ke.co.xently.shopping.features.authentication.models.RequestPasswordResetRequest
 import ke.co.xently.shopping.features.authentication.models.RequestPasswordResetResponse
@@ -9,7 +10,6 @@ import ke.co.xently.shopping.features.authentication.models.SignInRequest
 import ke.co.xently.shopping.features.authentication.models.SignInResponse
 import ke.co.xently.shopping.features.authentication.models.SignUpRequest
 import ke.co.xently.shopping.features.authentication.models.SignUpResponse
-import ke.co.xently.shopping.datasource.remote.SendHttpRequest
 import java.util.Base64
 import javax.inject.Inject
 import javax.inject.Singleton

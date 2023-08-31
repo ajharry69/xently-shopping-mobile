@@ -39,6 +39,7 @@ sealed interface Shop {
     ) : Shop
 
     @Parcelize
+    @Serializable
     data class LocalViewModel(
         override val id: Long,
         override val name: String,

@@ -14,10 +14,13 @@ import io.ktor.client.features.logging.Logging
 import io.ktor.client.features.websocket.WebSockets
 import ke.co.xently.shopping.BaseURL
 import ke.co.xently.shopping.BuildConfig
+import ke.co.xently.shopping.datasource.local.Database
 import ke.co.xently.shopping.datasource.remote.Serialization
 import ke.co.xently.shopping.datasource.remote.di.qualifiers.CacheInterceptor
 import ke.co.xently.shopping.datasource.remote.di.qualifiers.RequestHeadersInterceptor
 import ke.co.xently.shopping.datasource.remote.di.qualifiers.RequestQueriesInterceptor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import okhttp3.CacheControl
@@ -52,7 +55,7 @@ object NetworkModule {
     @Provides
     @Singleton
     @RequestHeadersInterceptor
-    fun provideRequestHeadersInterceptors(): Interceptor = Interceptor { chain ->
+    fun provideRequestHeadersInterceptors(database: Database): Interceptor = Interceptor { chain ->
         val request = chain.request()
 
         return@Interceptor chain.proceed(
@@ -64,7 +67,7 @@ object NetworkModule {
                     addHeader("Accept-Language", Locale.getDefault().language)
                 }
 
-                /*if (request.header("Accept") == null) {
+                if (request.header("Accept") == null) {
                     val version = if (BuildConfig.API_VERSION.isNotBlank()) {
                         "; version=${BuildConfig.API_VERSION}"
                     } else ""
@@ -72,10 +75,12 @@ object NetworkModule {
                 }
 
                 if (request.header("Authorization") == null) {
-                    preferences.getString(TOKEN_VALUE, null)?.also {
+                    runBlocking(Dispatchers.IO) {
+                        database.userDao.getAuthorizationToken()
+                    }?.also {
                         addHeader("Authorization", "Bearer $it")
                     }
-                }*/
+                }
             }.build(),
         )
     }

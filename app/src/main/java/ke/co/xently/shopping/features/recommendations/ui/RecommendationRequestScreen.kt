@@ -52,7 +52,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ke.co.xently.shopping.BottomSheet
 import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.hasEmojis
@@ -68,7 +67,7 @@ import ke.co.xently.shopping.features.recommendations.models.Recommendation
 fun RecommendationRequestScreen(
     modifier: Modifier,
     viewModel: RecommendationViewModel,
-    bottomSheetPeek: (BottomSheet) -> Unit,
+    onSuccess: () -> Unit,
 ) {
     val draftShoppingListItemIndex: Int by viewModel.draftShoppingListItemIndex.collectAsState()
     val recommendationsState: State by viewModel.recommendationsStateFlow.collectAsState(State.Idle)
@@ -92,7 +91,7 @@ fun RecommendationRequestScreen(
         recommendationsState = recommendationsState,
         modifier = modifier,
         draftShoppingListItemIndex = draftShoppingListItemIndex,
-        bottomSheetPeek = bottomSheetPeek,
+        onSuccess = onSuccess,
         saveDraftRecommendationRequest = viewModel::saveDraftRecommendationRequest,
         clearDraftShoppingListItem = viewModel::clearDraftShoppingListItem,
         getRecommendations = viewModel::flagGettingCurrentLocation,
@@ -108,7 +107,7 @@ fun RecommendationRequestScreen(
     recommendationsState: State,
     modifier: Modifier,
     draftShoppingListItemIndex: Int,
-    bottomSheetPeek: (BottomSheet) -> Unit,
+    onSuccess: () -> Unit,
     saveDraftRecommendationRequest: (request: Recommendation.Request) -> Unit,
     clearDraftShoppingListItem: () -> Unit,
     getRecommendations: () -> Unit,
@@ -162,7 +161,7 @@ fun RecommendationRequestScreen(
 
     LaunchedEffect(recommendationsState) {
         if (recommendationsState is State.Success) {
-            bottomSheetPeek(BottomSheet.RecommendationResponse.Many(recommendationsState.data))
+            onSuccess()
         } else if (recommendationsState is State.Failure) {
             val message = recommendationsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)
@@ -285,6 +284,7 @@ fun RecommendationRequestScreen(
             AnimatedContent(
                 modifier = Modifier.weight(1f),
                 targetState = showEmptyShoppingListMessage,
+                label = "RecommendationsAnimatedContent",
             ) { isShoppingListEmpty ->
                 if (isShoppingListEmpty) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -435,7 +435,7 @@ private fun RecommendationRequestScreenPreview() {
             recommendationsState = State.Idle,
             modifier = Modifier.fillMaxSize(),
             draftShoppingListItemIndex = RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX,
-            bottomSheetPeek = {},
+            onSuccess = {},
             saveDraftRecommendationRequest = {},
             clearDraftShoppingListItem = {},
             getRecommendations = {},

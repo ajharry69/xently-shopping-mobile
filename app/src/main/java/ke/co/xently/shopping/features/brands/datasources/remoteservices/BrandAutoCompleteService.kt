@@ -1,9 +1,9 @@
 package ke.co.xently.shopping.features.brands.datasources.remoteservices
 
 import io.ktor.client.HttpClient
-import ke.co.xently.shopping.features.brands.models.Brand
 import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.datasource.remote.services.WebsocketAutoCompleteService
+import ke.co.xently.shopping.features.brands.models.Brand
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import javax.inject.Inject

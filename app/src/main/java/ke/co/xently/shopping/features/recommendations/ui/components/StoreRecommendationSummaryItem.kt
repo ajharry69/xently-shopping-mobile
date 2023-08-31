@@ -1,7 +1,6 @@
 package ke.co.xently.shopping.features.recommendations.ui.components
 
 import android.content.res.Configuration
-import android.icu.math.BigDecimal
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,12 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.currencyNumberFormat
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
+import java.math.BigDecimal
 import kotlin.random.Random
 
 @Composable
@@ -40,10 +41,20 @@ fun StoreRecommendationSummaryItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                val isRedacted = response.store.isRedacted()
                 Text(
-                    text = response.store.toString(),
+                    text = if (isRedacted) {
+                        stringResource(R.string.xently_text_label_store_name_redacted)
+                    } else {
+                        response.store.toString()
+                    },
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
+                    textDecoration = if (isRedacted) {
+                        TextDecoration.LineThrough
+                    } else {
+                        null
+                    },
                 )
                 trailingContent?.invoke()
             }
@@ -99,8 +110,8 @@ private fun StoreRecommendationSummaryItemPreview() {
                     )
                 },
                 estimatedExpenditure = Recommendation.Response.EstimatedExpenditure.default.copy(
-                    unit = Random.nextInt(1000, 5000),
-                    total = Random.nextInt(1500, 10000),
+                    unit = Random.nextInt(1000, 5000).toDouble(),
+                    total = Random.nextInt(1500, 10000).toDouble(),
                 ),
                 hit = Recommendation.Response.Hit.default.copy(count = Random.nextInt(5)).run {
                     val items = List(count) {
@@ -164,8 +175,8 @@ private fun StoreRecommendationSummaryItemWithTrailingContentPreview() {
                     )
                 },
                 estimatedExpenditure = Recommendation.Response.EstimatedExpenditure.default.copy(
-                    unit = Random.nextInt(1000, 5000),
-                    total = Random.nextInt(1500, 10000),
+                    unit = Random.nextInt(1000, 5000).toDouble(),
+                    total = Random.nextInt(1500, 10000).toDouble(),
                 ),
                 hit = Recommendation.Response.Hit.default.copy(count = Random.nextInt(5)).run {
                     val items = List(count) {

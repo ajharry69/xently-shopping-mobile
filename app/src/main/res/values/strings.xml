@@ -144,4 +144,12 @@
     <string name="xently_page_title_request_password_reset">Request password reset</string>
     <string name="xently_button_label_request_password_reset_in_process">Requesting password reset</string>
     <string name="xently_notification_auth_session_expired">Session expired, please sign in</string>
+    <string name="xently_page_title_checkout">Checkout</string>
+    <string name="xently_page_sub_title_pay_with_mpesa">Pay with M-Pesa</string>
+    <string name="xently_text_field_label_phone_number_required">Phone number*</string>
+    <string name="xently_pay_service_charge">Pay %1$s service charge</string>
+    <string name="xently_button_label_payment_in_progress">Requesting payment</string>
+    <string name="xently_text_label_store_name_redacted">Please pay the service charge to view the store/shop name</string>
+    <string name="xently_checkout_mpesa_description">Please share your M-Pesa phone number. We will send a payment request to that number, and you can complete the transaction with your M-Pesa PIN.</string>
+    <string name="xently_button_label_confirming_payment">Confirming payment</string>
 </resources>

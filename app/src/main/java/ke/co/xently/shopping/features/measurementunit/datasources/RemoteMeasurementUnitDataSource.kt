@@ -1,8 +1,8 @@
 package ke.co.xently.shopping.features.measurementunit.datasources
 
+import ke.co.xently.shopping.datasource.remote.SendHttpRequest
 import ke.co.xently.shopping.features.measurementunit.datasources.remoteservices.MeasurementUnitService
 import ke.co.xently.shopping.features.measurementunit.models.MeasurementUnit
-import ke.co.xently.shopping.datasource.remote.SendHttpRequest
 import javax.inject.Inject
 import javax.inject.Singleton
 

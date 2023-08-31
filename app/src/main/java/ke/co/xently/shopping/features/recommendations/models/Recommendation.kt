@@ -1,13 +1,14 @@
 package ke.co.xently.shopping.features.recommendations.models
 
-import android.icu.math.BigDecimal
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import ke.co.xently.shopping.features.core.models.BigDecimalSerializer
 import ke.co.xently.shopping.features.core.models.Location
 import ke.co.xently.shopping.features.store.models.Store
 import kotlinx.parcelize.Parcelize
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import kotlinx.serialization.Serializable
+import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 sealed interface Recommendation {
@@ -91,22 +92,28 @@ sealed interface Recommendation {
         }
     }
 
+    @Serializable
     data class Response(
         val estimatedExpenditure: EstimatedExpenditure,
+        @SerializedName("redactedStore")
         val store: Store.LocalViewModel,
+        val encryptedStoreJson: String,
         val hit: Hit,
         val miss: Miss,
     ) : Recommendation {
         fun hasAnOnlineStore() = store.hasAnOnlineStore()
 
-        data class EstimatedExpenditure(val unit: Number = 0, val total: Number = 0) {
+        @Serializable
+        data class EstimatedExpenditure(val unit: Double = 0.0, val total: Double = 0.0) {
             companion object {
                 val default = EstimatedExpenditure()
             }
         }
 
+        @Serializable
         data class Miss(val count: Int, val items: List<Item> = emptyList()) {
             @JvmInline
+            @Serializable
             value class Item(val value: String) {
                 companion object {
                     val default = Item(value = "")
@@ -121,7 +128,9 @@ sealed interface Recommendation {
             }
         }
 
+        @Serializable
         data class Hit(val count: Int, val items: List<Item> = emptyList()) {
+            @Serializable
             data class Item(
                 val bestMatched: BestMatched,
                 val shoppingList: ShoppingList,
@@ -144,7 +153,8 @@ sealed interface Recommendation {
                     return result
                 }
 
-                data class ShoppingList(val name: String, val quantityToPurchase: Number = 1) {
+                @Serializable
+                data class ShoppingList(val name: String, val quantityToPurchase: Int = 1) {
                     override fun hashCode(): Int {
                         return name.hashCode()
                     }
@@ -165,18 +175,21 @@ sealed interface Recommendation {
                     }
                 }
 
+                @Serializable
                 data class BestMatched(
                     val name: String,
+                    @Serializable(with = BigDecimalSerializer::class)
                     val unitPrice: BigDecimal,
                     /**
                      * price after multiplying the unit price by the quantity of items planned for purchase
                      */
+                    @Serializable(with = BigDecimalSerializer::class)
                     val totalPrice: BigDecimal,
                     /**
-                     * Expected in the format: 2023-07-10T20:37:00
+                     * Expected in the format: 2023-07-10T20:37:00(TZ OFFSET)
                      */
                     @SerializedName("latestDateOfPurchase")
-                    val latestDateOfPurchaseUTCString: String,
+                    val latestDateOfPurchaseZonedDateTimeString: String,
                 ) {
                     override fun hashCode(): Int {
                         return name.hashCode()
@@ -195,12 +208,12 @@ sealed interface Recommendation {
 
                     companion object {
                         val LATEST_DATE_OF_PURCHASE_FORMAT: DateTimeFormatter =
-                            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
                         val default = BestMatched(
                             name = "",
                             unitPrice = BigDecimal.ZERO,
                             totalPrice = BigDecimal.ZERO,
-                            latestDateOfPurchaseUTCString = LocalDateTime.now(ZoneOffset.UTC)
+                            latestDateOfPurchaseZonedDateTimeString = OffsetDateTime.now()
                                 .format(LATEST_DATE_OF_PURCHASE_FORMAT),
                         )
                     }
@@ -226,6 +239,7 @@ sealed interface Recommendation {
             val default = Response(
                 estimatedExpenditure = EstimatedExpenditure.default,
                 store = Store.LocalViewModel.default,
+                encryptedStoreJson = "",
                 hit = Hit.default,
                 miss = Miss.default,
             )

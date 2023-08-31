@@ -1,15 +1,20 @@
-package ke.co.xently.shopping.ui
+package ke.co.xently.shopping
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import ke.co.xently.shopping.LocalNavController
 import ke.co.xently.shopping.features.authentication.ui.requestpasswordreset.RequestPasswordResetScreen
 import ke.co.xently.shopping.features.authentication.ui.resetpassword.ResetPasswordScreen
 import ke.co.xently.shopping.features.authentication.ui.signin.SignInScreen
 import ke.co.xently.shopping.features.authentication.ui.signup.SignUpScreen
+import ke.co.xently.shopping.features.collectpayments.ui.MpesaPaymentRequestScreen
+import ke.co.xently.shopping.features.recommendations.ui.response.RecommendationResponseScreen
+import ke.co.xently.shopping.features.recommendations.ui.response.navigateToStore
+import ke.co.xently.shopping.features.recommendations.ui.response.visitOnlineStore
+import ke.co.xently.shopping.ui.MainUI
+import java.math.BigDecimal
 
 
 @Composable
@@ -60,6 +65,30 @@ fun XentlyNavHost() {
             ResetPasswordScreen(
                 onSuccess = onSuccess,
                 onNavigateBack = onNavigateBack,
+            )
+        }
+
+        composable(NavigationRoute.Recommendations.route) {
+            RecommendationResponseScreen(
+                navigateToStore = navigateToStore(),
+                visitOnlineStore = visitOnlineStore(),
+                onNavigateBack = onNavigateBack,
+                onPaymentRequest = {
+                    navController.navigate(NavigationRoute.MpesaCheckout(NavigationRoute.MpesaCheckout.Argument.ServiceCharge.name to it))
+                },
+            )
+        }
+
+        composable(
+            NavigationRoute.MpesaCheckout.route,
+            arguments = NavigationRoute.MpesaCheckout.Argument.arguments,
+        ) {
+            val serviceCharge = it.arguments!!
+                .getString(NavigationRoute.MpesaCheckout.Argument.ServiceCharge.name)
+            MpesaPaymentRequestScreen(
+                onSuccess = onNavigateBack,
+                onNavigateBack = onNavigateBack,
+                serviceCharge = BigDecimal(serviceCharge),
             )
         }
     }
