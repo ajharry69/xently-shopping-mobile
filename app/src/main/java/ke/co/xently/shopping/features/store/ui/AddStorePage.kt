@@ -69,10 +69,9 @@ fun AddStorePage(
     }
 
     ForegroundLocationTracker(snackbarHostState = LocalSnackbarHostState.current) { myLocation ->
+        currentLocation = myLocation.toLocation()
         if (!isLocationUsable) {
-            location = myLocation.toLocation().also {
-                currentLocation = it
-            }
+            location = currentLocation!!
         }
     }
 
@@ -191,9 +190,7 @@ fun AddStorePage(
                     location = it.toLocation()
                 },
                 onMyLocationClick = { myLocation ->
-                    location = myLocation.toLocation().also {
-                        currentLocation = it
-                    }
+                    location = myLocation.toLocation()
                 },
                 onPOIClick = { poi: PointOfInterest ->
                     location = poi.latLng.toLocation().also { poiLocation ->
