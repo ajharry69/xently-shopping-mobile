@@ -1,7 +1,6 @@
 package ke.co.xently.shopping.features.store.ui
 
 import android.content.res.Configuration
-import android.location.Location
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +33,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
+import ke.co.xently.shopping.features.core.models.Location
 import ke.co.xently.shopping.features.core.models.toLocation
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
@@ -68,10 +68,11 @@ fun AddStorePage(
         mutableStateOf(null)
     }
 
-    ForegroundLocationTracker(snackbarHostState = LocalSnackbarHostState.current) {
-        currentLocation = it
+    ForegroundLocationTracker(snackbarHostState = LocalSnackbarHostState.current) { myLocation ->
         if (!isLocationUsable) {
-            location = it.toLocation()
+            location = myLocation.toLocation().also {
+                currentLocation = it
+            }
         }
     }
 
@@ -95,13 +96,13 @@ fun AddStorePage(
             }
         },
     ) {
-        AddProductAutoCompleteTextField(
+        AddProductAutoCompleteTextField<Store, Store>(
             modifier = Modifier.fillMaxWidth(),
             service = LocalStoreAutoCompleteService.current,
             state = nameAutoCompleteState,
             onSearch = { query ->
                 Store.LocalViewModel.default.run {
-                    copy(name = query, location = currentLocation?.toLocation() ?: this.location)
+                    copy(name = query, location = currentLocation ?: this.location)
                 }
             },
             onSuggestionSelected = saveDraft,
@@ -189,8 +190,10 @@ fun AddStorePage(
                 onMapClick = {
                     location = it.toLocation()
                 },
-                onMyLocationClick = {
-                    location = it.toLocation()
+                onMyLocationClick = { myLocation ->
+                    location = myLocation.toLocation().also {
+                        currentLocation = it
+                    }
                 },
                 onPOIClick = { poi: PointOfInterest ->
                     location = poi.latLng.toLocation().also { poiLocation ->
