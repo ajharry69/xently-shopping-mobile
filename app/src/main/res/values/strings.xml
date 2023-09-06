@@ -159,4 +159,6 @@
     <string name="xently_text_field_label_unit_quantity_length">Length</string>
     <string name="xently_text_field_label_unit_quantity_width">Width</string>
     <string name="xently_text_field_label_unit_quantity_height">Height</string>
+    <string name="xently_help_text_height_field">Only fill for products with 3-dimensional measurements</string>
+    <string name="xently_subheading_multidimentional_measurement_unit_quantity">Please fill the following if the product is measured by the following dimensions?</string>
 </resources>

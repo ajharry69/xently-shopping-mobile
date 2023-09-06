@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.cleansedForNumberParsing
+import ke.co.xently.shopping.features.core.toStringWithoutUnnecessaryDigitsAfterDecimalPoint
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.measurementunit.ui.components.MeasurementUnitQuantityTextField
@@ -33,23 +34,23 @@ fun AddMeasurementUnitQuantityPage(
 ) {
     val measurementUnit = product.measurementUnit
     var standalone by remember(product.measurementUnitQuantity.standalone) {
-        val quantity = product.measurementUnitQuantity.standalone.toString()
-            .replace(".0", "")
+        val quantity = product.measurementUnitQuantity.standalone
+            .toStringWithoutUnnecessaryDigitsAfterDecimalPoint()
         mutableStateOf(TextFieldValue(quantity))
     }
-    var length by remember(product.measurementUnitQuantity.threeDimension?.length) {
-        val length = (product.measurementUnitQuantity.threeDimension?.length ?: "").toString()
-            .replace(".0", "")
+    var length by remember(product.measurementUnitQuantity.twoOrThreeDimension?.length) {
+        val length = (product.measurementUnitQuantity.twoOrThreeDimension?.length ?: "").toString()
+            .toStringWithoutUnnecessaryDigitsAfterDecimalPoint()
         mutableStateOf(TextFieldValue(length))
     }
-    var width by remember(product.measurementUnitQuantity.threeDimension?.width) {
-        val width = (product.measurementUnitQuantity.threeDimension?.width ?: "").toString()
-            .replace(".0", "")
+    var width by remember(product.measurementUnitQuantity.twoOrThreeDimension?.width) {
+        val width = (product.measurementUnitQuantity.twoOrThreeDimension?.width ?: "").toString()
+            .toStringWithoutUnnecessaryDigitsAfterDecimalPoint()
         mutableStateOf(TextFieldValue(width))
     }
-    var height by remember(product.measurementUnitQuantity.threeDimension?.height) {
-        val height = (product.measurementUnitQuantity.threeDimension?.height ?: "").toString()
-            .replace(".0", "")
+    var height by remember(product.measurementUnitQuantity.twoOrThreeDimension?.height) {
+        val height = (product.measurementUnitQuantity.twoOrThreeDimension?.height ?: "").toString()
+            .toStringWithoutUnnecessaryDigitsAfterDecimalPoint()
         mutableStateOf(TextFieldValue(height))
     }
 
@@ -99,14 +100,13 @@ fun AddMeasurementUnitQuantityPage(
                         val hasValidValueForThreeDimension = listOf(length, width, height).any {
                             it.text.cleansedForNumberParsing().isNotBlank()
                         }
-                        val threeDimension = if (hasValidValueForThreeDimension) {
-                            (measurementUnitQuantity.threeDimension
-                                ?: MeasurementUnitQuantity.ThreeDimension.default).copy(
+                        val twoOrThreeDimension = if (hasValidValueForThreeDimension) {
+                            (measurementUnitQuantity.twoOrThreeDimension
+                                ?: MeasurementUnitQuantity.TwoOrThreeDimension.default).copy(
                                 length = length.text.cleansedForNumberParsing().toFloatOrNull()
                                     ?: 1f,
                                 width = width.text.cleansedForNumberParsing().toFloatOrNull() ?: 1f,
-                                height = height.text.cleansedForNumberParsing().toFloatOrNull()
-                                    ?: 1f,
+                                height = height.text.cleansedForNumberParsing().toFloatOrNull(),
                             )
                         } else {
                             null
@@ -116,7 +116,7 @@ fun AddMeasurementUnitQuantityPage(
                                 standalone = standalone.text
                                     .cleansedForNumberParsing()
                                     .toFloatOrNull() ?: 1f,
-                                threeDimension = threeDimension
+                                twoOrThreeDimension = twoOrThreeDimension
                             ),
                         )
                     }.let(onContinueClick)
@@ -132,22 +132,25 @@ fun AddMeasurementUnitQuantityPage(
             measurementUnitName = measurementUnit?.name,
             label = stringResource(R.string.xently_text_field_label_unit_quantity_standalone),
             isError = { uiState is MeasurementUnitQuantityUIState.StandaloneError },
-        ) { standalone = it }
-        Text(text = "Please fill the following if the product is measured by the following dimensions?")
+            onValueChange = { standalone = it },
+        )
+        Text(text = stringResource(R.string.xently_subheading_multidimentional_measurement_unit_quantity))
         MeasurementUnitQuantityTextField(
             value = length,
             uiState = uiState,
             measurementUnitName = measurementUnit?.name,
             label = stringResource(R.string.xently_text_field_label_unit_quantity_length),
             isError = { uiState is MeasurementUnitQuantityUIState.LengthError },
-        ) { length = it }
+            onValueChange = { length = it },
+        )
         MeasurementUnitQuantityTextField(
             value = width,
             uiState = uiState,
             measurementUnitName = measurementUnit?.name,
             label = stringResource(R.string.xently_text_field_label_unit_quantity_width),
             isError = { uiState is MeasurementUnitQuantityUIState.WidthError },
-        ) { width = it }
+            onValueChange = { width = it },
+        )
         MeasurementUnitQuantityTextField(
             value = height,
             uiState = uiState,
@@ -155,7 +158,10 @@ fun AddMeasurementUnitQuantityPage(
             measurementUnitName = measurementUnit?.name,
             label = stringResource(R.string.xently_text_field_label_unit_quantity_height),
             isError = { uiState is MeasurementUnitQuantityUIState.HeightError },
-        ) { height = it }
+            onValueChange = { height = it },
+        ) {
+            Text(text = stringResource(R.string.xently_help_text_height_field))
+        }
     }
 }
 
