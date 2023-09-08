@@ -11,7 +11,6 @@
     <string name="xently_text_field_label_name_plural">Name plural</string>
     <string name="xently_measurement_unit_page_title">Measurement unit name</string>
     <string name="xently_text_field_label_symbol">Symbol</string>
-    <string name="xently_text_field_label_symbol_plural">Symbol plural</string>
     <string name="xently_add_store_page_title">Store/branch</string>
     <string name="xently_general_details_page_title">General details</string>
     <string name="xently_add_attributes_page_title">Attributes</string>
@@ -41,7 +40,6 @@
     <string name="xently_content_description_add_item">Add "%1$s"</string>
     <string name="xently_empty_shopping_list_message">You have an empty shopping list. Please fill in the form above to get started adding items to your shopping list.</string>
     <string name="xently_text_field_label_shopping_list_item_name">Descriptive item name</string>
-    <string name="xently_text_field_help_text_shopping_list_item_name">Example, (2packs of) 400g (brown) bread (by eliot).</string>
     <string name="xently_text_field_help_text_comparison_list_item_name">Example, 400g bread</string>
     <string name="xently_button_label_get_recommendations">Get recommendations</string>
     <string name="xently_button_label_getting_recommendations">Getting recommendations</string>
@@ -61,7 +59,6 @@
     <string name="xently_button_label_invalid_pack_count">Invalid pack count</string>
     <string name="xently_button_label_invalid_unit_price">Invalid unit price</string>
     <string name="xently_checkbox_label_autofill_unit_name_plural">Autofill unit name plural?</string>
-    <string name="xently_checkbox_label_autofill_unit_symbol_plural">Autofill unit symbol plural?</string>
     <string name="xently_button_label_invalid_standalone_unit_quantity">Please provide a valid standalone unit quantity</string>
     <string name="xently_button_label_invalid_length_unit_quantity">Please provide a valid length unit quantity</string>
     <string name="xently_button_label_invalid_width_unit_quantity">Please provide a valid width unit quantity</string>
@@ -148,9 +145,10 @@
     <string name="xently_button_label_request_password_reset_in_process">Requesting password reset</string>
     <string name="xently_notification_auth_session_expired">Session expired, please sign in</string>
     <string name="xently_page_title_checkout">Checkout</string>
-    <string name="xently_page_sub_title_pay_with_mpesa">Pay with M-Pesa</string>
+    <string name="xently_page_sub_title_pay_with_mpesa">Pay with Safaricom M-Pesa</string>
     <string name="xently_text_field_label_phone_number_required">Phone number*</string>
     <string name="xently_pay_service_charge">Pay %1$s service charge</string>
+    <string name="xently_request_pay_service_charge">Please pay %1$s service charge</string>
     <string name="xently_button_label_payment_in_progress">Requesting payment</string>
     <string name="xently_text_label_store_name_redacted">Please pay the service charge to view the store/shop name</string>
     <string name="xently_checkout_mpesa_description">Please share your M-Pesa phone number. We will send a payment request to that number, and you can complete the transaction with your M-Pesa PIN.</string>
@@ -159,4 +157,12 @@
     <string name="xently_text_field_label_unit_quantity_length">Length</string>
     <string name="xently_text_field_label_unit_quantity_width">Width</string>
     <string name="xently_text_field_label_unit_quantity_height">Height</string>
+    <string name="xently_help_text_height_field">Only fill for products with 3-dimensional measurements</string>
+    <string name="xently_subheading_multidimentional_measurement_unit_quantity">Please fill the following if the product is measured by the following dimensions?</string>
+    <string name="xently_content_description_privacy_policy">Privacy policy</string>
+    <string name="xently_by_clicking">By clicking</string>
+    <string name="xently_agree_to_tos">you agree to the</string>
+    <string name="xently_tos_label">Terms of Service</string>
+    <string name="xently_privacy_policy_label">Privacy Policy</string>
+    <string name="xently_confirm_payment">Confirm payment</string>
 </resources>

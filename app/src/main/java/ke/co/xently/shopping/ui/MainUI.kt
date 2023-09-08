@@ -4,9 +4,12 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
@@ -47,7 +50,9 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.compareproducts.repositories.CompareProductRepository
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductViewModel
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductsRequestScreen
+import ke.co.xently.shopping.features.core.PRIVACY_POLICY_URL
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
+import ke.co.xently.shopping.features.core.visitUriPage
 import ke.co.xently.shopping.features.products.repositories.ProductRepository
 import ke.co.xently.shopping.features.products.ui.AddProductScreen
 import ke.co.xently.shopping.features.products.ui.ProductViewModel
@@ -101,6 +106,9 @@ fun MainUI() {
         updateBottomSheetPeek = {
             stackOfBottomSheets.add(0, it)
         },
+        onPrivacyPolicyClicked = {
+            context.visitUriPage(PRIVACY_POLICY_URL, logTag = "MainScreen")
+        },
     )
 }
 
@@ -110,6 +118,7 @@ fun MainUI(
     selectedTab: HomeTab,
     bottomSheet: () -> BottomSheet,
     hideBottomSheet: () -> Boolean,
+    onPrivacyPolicyClicked: () -> Unit,
     onRecommendationRequestSuccess: () -> Unit,
     onTabClicked: (HomeTab) -> Unit,
     updateBottomSheetPeek: (BottomSheet) -> Unit,
@@ -129,6 +138,20 @@ fun MainUI(
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = TextUnit(4f, TextUnitType.Sp),
                     )
+                },
+                actions = {
+                    PlainTooltipBox(
+                        tooltip = {
+                            Text(text = stringResource(R.string.xently_content_description_privacy_policy))
+                        },
+                    ) {
+                        IconButton(onClick = onPrivacyPolicyClicked) {
+                            Icon(
+                                Icons.Default.PrivacyTip,
+                                contentDescription = stringResource(R.string.xently_content_description_privacy_policy)
+                            )
+                        }
+                    }
                 },
             )
         },
@@ -203,6 +226,7 @@ private fun MainUIPreview() {
             selectedTab = selectedTab,
             bottomSheet = { BottomSheet.Ignore },
             hideBottomSheet = { true },
+            onPrivacyPolicyClicked = {},
             onRecommendationRequestSuccess = {},
             onTabClicked = { selectedTab = it },
             updateBottomSheetPeek = {},

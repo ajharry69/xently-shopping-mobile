@@ -22,6 +22,7 @@ internal fun MeasurementUnitQuantityTextField(
     imeAction: ImeAction = ImeAction.Next,
     isError: () -> Boolean,
     onValueChange: (TextFieldValue) -> Unit,
+    supportingText: (@Composable () -> Unit)? = null,
 ) {
     TextField(
         value = value,
@@ -34,7 +35,7 @@ internal fun MeasurementUnitQuantityTextField(
             {
                 Text(text = uiState(context = LocalContext.current))
             }
-        } else null,
+        } else supportingText,
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions.Default.copy(

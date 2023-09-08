@@ -27,6 +27,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 open class WebsocketAutoCompleteService<in Q>(
@@ -98,6 +99,7 @@ open class WebsocketAutoCompleteService<in Q>(
             Timber.tag(TAG).i("[%s]: skipping search of blank query...", urlString)
             return
         }
+        delay(250.milliseconds)
 
         currentQuery = query
 

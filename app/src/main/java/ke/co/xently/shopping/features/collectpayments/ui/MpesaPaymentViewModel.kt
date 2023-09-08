@@ -7,12 +7,10 @@ import ke.co.xently.shopping.features.collectpayments.models.MpesaPaymentRequest
 import ke.co.xently.shopping.features.collectpayments.repositories.MpesaPaymentRepository
 import ke.co.xently.shopping.features.recommendations.repositories.RecommendationRepository
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class MpesaPaymentViewModel @Inject constructor(
@@ -28,34 +26,23 @@ class MpesaPaymentViewModel @Inject constructor(
 
             repository.pay(request).also { result ->
                 result.onSuccess {
-                    stateChannel.send(MpesaPaymentRequestState.ConfirmingPayment)
-
-                    var error: Throwable? = null
-                    var retryCount = 1
-                    do {
-                        recommendationRepository.getDecryptionCredentials().also {
-                            it.onSuccess {
-                                stateChannel.send(MpesaPaymentRequestState.Success)
-                            }.onFailure { throwable ->
-                                error = throwable
-                                retryCount += 1
-
-                                val retryDuration = (retryCount * 10).seconds
-                                Timber.tag(TAG).i(
-                                    "Retrying getting decryption credentials in %s",
-                                    retryDuration,
-                                )
-                                delay(retryDuration)
-                            }
-                        }
-                    } while (retryCount < 6)
-
-                    error?.let {
-                        Timber.tag(TAG).e(it, "pay: %s", it.localizedMessage)
-                        stateChannel.send(MpesaPaymentRequestState.Failure(it))
-                    }
+                    stateChannel.send(MpesaPaymentRequestState.ShouldRequestPaymentConfirmation)
                 }.onFailure {
                     Timber.tag(TAG).e(it, "pay: %s", it.localizedMessage)
+                    stateChannel.send(MpesaPaymentRequestState.Failure(it))
+                }
+            }
+        }
+    }
+
+    fun confirmPayment() {
+        viewModelScope.launch {
+            stateChannel.send(MpesaPaymentRequestState.ConfirmingPayment)
+            recommendationRepository.getDecryptionCredentials().also { result ->
+                result.onSuccess {
+                    stateChannel.send(MpesaPaymentRequestState.Success)
+                }.onFailure {
+                    Timber.tag(TAG).i(it, "Error confirming M-Pesa payment")
                     stateChannel.send(MpesaPaymentRequestState.Failure(it))
                 }
             }

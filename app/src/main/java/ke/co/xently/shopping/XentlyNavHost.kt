@@ -1,8 +1,13 @@
 package ke.co.xently.shopping
 
+import androidx.compose.foundation.layout.mandatorySystemGesturesPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import ke.co.xently.shopping.features.authentication.ui.requestpasswordreset.RequestPasswordResetScreen
@@ -33,7 +38,15 @@ fun XentlyNavHost() {
         navController.navigateUp()
     }
 
-    NavHost(navController = navController, startDestination = NavigationRoute.Main.route) {
+    NavHost(
+        modifier = Modifier
+            .navigationBarsPadding()
+            .systemBarsPadding()
+            .mandatorySystemGesturesPadding()
+            .safeContentPadding(),
+        navController = navController,
+        startDestination = NavigationRoute.Main.route
+    ) {
         composable(NavigationRoute.Main.route) {
             MainUI()
         }

@@ -1,5 +1,6 @@
 package ke.co.xently.shopping.features.authentication.ui.signup
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -15,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -33,10 +36,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,8 +53,11 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.authentication.models.SignUpRequest
 import ke.co.xently.shopping.features.authentication.ui.components.PasswordTextField
 import ke.co.xently.shopping.features.authentication.ui.components.RequiredEmailTextField
+import ke.co.xently.shopping.features.core.PRIVACY_POLICY_URL
+import ke.co.xently.shopping.features.core.TERMS_OF_SERVICE_URL
 import ke.co.xently.shopping.features.core.loadingIndicatorLabel
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
+import ke.co.xently.shopping.features.core.visitUriPage
 
 @Composable
 fun SignUpScreen(
@@ -158,14 +169,31 @@ private fun SignUpScreen(
                     onValueChange = { password = it },
                 )
 
+                val termsText = getTermsText(context)
+                ClickableText(
+                    text = termsText,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        // Needed for dark screen
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                    ),
+                ) { offset ->
+                    termsText.getStringAnnotations("TOS_URL", offset, offset).firstOrNull()
+                        ?.let { context.visitUriPage(it.item, logTag = "SignUpScreen") }
+                        ?: termsText.getStringAnnotations("PRIVACY_POLICY_URL", offset, offset)
+                            .firstOrNull()
+                            ?.let { context.visitUriPage(it.item, logTag = "SignUpScreen") }
+                }
+
                 val focusManager = LocalFocusManager.current
                 Button(
                     enabled = !loading,
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         SignUpRequest(
-                            firstName = firstName.takeIf { it.isNotBlank() },
-                            lastName = lastName.takeIf { it.isNotBlank() },
+                            firstName = firstName.takeIf { it.isNotBlank() } ?: "",
+                            lastName = lastName.takeIf { it.isNotBlank() } ?: "",
                             email = email,
                             password = password,
                         ).let(signUp)
@@ -185,6 +213,39 @@ private fun SignUpScreen(
             }
         }
     }
+}
+
+@Composable
+private fun getTermsText(context: Context) = buildAnnotatedString {
+    append("${stringResource(R.string.xently_by_clicking)} ")
+    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+        append(
+            "${
+                stringResource(R.string.xently_page_title_sign_up).toUpperCase(
+                    Locale.current
+                )
+            }, "
+        )
+    }
+    append(" ${stringResource(R.string.xently_agree_to_tos)} ")
+    pushStringAnnotation(
+        tag = "TOS_URL",
+        annotation = TERMS_OF_SERVICE_URL,
+    )
+    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+        append(context.getString(R.string.xently_tos_label))
+    }
+    pop()
+    append(" & ")
+    pushStringAnnotation(
+        tag = "PRIVACY_POLICY_URL",
+        annotation = PRIVACY_POLICY_URL,
+    )
+    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+        append(context.getString(R.string.xently_privacy_policy_label))
+    }
+    append(".")
+    pop()
 }
 
 @Composable

@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.intl.Locale
+import ke.co.xently.shopping.BaseURL
 import ke.co.xently.shopping.R
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -53,6 +54,9 @@ val Context.currencyNumberFormat: NumberFormat
         currency = Currency.getInstance(getString(R.string.xently_iso_currency_code))
         isGroupingUsed = true
     }
+
+val PRIVACY_POLICY_URL = "${BaseURL.API.removeSuffix("/")}/legal/privacy-policy.html"
+val TERMS_OF_SERVICE_URL = "${BaseURL.API.removeSuffix("/")}/legal/terms-of-service.html"
 
 inline fun Context.visitUriPage(
     uriString: String,
