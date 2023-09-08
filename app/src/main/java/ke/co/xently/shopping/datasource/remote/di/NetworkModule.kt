@@ -142,7 +142,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl(BaseURL.API)
+        .baseUrl(BaseURL.API.removeSuffix("/").plus("/api/"))
         .addConverterFactory(GsonConverterFactory.create(Serialization.JSON_CONVERTER))
         .client(okHttpClient)
         .build()

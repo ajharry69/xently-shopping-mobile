@@ -108,7 +108,10 @@ fun AddProductScreen(
                 )
             }
         }
-        AnimatedContent(targetState = currentlyActiveStep, label = "AddProductAnimatedContent") { step ->
+        AnimatedContent(
+            targetState = currentlyActiveStep,
+            label = "AddProductAnimatedContent"
+        ) { step ->
             when (step) {
                 AddProductStep.Store -> {
                     val productDraft: (Store) -> Product.LocalViewModel by rememberUpdatedState {

@@ -21,7 +21,8 @@ data class MeasurementUnitQuantity(
             append(length)
             append('x')
             append(width)
-            val height = twoOrThreeDimension.height?.toStringWithoutUnnecessaryDigitsAfterDecimalPoint()
+            val height =
+                twoOrThreeDimension.height?.toStringWithoutUnnecessaryDigitsAfterDecimalPoint()
             if (!height.isNullOrBlank()) {
                 append('x')
                 append(height)

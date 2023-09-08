@@ -38,7 +38,7 @@ fun <Q> AutoCompleteSearchResults(
 
                 val initState = service.initSession()
                 while (initState !is AutoCompleteService.InitState.Success && initState !is AutoCompleteService.InitState.Failure) {
-                    delay(100.milliseconds)
+                    delay(250.milliseconds)
                     Timber.tag("AutoCompleteSearchResults").i(
                         "Response: %s. Retrying service initialization. Please wait...",
                         initState,

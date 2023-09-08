@@ -232,13 +232,11 @@ fun RecommendationRequestScreen(
                         Text(text = stringResource(R.string.xently_text_field_label_shopping_list_item_name))
                     },
                     isError = uiState is RecommendationRequestUIState.NameError,
-                    supportingText = {
-                        if (uiState is RecommendationRequestUIState.NameError) {
+                    supportingText = if (uiState is RecommendationRequestUIState.NameError) {
+                        {
                             Text(text = uiState(context = LocalContext.current))
-                        } else {
-                            Text(text = stringResource(R.string.xently_text_field_help_text_shopping_list_item_name))
                         }
-                    },
+                    } else null,
                     keyboardActions = KeyboardActions(
                         onDone = {
                             if (imeActionClickedOnce) {

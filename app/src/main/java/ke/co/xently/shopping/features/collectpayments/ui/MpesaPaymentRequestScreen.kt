@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -65,6 +66,7 @@ fun MpesaPaymentRequestScreen(
         pay = viewModel::pay,
         onSuccess = onSuccess,
         onNavigateBack = onNavigateBack,
+        confirmPayment = viewModel::confirmPayment,
     )
 }
 
@@ -75,13 +77,13 @@ private fun MpesaPaymentRequestScreen(
     state: MpesaPaymentRequestState,
     serviceCharge: BigDecimal,
     pay: (MpesaPaymentRequest) -> Unit,
+    confirmPayment: () -> Unit,
     onSuccess: () -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     val loading by remember(state) {
         derivedStateOf {
             state is MpesaPaymentRequestState.Loading
-                    || state is MpesaPaymentRequestState.ConfirmingPayment
         }
     }
 
@@ -126,56 +128,51 @@ private fun MpesaPaymentRequestScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                    .padding(top = 16.dp),
             ) {
-                Text(
-                    text = stringResource(R.string.xently_page_sub_title_pay_with_mpesa),
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-
-                Text(text = stringResource(R.string.xently_checkout_mpesa_description))
-
-                var phoneNumber by rememberSaveable {
-                    mutableStateOf("")
-                }
-
-                TextField(
-                    value = phoneNumber,
-                    onValueChange = { phoneNumber = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
-                    label = {
-                        Text(text = stringResource(R.string.xently_text_field_label_phone_number_required))
-                    },
-                    prefix = {
-                        Text(text = "+254")
-                    },
-                )
-
-                val focusManager = LocalFocusManager.current
-                Button(
-                    enabled = !loading,
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        val cleansedPhoneNumber = phoneNumber.cleansedForNumberParsing()
-                            .removePrefix("+")
-                            .removePrefix("254")
-                        MpesaPaymentRequest(phoneNumber = "254$cleansedPhoneNumber".toLong())
-                            .let(pay)
-                        focusManager.clearFocus()
-                    },
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    if (state is MpesaPaymentRequestState.ConfirmingPayment) {
-                        Text(
-                            text = loadingIndicatorLabel(
-                                loading = loading,
-                                label = stringResource(R.string.xently_button_label_confirming_payment),
-                                keys = arrayOf(state),
-                            ),
-                        )
-                    } else {
+                    Text(
+                        text = stringResource(R.string.xently_page_sub_title_pay_with_mpesa),
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+
+                    Text(text = stringResource(R.string.xently_checkout_mpesa_description))
+
+                    var phoneNumber by rememberSaveable {
+                        mutableStateOf("")
+                    }
+
+                    TextField(
+                        value = phoneNumber,
+                        onValueChange = { phoneNumber = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+                        label = {
+                            Text(text = stringResource(R.string.xently_text_field_label_phone_number_required))
+                        },
+                        prefix = {
+                            Text(text = "+254")
+                        },
+                    )
+
+                    val focusManager = LocalFocusManager.current
+                    Button(
+                        enabled = !loading,
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            val cleansedPhoneNumber = phoneNumber.cleansedForNumberParsing()
+                                .removePrefix("+")
+                                .removePrefix("254")
+                            MpesaPaymentRequest(phoneNumber = "254$cleansedPhoneNumber".toLong())
+                                .let(pay)
+                            focusManager.clearFocus()
+                        },
+                    ) {
                         Text(
                             text = loadingIndicatorLabel(
                                 loading = loading,
@@ -190,6 +187,23 @@ private fun MpesaPaymentRequestScreen(
                             ),
                         )
                     }
+                }
+
+                OutlinedButton(
+                    enabled = state !is MpesaPaymentRequestState.ConfirmingPayment,
+                    onClick = confirmPayment,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                ) {
+                    Text(
+                        text = loadingIndicatorLabel(
+                            label = stringResource(R.string.xently_confirm_payment)
+                                .toUpperCase(Locale.current),
+                            loading = state is MpesaPaymentRequestState.ConfirmingPayment,
+                            loadingLabelPrefix = stringResource(R.string.xently_button_label_confirming_payment),
+                        ),
+                    )
                 }
             }
         }
@@ -206,6 +220,7 @@ private fun MpesaPaymentRequestScreenPreview() {
             serviceCharge = BigDecimal("50000"),
             pay = {},
             onSuccess = {},
+            confirmPayment = {},
             onNavigateBack = {},
         )
     }

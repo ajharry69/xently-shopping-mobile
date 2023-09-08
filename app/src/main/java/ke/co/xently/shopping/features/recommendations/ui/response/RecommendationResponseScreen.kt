@@ -66,6 +66,7 @@ import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.OrderBy
 import ke.co.xently.shopping.features.core.currencyNumberFormat
+import ke.co.xently.shopping.features.core.toStringWithoutUnnecessaryDigitsAfterDecimalPoint
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
 import ke.co.xently.shopping.features.recommendations.models.RecommendationResponse
@@ -187,10 +188,10 @@ private fun RecommendationResponseScreen(
                     text = {
                         Text(
                             text = stringResource(
-                                R.string.xently_pay_service_charge,
+                                R.string.xently_request_pay_service_charge,
                                 context.currencyNumberFormat
                                     .format(state.data.serviceCharge)
-                                    .removeSuffix(".00"),
+                                    .toStringWithoutUnnecessaryDigitsAfterDecimalPoint(),
                             ).toUpperCase(Locale.current),
                         )
                     },
