@@ -18,6 +18,7 @@ sealed interface AuthenticationRepository {
     suspend fun signIn(request: SignInRequest): Result<Unit>
     suspend fun requestPasswordReset(request: RequestPasswordResetRequest): Result<Unit>
     suspend fun resetPassword(request: ResetPasswordRequest): Result<Unit>
+   suspend fun signOut()
 
     object Fake : AuthenticationRepository {
         override fun getCurrentlySignedInUser() = emptyFlow<User>()
@@ -36,6 +37,10 @@ sealed interface AuthenticationRepository {
 
         override suspend fun resetPassword(request: ResetPasswordRequest): Result<Unit> {
             return Result.success(Unit)
+        }
+
+        override suspend fun signOut() {
+
         }
     }
 
@@ -94,6 +99,10 @@ sealed interface AuthenticationRepository {
             } catch (ex: Exception) {
                 Result.failure(ex)
             }
+        }
+
+        override suspend fun signOut() {
+            localDataSource.deleteCurrentlySignedInUser()
         }
     }
 }

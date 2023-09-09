@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -51,6 +54,7 @@ import ke.co.xently.shopping.features.compareproducts.repositories.CompareProduc
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductViewModel
 import ke.co.xently.shopping.features.compareproducts.ui.CompareProductsRequestScreen
 import ke.co.xently.shopping.features.core.PRIVACY_POLICY_URL
+import ke.co.xently.shopping.features.core.TERMS_OF_SERVICE_URL
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.core.visitUriPage
 import ke.co.xently.shopping.features.products.repositories.ProductRepository
@@ -99,15 +103,25 @@ fun MainUI() {
         hideBottomSheet = {
             stackOfBottomSheets.removeFirstOrNull() == null
         },
+        onPrivacyPolicyClicked = {
+            context.visitUriPage(PRIVACY_POLICY_URL, logTag = "MainScreen")
+        },
+        onTermsOfServiceClicked = {
+            context.visitUriPage(TERMS_OF_SERVICE_URL, logTag = "MainScreen")
+        },
+        onLogoutOrLoginClicked = {
+            if (user == null) {
+                navController.navigate(NavigationRoute.SignIn())
+            } else {
+                viewModel.signOut()
+            }
+        },
         onRecommendationRequestSuccess = {
             navController.navigate(NavigationRoute.Recommendations())
         },
         onTabClicked = viewModel::saveCurrentlyActiveTab,
         updateBottomSheetPeek = {
             stackOfBottomSheets.add(0, it)
-        },
-        onPrivacyPolicyClicked = {
-            context.visitUriPage(PRIVACY_POLICY_URL, logTag = "MainScreen")
         },
     )
 }
@@ -119,6 +133,8 @@ fun MainUI(
     bottomSheet: () -> BottomSheet,
     hideBottomSheet: () -> Boolean,
     onPrivacyPolicyClicked: () -> Unit,
+    onTermsOfServiceClicked: () -> Unit,
+    onLogoutOrLoginClicked: () -> Unit,
     onRecommendationRequestSuccess: () -> Unit,
     onTabClicked: (HomeTab) -> Unit,
     updateBottomSheetPeek: (BottomSheet) -> Unit,
@@ -126,6 +142,8 @@ fun MainUI(
     recommendationViewModel: RecommendationViewModel = hiltViewModel(),
     compareProductViewModel: CompareProductViewModel = hiltViewModel(),
 ) {
+    val user = LocalCurrentlySignInUser.current
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = LocalSnackbarHostState.current)
@@ -140,17 +158,40 @@ fun MainUI(
                     )
                 },
                 actions = {
-                    PlainTooltipBox(
-                        tooltip = {
-                            Text(text = stringResource(R.string.xently_content_description_privacy_policy))
-                        },
-                    ) {
-                        IconButton(onClick = onPrivacyPolicyClicked) {
-                            Icon(
-                                Icons.Default.PrivacyTip,
-                                contentDescription = stringResource(R.string.xently_content_description_privacy_policy)
-                            )
-                        }
+                    var showMenu by rememberSaveable {
+                        mutableStateOf(false)
+                    }
+
+                    IconButton(onClick = { showMenu = !showMenu }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "Menu options")
+                    }
+
+
+                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenuItem(
+                            onClick = { onLogoutOrLoginClicked(); showMenu = false },
+                            text = {
+                                val label = if (user == null) {
+                                    R.string.xently_menu_item_signin
+                                } else {
+                                    R.string.xently_menu_item_signout
+                                }
+
+                                Text(text = stringResource(label))
+                            },
+                        )
+                        DropdownMenuItem(
+                            onClick = { onPrivacyPolicyClicked(); showMenu = false },
+                            text = {
+                                Text(text = stringResource(R.string.xently_content_description_privacy_policy))
+                            },
+                        )
+                        DropdownMenuItem(
+                            onClick = { onTermsOfServiceClicked(); showMenu = false },
+                            text = {
+                                Text(text = stringResource(R.string.xently_content_description_terms_of_service))
+                            },
+                        )
                     }
                 },
             )
@@ -227,6 +268,8 @@ private fun MainUIPreview() {
             bottomSheet = { BottomSheet.Ignore },
             hideBottomSheet = { true },
             onPrivacyPolicyClicked = {},
+            onTermsOfServiceClicked = {},
+            onLogoutOrLoginClicked = {},
             onRecommendationRequestSuccess = {},
             onTabClicked = { selectedTab = it },
             updateBottomSheetPeek = {},

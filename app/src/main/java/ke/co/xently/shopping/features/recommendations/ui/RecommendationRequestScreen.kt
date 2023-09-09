@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -43,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -218,10 +216,6 @@ fun RecommendationRequestScreen(
                     clearDraftShoppingListItem()
                     shoppingListItemValue = TextFieldValue("")
                 }
-                var imeActionClickedOnce by remember {
-                    mutableStateOf(false)
-                }
-                val focusManager = LocalFocusManager.current
                 TextField(
                     value = shoppingListItemValue,
                     onValueChange = {
@@ -237,22 +231,6 @@ fun RecommendationRequestScreen(
                             Text(text = uiState(context = LocalContext.current))
                         }
                     } else null,
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            if (imeActionClickedOnce) {
-                                // Apparently, we need to click the IME action once before the
-                                // field can be cleared
-                                imeActionClickedOnce = false
-                                if (showAddButton) {
-                                    addShoppingListItem()
-                                } else {
-                                    focusManager.clearFocus()
-                                }
-                            } else {
-                                imeActionClickedOnce = true
-                            }
-                        },
-                    ),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                     trailingIcon = {
                         val contentDescription = stringResource(

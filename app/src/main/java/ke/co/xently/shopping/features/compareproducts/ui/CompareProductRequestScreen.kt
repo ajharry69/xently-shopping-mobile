@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.intl.Locale
@@ -194,6 +195,8 @@ internal fun CompareProductsRequestScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     TextField(
+                        maxLines = 1,
+                        singleLine = true,
                         value = comparisonListItemNameValue,
                         onValueChange = {
                             comparisonListItemNameValue = it
@@ -211,6 +214,7 @@ internal fun CompareProductsRequestScreen(
                             }
                             Text(text = stringResource(message))
                         },
+                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                     )
                     TextField(
                         value = comparisonListItemUnitPriceValue,
@@ -222,7 +226,10 @@ internal fun CompareProductsRequestScreen(
                         label = {
                             Text(text = stringResource(R.string.xently_text_field_label_unit_price_required))
                         },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Done,
+                        ),
                         supportingText = if (uiState is CompareProductRequestUIState.UnitPriceError) {
                             {
                                 Text(text = stringResource(uiState.message))
@@ -263,6 +270,7 @@ internal fun CompareProductsRequestScreen(
             AnimatedContent(
                 modifier = Modifier.weight(1f),
                 targetState = showEmptyComparisonListMessage,
+                label = "ComparisonRequestListAnimatedContent",
             ) { isComparisonListEmpty ->
                 if (isComparisonListEmpty) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

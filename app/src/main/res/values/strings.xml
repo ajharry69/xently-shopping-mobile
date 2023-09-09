@@ -165,4 +165,7 @@
     <string name="xently_tos_label">Terms of Service</string>
     <string name="xently_privacy_policy_label">Privacy Policy</string>
     <string name="xently_confirm_payment">Confirm payment</string>
+    <string name="xently_content_description_terms_of_service">Terms of service</string>
+    <string name="xently_menu_item_signout">Sign out</string>
+    <string name="xently_menu_item_signin">Sign in</string>
 </resources>

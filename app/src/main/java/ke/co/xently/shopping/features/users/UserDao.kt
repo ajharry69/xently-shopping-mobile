@@ -18,5 +18,5 @@ interface UserDao {
     suspend fun getAuthorizationToken(): String?
 
     @Query("DELETE FROM user") // We expect to have 1 record anyway
-    fun deleteCurrentlySignedInUserOnSessionExpiration()
+    fun deleteCurrentlySignedInUser()
 }
