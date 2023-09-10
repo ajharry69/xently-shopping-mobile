@@ -5,7 +5,16 @@ open class HttpException(
     val error: Any? = null,
     @Suppress("unused") val errorCode: String? = null,
     @Suppress("unused") var statusCode: Int? = null,
+    @Suppress("unused") var unParsedErrorString: String? = null,
 ) : RuntimeException() {
+    override fun toString(): String {
+        return buildString {
+            append(super.toString())
+            append("=>")
+            append(unParsedErrorString)
+        }
+    }
+
     // TODO: Override this class in every parent class...
     open fun hasFieldErrors(): Boolean {
         return false

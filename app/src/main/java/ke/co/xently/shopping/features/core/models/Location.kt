@@ -1,10 +1,12 @@
 package ke.co.xently.shopping.features.core.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
+@Keep
 @Parcelize
 @Serializable
 data class Location(

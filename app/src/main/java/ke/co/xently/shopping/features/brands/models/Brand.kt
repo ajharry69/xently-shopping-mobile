@@ -1,6 +1,7 @@
 package ke.co.xently.shopping.features.brands.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -9,12 +10,14 @@ sealed interface Brand {
     val name: String
     val slug: String
 
+    @Keep
     data class RemoteRequest(
         override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Brand
 
+    @Keep
     @Serializable
     data class RemoteResponse(
         override val id: Long,
@@ -22,18 +25,21 @@ sealed interface Brand {
         override val name: String,
     ) : Brand
 
+    @Keep
     data class LocalEntityRequest(
         override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Brand
 
+    @Keep
     data class LocalEntityResponse(
         override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Brand
 
+    @Keep
     @Parcelize
     data class LocalViewModel(
         override val id: Long,

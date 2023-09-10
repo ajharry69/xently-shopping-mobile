@@ -2,6 +2,7 @@ package ke.co.xently.shopping.features.store.models
 
 import android.content.Context
 import android.os.Parcelable
+import androidx.annotation.Keep
 import ke.co.xently.shopping.features.core.models.Location
 import ke.co.xently.shopping.features.core.numberFormat
 import ke.co.xently.shopping.features.shop.models.Shop
@@ -17,6 +18,7 @@ sealed interface Store {
     val shop: Shop
     fun hasAnOnlineStore() = shop.hasAnOnlineStore()
 
+    @Keep
     data class RemoteRequest(
         override val id: Long,
         override val slug: String,
@@ -25,6 +27,7 @@ sealed interface Store {
         override val shop: Shop.RemoteRequest,
     ) : Store
 
+    @Keep
     @Serializable
     data class RemoteResponse(
         override val id: Long,
@@ -34,6 +37,7 @@ sealed interface Store {
         override val shop: Shop.RemoteResponse,
     ) : Store
 
+    @Keep
     data class LocalEntityRequest(
         override val id: Long,
         override val slug: String,
@@ -42,6 +46,7 @@ sealed interface Store {
         override val shop: Shop.LocalEntityRequest,
     ) : Store
 
+    @Keep
     data class LocalEntityResponse(
         override val id: Long,
         override val slug: String,
@@ -50,6 +55,7 @@ sealed interface Store {
         override val shop: Shop.LocalEntityResponse,
     ) : Store
 
+    @Keep
     @Parcelize
     @Serializable
     data class LocalViewModel(

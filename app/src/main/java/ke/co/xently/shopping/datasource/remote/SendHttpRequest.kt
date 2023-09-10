@@ -26,11 +26,12 @@ object SendHttpRequest {
                 Result.success(body ?: Any() as T)
             }
         } else {
+            // The following is potentially blocking! Assume the consumer will call the
+            // suspend function from IO dispatcher.
+            val errorString = errorBody!!.string()
             throw try {
                 Serialization.JSON_CONVERTER.fromJson(
-                    // The following is potentially blocking! Assume the consumer will call the
-                    // suspend function from IO dispatcher.
-                    errorBody!!.string(),
+                    errorString,
                     errorClass.java,
                 )
             } catch (ex: IllegalStateException) {
@@ -39,6 +40,7 @@ object SendHttpRequest {
                 if (this.statusCode == null) {
                     this.statusCode = statusCode
                 }
+                this.unParsedErrorString = errorString
             }
         }
     }

@@ -34,11 +34,19 @@ class Xently : Application(), Configuration.Provider {
             object : Timber.Tree() {
                 override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
                     if (priority in CRASHLYTICS_LOGGABLE_ERROR_TAGS) {
-                        t?.also(Firebase.crashlytics::recordException)
-                            ?: tag?.also {
-                                Firebase.crashlytics.setCustomKey(it, message)
+                        when {
+                            t != null -> {
+                                Firebase.crashlytics.recordException(t)
                             }
-                            ?: Firebase.crashlytics.log(message)
+
+                            tag != null -> {
+                                Firebase.crashlytics.setCustomKey(tag, message)
+                            }
+
+                            else -> {
+                                Firebase.crashlytics.log(message)
+                            }
+                        }
                     }
                 }
             }

@@ -1,9 +1,11 @@
 package ke.co.xently.shopping.features.users
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.Instant
 
+@Keep
 @Entity
 data class User(
     @PrimaryKey

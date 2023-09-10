@@ -57,6 +57,8 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import ke.co.xently.shopping.BottomSheet
 import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
@@ -424,7 +426,10 @@ internal fun CompareProductsRequestScreen(
             Button(
                 enabled = enableGetCompareProductsButton,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = compareProducts,
+                onClick = {
+                    compareProducts()
+                    Firebase.analytics.logEvent("compare_products_request", null)
+                },
             ) {
                 Text(
                     text = loadingIndicatorLabel(

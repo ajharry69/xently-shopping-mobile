@@ -1,10 +1,12 @@
 package ke.co.xently.shopping.features.products.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import ke.co.xently.shopping.features.core.toStringWithoutUnnecessaryDigitsAfterDecimalPoint
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
+@Keep
 @Serializable
 @Parcelize
 data class MeasurementUnitQuantity(
@@ -30,6 +32,7 @@ data class MeasurementUnitQuantity(
         }
     }
 
+    @Keep
     @Serializable
     @Parcelize
     data class TwoOrThreeDimension(

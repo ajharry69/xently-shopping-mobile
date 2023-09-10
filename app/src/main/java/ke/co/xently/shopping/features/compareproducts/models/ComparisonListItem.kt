@@ -1,8 +1,10 @@
 package ke.co.xently.shopping.features.compareproducts.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 
+@Keep
 @Parcelize
 data class ComparisonListItem(
     val name: String,

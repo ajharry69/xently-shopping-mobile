@@ -1,5 +1,6 @@
 package ke.co.xently.shopping.datasource.remote.services
 
+import androidx.annotation.Keep
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.webSocketSession
 import io.ktor.client.request.url
@@ -87,6 +88,7 @@ open class WebsocketAutoCompleteService<in Q>(
         }
     }
 
+    @Keep
     @Serializable
     data class Request(val q: String, val size: Int = 5)
 

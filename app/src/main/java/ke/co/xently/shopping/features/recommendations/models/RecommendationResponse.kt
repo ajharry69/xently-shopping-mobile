@@ -1,5 +1,6 @@
 package ke.co.xently.shopping.features.recommendations.models
 
+import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -10,6 +11,7 @@ sealed interface RecommendationResponse {
     val requestId: Long
     val serviceCharge: Double
 
+    @Keep
     data class ViewModel(
         override val requestId: Long,
         override val serviceCharge: Double,
@@ -17,12 +19,14 @@ sealed interface RecommendationResponse {
         val isPaid: Boolean = false,
     ) : RecommendationResponse
 
+    @Keep
     data class ServerSide(
         override val requestId: Long,
         override val serviceCharge: Double,
         val recommendations: List<Recommendation.Response>,
     ) : RecommendationResponse
 
+    @Keep
     @Entity("recommendations")
     data class LocalCache(
         @PrimaryKey
