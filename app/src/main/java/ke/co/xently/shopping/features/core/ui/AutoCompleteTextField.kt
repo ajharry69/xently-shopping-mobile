@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,10 +72,9 @@ fun <Q, R> AutoCompleteTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onSearch: (String) -> Q,
     onSuggestionSelected: (R) -> Unit,
-    closeSessionKey: @Composable () -> Any = { true },
-    label: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    supportingText: @Composable (() -> Unit)? = null,
+    label: @Composable() (() -> Unit)? = null,
+    trailingIcon: @Composable() (() -> Unit)? = null,
+    supportingText: @Composable() (() -> Unit)? = null,
     suggestionContent: @Composable (R) -> Unit,
 ) {
     val suggestions = remember {
@@ -86,29 +86,18 @@ fun <Q, R> AutoCompleteTextField(
     }
 
     LaunchedEffect(resultState) {
-        when (@Suppress("LocalVariableName") val _state = resultState) {
-            is AutoCompleteService.ResultState.Failure -> {
-                suggestions.clear()
-            }
-
-            is AutoCompleteService.ResultState.Success<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                val results = _state.data as List<R>
-                suggestions.clear()
-                suggestions.addAll(results)
-            }
-
-            AutoCompleteService.ResultState.Idle -> {
-
-            }
-
-            AutoCompleteService.ResultState.Loading -> {
-
-            }
+        if (resultState is AutoCompleteService.ResultState.Failure) {
+            suggestions.clear()
+        } else if (resultState is AutoCompleteService.ResultState.Success<*>) {
+            @Suppress("UNCHECKED_CAST")
+            val results =
+                (resultState as AutoCompleteService.ResultState.Success<*>).data as List<R>
+            suggestions.clear()
+            suggestions.addAll(results)
         }
     }
 
-    AutoCompleteSearchResults(service = service, closeSessionKey = closeSessionKey) {
+    AutoCompleteSearchResults(service = service) {
         resultState = it
     }
 
@@ -125,7 +114,11 @@ fun <Q, R> AutoCompleteTextField(
         mutableStateOf(false)
     }
 
-    val hasErrors = isError || shouldReportEmojiProhibition
+    val hasErrors by remember(isError, shouldReportEmojiProhibition) {
+        derivedStateOf {
+            isError || shouldReportEmojiProhibition
+        }
+    }
 
     LaunchedEffect(state.query, suggestions, hasErrors) {
         if (wasSuggestionSelected || hasErrors) {
@@ -144,10 +137,11 @@ fun <Q, R> AutoCompleteTextField(
         }
     }
 
+    val currentOnSearch by rememberUpdatedState(onSearch)
     if (!hasErrors) {
-        LaunchedEffect(state.query) {
+        LaunchedEffect(state.query, service, numberOfResults) {
             // No need to send an unnecessary search request if an error was encountered
-            val query = onSearch(state.query)
+            val query = currentOnSearch(state.query)
             service.search(query, numberOfResults)
         }
     }
@@ -198,21 +192,20 @@ private fun AutoCompleteTextFieldPreview() {
         Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
             AutoCompleteTextField<String, String>(
                 modifier = Modifier.fillMaxWidth(),
-                state = rememberAutoCompleteTextFieldState(),
                 service = AutoCompleteService.Fake(
                     AutoCompleteService.ResultState.Success(
                         suggestions
                     )
                 ),
+                state = rememberAutoCompleteTextFieldState(),
                 onSearch = { "" },
                 onSuggestionSelected = {},
                 label = {
                     Text(text = "Search...")
                 },
-                suggestionContent = {
-                    Text(text = it)
-                },
-            )
+            ) {
+                Text(text = it)
+            }
         }
     }
 }
