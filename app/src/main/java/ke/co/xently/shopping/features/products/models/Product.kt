@@ -2,6 +2,7 @@ package ke.co.xently.shopping.features.products.models
 
 import android.content.Context
 import android.os.Parcelable
+import androidx.annotation.Keep
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.attributesvalues.models.AttributeValue
 import ke.co.xently.shopping.features.brands.models.Brand
@@ -101,6 +102,7 @@ sealed interface Product {
         }
     }
 
+    @Keep
     data class RemoteRequest(
         override val id: Long,
         override val slug: String,
@@ -121,6 +123,7 @@ sealed interface Product {
         }
     }
 
+    @Keep
     @Serializable
     data class RemoteResponse(
         override val id: Long,
@@ -143,6 +146,7 @@ sealed interface Product {
         }
     }
 
+    @Keep
     data class LocalEntityRequest(
         override val id: Long,
         override val slug: String,
@@ -158,6 +162,7 @@ sealed interface Product {
         val datePurchased: OffsetDateTime,
     ) : Product
 
+    @Keep
     data class LocalEntityResponse(
         override val id: Long,
         override val slug: String,
@@ -173,6 +178,7 @@ sealed interface Product {
         val datePurchased: OffsetDateTime,
     ) : Product
 
+    @Keep
     @Parcelize
     data class LocalViewModel(
         override val id: Long,

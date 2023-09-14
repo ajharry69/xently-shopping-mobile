@@ -35,7 +35,7 @@ class DeleteCurrentlySignedInUserOnSessionExpirationWorker @AssistedInject const
                     if (durationSinceAddition > it.expiry) {
                         Timber.tag(TAG)
                             .i("Session expired, deleting currently signed in user. Time difference: $durationSinceAddition seconds; Session expiry: ${it.expiry} seconds")
-                        authenticationDataSource.deleteCurrentlySignedInUserOnSessionExpiration()
+                        authenticationDataSource.deleteCurrentlySignedInUser()
                     }
                 }
             }

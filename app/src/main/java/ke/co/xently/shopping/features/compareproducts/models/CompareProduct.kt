@@ -1,12 +1,14 @@
 package ke.co.xently.shopping.features.compareproducts.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import ke.co.xently.shopping.features.core.OrderBy
 import kotlinx.parcelize.Parcelize
 
 sealed interface CompareProduct {
     val comparisonList: List<ComparisonListItem>
 
+    @Keep
     @Parcelize
     data class Request(
         val orderBy: OrderBy,
@@ -35,6 +37,7 @@ sealed interface CompareProduct {
         }
     }
 
+    @Keep
     data class Response(
         val orderedBy: OrderBy,
         override val comparisonList: List<ComparisonListItem>,

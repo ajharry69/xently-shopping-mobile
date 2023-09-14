@@ -7,7 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.features.auth.Auth
+import io.ktor.client.features.auth.providers.BearerTokens
+import io.ktor.client.features.auth.providers.bearer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.Logging
@@ -157,12 +160,24 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(json: Json): HttpClient {
-        return HttpClient(CIO) {
+    fun provideHttpClient(json: Json, database: Database, okHttpClient: OkHttpClient): HttpClient {
+        return HttpClient(OkHttp) {
+            engine {
+                preconfigured = okHttpClient
+            }
             install(Logging)
             install(WebSockets)
             install(JsonFeature) {
                 serializer = KotlinxSerializer(json = json)
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        database.userDao.getAuthorizationToken()?.let {
+                            BearerTokens(it, it)
+                        }
+                    }
+                }
             }
         }
     }

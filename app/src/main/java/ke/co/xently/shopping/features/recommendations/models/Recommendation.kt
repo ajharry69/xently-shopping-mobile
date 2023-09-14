@@ -1,6 +1,7 @@
 package ke.co.xently.shopping.features.recommendations.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import ke.co.xently.shopping.features.core.models.BigDecimalSerializer
 import ke.co.xently.shopping.features.core.models.Location
@@ -12,6 +13,7 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 sealed interface Recommendation {
+    @Keep
     @Parcelize
     data class Request(
         val currentLocation: Location,
@@ -38,6 +40,7 @@ sealed interface Recommendation {
             return true
         }
 
+        @Keep
         @Parcelize
         data class ShoppingListItem(
             val name: String,
@@ -92,6 +95,7 @@ sealed interface Recommendation {
         }
     }
 
+    @Keep
     @Serializable
     data class Response(
         val estimatedExpenditure: EstimatedExpenditure,
@@ -103,6 +107,7 @@ sealed interface Recommendation {
     ) : Recommendation {
         fun hasAnOnlineStore() = store.hasAnOnlineStore()
 
+        @Keep
         @Serializable
         data class EstimatedExpenditure(val unit: Double = 0.0, val total: Double = 0.0) {
             companion object {
@@ -110,6 +115,7 @@ sealed interface Recommendation {
             }
         }
 
+        @Keep
         @Serializable
         data class Miss(val count: Int, val items: List<Item> = emptyList()) {
             @JvmInline
@@ -128,8 +134,10 @@ sealed interface Recommendation {
             }
         }
 
+        @Keep
         @Serializable
         data class Hit(val count: Int, val items: List<Item> = emptyList()) {
+            @Keep
             @Serializable
             data class Item(
                 val bestMatched: BestMatched,
@@ -153,6 +161,7 @@ sealed interface Recommendation {
                     return result
                 }
 
+                @Keep
                 @Serializable
                 data class ShoppingList(val name: String, val quantityToPurchase: Int = 1) {
                     override fun hashCode(): Int {
@@ -175,6 +184,7 @@ sealed interface Recommendation {
                     }
                 }
 
+                @Keep
                 @Serializable
                 data class BestMatched(
                     val name: String,

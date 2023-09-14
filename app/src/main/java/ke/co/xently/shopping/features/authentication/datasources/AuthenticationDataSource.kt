@@ -25,5 +25,5 @@ abstract class AuthenticationDataSource {
 
     abstract suspend fun resetPassword(request: ResetPasswordRequest): ResetPasswordResponse
     open suspend fun saveResetPasswordResponse(response: ResetPasswordResponse) {}
-    open suspend fun deleteCurrentlySignedInUserOnSessionExpiration() {}
+    open suspend fun deleteCurrentlySignedInUser() {}
 }

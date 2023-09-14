@@ -1,6 +1,7 @@
 package ke.co.xently.shopping.features.shop.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -14,6 +15,7 @@ sealed interface Shop {
         return !ecommerceSiteUrl.isNullOrBlank()
     }
 
+    @Keep
     data class RemoteRequest(
         override val id: Long,
         override val slug: String,
@@ -21,6 +23,7 @@ sealed interface Shop {
         override val ecommerceSiteUrl: String?,
     ) : Shop
 
+    @Keep
     @Serializable
     data class RemoteResponse(
         override val id: Long,
@@ -29,6 +32,7 @@ sealed interface Shop {
         override val ecommerceSiteUrl: String?,
     ) : Shop
 
+    @Keep
     data class LocalEntityRequest(
         override val id: Long,
         override val slug: String,
@@ -36,6 +40,7 @@ sealed interface Shop {
         override val ecommerceSiteUrl: String?,
     ) : Shop
 
+    @Keep
     data class LocalEntityResponse(
         override val id: Long,
         override val slug: String,
@@ -43,6 +48,7 @@ sealed interface Shop {
         override val ecommerceSiteUrl: String?,
     ) : Shop
 
+    @Keep
     @Parcelize
     @Serializable
     data class LocalViewModel(

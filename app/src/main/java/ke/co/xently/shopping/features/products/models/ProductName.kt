@@ -1,12 +1,13 @@
 package ke.co.xently.shopping.features.products.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import ke.co.xently.shopping.features.core.models.SynonymStructure
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 sealed interface ProductName : SynonymStructure {
-
+    @Keep
     data class RemoteRequest(
         override val id: Long,
         override val slug: String,
@@ -15,6 +16,7 @@ sealed interface ProductName : SynonymStructure {
         override val symbol: String?,
     ) : ProductName
 
+    @Keep
     @Serializable
     data class RemoteResponse(
         override val id: Long,
@@ -24,6 +26,7 @@ sealed interface ProductName : SynonymStructure {
         override val symbol: String?,
     ) : ProductName
 
+    @Keep
     data class LocalEntityRequest(
         override val id: Long,
         override val slug: String,
@@ -32,6 +35,7 @@ sealed interface ProductName : SynonymStructure {
         override val symbol: String?,
     ) : ProductName
 
+    @Keep
     data class LocalEntityResponse(
         override val id: Long,
         override val slug: String,
@@ -40,6 +44,7 @@ sealed interface ProductName : SynonymStructure {
         override val symbol: String?,
     ) : ProductName
 
+    @Keep
     @Parcelize
     data class LocalViewModel(
         override val id: Long,
