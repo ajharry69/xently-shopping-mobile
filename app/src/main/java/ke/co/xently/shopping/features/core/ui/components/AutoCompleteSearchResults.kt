@@ -50,37 +50,4 @@ fun <Q> AutoCompleteSearchResults(
     CallOnLifecycleEvent {
         lifecycleEvent = it
     }
-
-    /*val coroutineScope = rememberCoroutineScope()
-    LaunchedEffect(closeSessionKey()) {
-        service.closeSession()
-    }
-
-    CallOnLifecycleEvent {
-        coroutineScope.launch {
-            if (it == Lifecycle.Event.ON_PAUSE) {
-                service.closeSession()
-            } else if (it == Lifecycle.Event.ON_RESUME) {
-                // Ensure previous sessions are closed before initialising another
-                // this is a defensive move aimed at preventing the possibility of
-                // running into unexpected errors.
-                service.closeSession()
-
-                val initState = service.initSession()
-                while (initState !is AutoCompleteService.InitState.Success && initState !is AutoCompleteService.InitState.Failure) {
-                    delay(250.milliseconds)
-                    Timber.tag("AutoCompleteSearchResults").i(
-                        "Response: %s. Retrying service initialization. Please wait...",
-                        initState,
-                    )
-                }
-                service.getSearchResults()
-                    .flowWithLifecycle(
-                        lifecycle = lifecycle.lifecycle,
-                        minActiveState = Lifecycle.State.RESUMED,
-                    )
-                    .collect(suggestions)
-            }
-        }
-    }*/
 }
