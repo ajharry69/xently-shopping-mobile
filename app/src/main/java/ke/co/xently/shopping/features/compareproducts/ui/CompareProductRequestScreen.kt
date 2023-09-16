@@ -1,7 +1,6 @@
 package ke.co.xently.shopping.features.compareproducts.ui
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +39,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -133,12 +134,16 @@ internal fun CompareProductsRequestScreen(
         }
     }
 
-    var uiState by remember {
-        mutableStateOf<CompareProductRequestUIState>(CompareProductRequestUIState.OK)
-    }
+    val uiState by produceState<CompareProductRequestUIState>(
+        CompareProductRequestUIState.OK,
+        comparisonListItemUnitPriceValue.text,
+        comparisonListItemNameValue.text,
+    ) {
+        value = when {
+            comparisonListItemUnitPriceValue.text.isBlank() && comparisonListItemNameValue.text.isBlank() -> {
+                CompareProductRequestUIState.NameAndUnitPriceBlank
+            }
 
-    LaunchedEffect(comparisonListItemUnitPriceValue.text, comparisonListItemNameValue.text) {
-        uiState = when {
             comparisonListItemUnitPriceValue.text.isBlank() -> {
                 CompareProductRequestUIState.MissingUnitPrice
             }
@@ -160,10 +165,12 @@ internal fun CompareProductsRequestScreen(
 
     val context = LocalContext.current
     val snackbarHostState = LocalSnackbarHostState.current
+    val currentCompareProducts by rememberUpdatedState(compareProducts)
+    val currentBottomSheetPeek by rememberUpdatedState(bottomSheetPeek)
 
     LaunchedEffect(comparisonsState) {
         if (comparisonsState is State.Success) {
-            bottomSheetPeek(BottomSheet.CompareProductResponse(comparisonsState.data))
+            currentBottomSheetPeek(BottomSheet.CompareProductResponse(comparisonsState.data))
         } else if (comparisonsState is State.Failure) {
             val message = comparisonsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)
@@ -179,7 +186,7 @@ internal fun CompareProductsRequestScreen(
             )
 
             if (result == SnackbarResult.ActionPerformed) {
-                compareProducts()
+                currentCompareProducts()
             }
         }
     }
@@ -210,15 +217,17 @@ internal fun CompareProductsRequestScreen(
                         },
                         supportingText = {
                             val message = if (uiState is CompareProductRequestUIState.NameError) {
-                                uiState.message
+                                uiState(context = LocalContext.current)
                             } else {
-                                R.string.xently_text_field_help_text_comparison_list_item_name
+                                stringResource(R.string.xently_text_field_help_text_comparison_list_item_name)
                             }
-                            Text(text = stringResource(message))
+                            Text(text = message)
                         },
                         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                     )
                     TextField(
+                        maxLines = 1,
+                        singleLine = true,
                         value = comparisonListItemUnitPriceValue,
                         onValueChange = {
                             comparisonListItemUnitPriceValue = it
@@ -234,7 +243,7 @@ internal fun CompareProductsRequestScreen(
                         ),
                         supportingText = if (uiState is CompareProductRequestUIState.UnitPriceError) {
                             {
-                                Text(text = stringResource(uiState.message))
+                                Text(text = uiState(context = LocalContext.current))
                             }
                         } else {
                             null
@@ -291,7 +300,6 @@ internal fun CompareProductsRequestScreen(
                     }
 
                     LazyColumn(
-                        reverseLayout = true,
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
                     ) {
@@ -465,29 +473,5 @@ private fun CompareProductsRequestScreenPreview() {
             clearDraftComparisonListItem = {},
             compareProducts = {},
         )
-    }
-}
-
-private sealed interface CompareProductRequestUIState {
-    @get:StringRes
-    val message: Int
-
-    sealed interface UnitPriceError : CompareProductRequestUIState
-    sealed interface NameError : CompareProductRequestUIState
-
-    object OK : CompareProductRequestUIState {
-        override val message: Int = android.R.string.ok
-    }
-
-    object MissingUnitPrice : UnitPriceError {
-        override val message: Int = R.string.xently_error_missing_unit_price
-    }
-
-    object InvalidUnitPrice : UnitPriceError {
-        override val message: Int = R.string.xently_error_invalid_unit_price
-    }
-
-    object MissingName : NameError {
-        override val message: Int = R.string.xently_error_missing_name
     }
 }

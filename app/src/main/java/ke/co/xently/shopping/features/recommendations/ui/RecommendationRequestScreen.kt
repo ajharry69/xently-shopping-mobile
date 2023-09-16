@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -36,12 +37,14 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -115,22 +118,6 @@ fun RecommendationRequestScreen(
         mutableStateOf(TextFieldValue(draftShoppingListItem.name))
     }
 
-    var uiState by remember {
-        mutableStateOf<RecommendationRequestUIState>(RecommendationRequestUIState.OK)
-    }
-
-    LaunchedEffect(shoppingListItemValue.text) {
-        uiState = when {
-            shoppingListItemValue.text.hasEmojis -> {
-                RecommendationRequestUIState.NameError.ImojisNotAllowed
-            }
-
-            else -> {
-                RecommendationRequestUIState.OK
-            }
-        }
-    }
-
     val shoppingList = remember(request.shoppingList) {
         mutableStateListOf(*request.shoppingList.toTypedArray())
     }
@@ -141,10 +128,28 @@ fun RecommendationRequestScreen(
         }
     }
 
+    val uiState by produceState<RecommendationRequestUIState>(
+        RecommendationRequestUIState.OK,
+        shoppingListItemValue.text,
+    ) {
+        value = when {
+            shoppingListItemValue.text.hasEmojis -> {
+                RecommendationRequestUIState.NameError.ImojisNotAllowed
+            }
+
+            shoppingListItemValue.text.isBlank() -> {
+                RecommendationRequestUIState.BlankNameNotAllowed
+            }
+
+            else -> {
+                RecommendationRequestUIState.OK
+            }
+        }
+    }
+
     val showAddButton by remember(shoppingListItemValue, uiState) {
         derivedStateOf {
             uiState is RecommendationRequestUIState.OK
-                    && shoppingListItemValue.text.isNotBlank()
         }
     }
 
@@ -155,11 +160,14 @@ fun RecommendationRequestScreen(
     }
 
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
     val snackbarHostState = LocalSnackbarHostState.current
 
+    val currentOnSuccess by rememberUpdatedState(onSuccess)
+    val currentGetRecommendations by rememberUpdatedState(getRecommendations)
     LaunchedEffect(recommendationsState) {
         if (recommendationsState is State.Success) {
-            onSuccess()
+            currentOnSuccess()
         } else if (recommendationsState is State.Failure) {
             val message = recommendationsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)
@@ -175,7 +183,7 @@ fun RecommendationRequestScreen(
             )
 
             if (result == SnackbarResult.ActionPerformed) {
-                getRecommendations()
+                currentGetRecommendations()
             }
         }
     }
@@ -188,7 +196,7 @@ fun RecommendationRequestScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                val onEnforceStrictMeasurementUnitChange: (Boolean) -> Unit by rememberUpdatedState { enforce ->
+                val onEnforceStrictMeasurementUnitChange: (Boolean) -> Unit = { enforce ->
                     saveIndexedDraftShoppingListItem(
                         draftShoppingListItem.copy(enforceStrictMeasurementUnit = enforce),
                         draftShoppingListItemIndex,
@@ -202,7 +210,7 @@ fun RecommendationRequestScreen(
                     Text(text = stringResource(R.string.xently_checkbox_label_enforce_strict_measurement_unit))
                 }
 
-                val addShoppingListItem: () -> Unit by rememberUpdatedState {
+                val addShoppingListItem: () -> Unit = {
                     draftShoppingListItem.copy(name = shoppingListItemValue.text).let {
                         if (draftShoppingListItemIndex == RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX) {
                             shoppingList.add(it)
@@ -217,6 +225,8 @@ fun RecommendationRequestScreen(
                     shoppingListItemValue = TextFieldValue("")
                 }
                 TextField(
+                    maxLines = 1,
+                    singleLine = true,
                     value = shoppingListItemValue,
                     onValueChange = {
                         shoppingListItemValue = it
@@ -232,6 +242,15 @@ fun RecommendationRequestScreen(
                         }
                     } else null,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (showAddButton) {
+                                addShoppingListItem()
+                            } else {
+                                focusManager.clearFocus()
+                            }
+                        },
+                    ),
                     trailingIcon = {
                         val contentDescription = stringResource(
                             R.string.xently_content_description_add_item,
@@ -279,7 +298,6 @@ fun RecommendationRequestScreen(
                     }
 
                     LazyColumn(
-                        reverseLayout = true,
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
                     ) {
