@@ -40,7 +40,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -133,12 +135,12 @@ internal fun CompareProductsRequestScreen(
         }
     }
 
-    var uiState by remember {
-        mutableStateOf<CompareProductRequestUIState>(CompareProductRequestUIState.OK)
-    }
-
-    LaunchedEffect(comparisonListItemUnitPriceValue.text, comparisonListItemNameValue.text) {
-        uiState = when {
+    val uiState by produceState<CompareProductRequestUIState>(
+        CompareProductRequestUIState.OK,
+        comparisonListItemUnitPriceValue.text,
+        comparisonListItemNameValue.text,
+    ) {
+        value = when {
             comparisonListItemUnitPriceValue.text.isBlank() -> {
                 CompareProductRequestUIState.MissingUnitPrice
             }
@@ -160,10 +162,12 @@ internal fun CompareProductsRequestScreen(
 
     val context = LocalContext.current
     val snackbarHostState = LocalSnackbarHostState.current
+    val currentCompareProducts by rememberUpdatedState(compareProducts)
+    val currentBottomSheetPeek by rememberUpdatedState(bottomSheetPeek)
 
     LaunchedEffect(comparisonsState) {
         if (comparisonsState is State.Success) {
-            bottomSheetPeek(BottomSheet.CompareProductResponse(comparisonsState.data))
+            currentBottomSheetPeek(BottomSheet.CompareProductResponse(comparisonsState.data))
         } else if (comparisonsState is State.Failure) {
             val message = comparisonsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)
@@ -179,7 +183,7 @@ internal fun CompareProductsRequestScreen(
             )
 
             if (result == SnackbarResult.ActionPerformed) {
-                compareProducts()
+                currentCompareProducts()
             }
         }
     }

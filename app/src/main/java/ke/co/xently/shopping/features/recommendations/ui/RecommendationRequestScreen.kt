@@ -36,6 +36,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -115,22 +116,6 @@ fun RecommendationRequestScreen(
         mutableStateOf(TextFieldValue(draftShoppingListItem.name))
     }
 
-    var uiState by remember {
-        mutableStateOf<RecommendationRequestUIState>(RecommendationRequestUIState.OK)
-    }
-
-    LaunchedEffect(shoppingListItemValue.text) {
-        uiState = when {
-            shoppingListItemValue.text.hasEmojis -> {
-                RecommendationRequestUIState.NameError.ImojisNotAllowed
-            }
-
-            else -> {
-                RecommendationRequestUIState.OK
-            }
-        }
-    }
-
     val shoppingList = remember(request.shoppingList) {
         mutableStateListOf(*request.shoppingList.toTypedArray())
     }
@@ -138,6 +123,21 @@ fun RecommendationRequestScreen(
     val showEmptyShoppingListMessage by remember(request.shoppingList) {
         derivedStateOf {
             request.shoppingList.isEmpty()
+        }
+    }
+
+    val uiState by produceState<RecommendationRequestUIState>(
+        RecommendationRequestUIState.OK,
+        shoppingListItemValue.text,
+    ) {
+        value = when {
+            shoppingListItemValue.text.hasEmojis -> {
+                RecommendationRequestUIState.NameError.ImojisNotAllowed
+            }
+
+            else -> {
+                RecommendationRequestUIState.OK
+            }
         }
     }
 
@@ -157,9 +157,11 @@ fun RecommendationRequestScreen(
     val context = LocalContext.current
     val snackbarHostState = LocalSnackbarHostState.current
 
+    val currentOnSuccess by rememberUpdatedState(onSuccess)
+    val currentGetRecommendations by rememberUpdatedState(getRecommendations)
     LaunchedEffect(recommendationsState) {
         if (recommendationsState is State.Success) {
-            onSuccess()
+            currentOnSuccess()
         } else if (recommendationsState is State.Failure) {
             val message = recommendationsState.error.localizedMessage
                 ?: context.getString(R.string.xently_generic_error_message)
@@ -175,7 +177,7 @@ fun RecommendationRequestScreen(
             )
 
             if (result == SnackbarResult.ActionPerformed) {
-                getRecommendations()
+                currentGetRecommendations()
             }
         }
     }
@@ -188,7 +190,7 @@ fun RecommendationRequestScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                val onEnforceStrictMeasurementUnitChange: (Boolean) -> Unit by rememberUpdatedState { enforce ->
+                val onEnforceStrictMeasurementUnitChange: (Boolean) -> Unit = { enforce ->
                     saveIndexedDraftShoppingListItem(
                         draftShoppingListItem.copy(enforceStrictMeasurementUnit = enforce),
                         draftShoppingListItemIndex,
@@ -202,7 +204,7 @@ fun RecommendationRequestScreen(
                     Text(text = stringResource(R.string.xently_checkbox_label_enforce_strict_measurement_unit))
                 }
 
-                val addShoppingListItem: () -> Unit by rememberUpdatedState {
+                val addShoppingListItem: () -> Unit = {
                     draftShoppingListItem.copy(name = shoppingListItemValue.text).let {
                         if (draftShoppingListItemIndex == RecommendationViewModel.DEFAULT_SHOPPING_LIST_ITEM_INDEX) {
                             shoppingList.add(it)
@@ -217,6 +219,8 @@ fun RecommendationRequestScreen(
                     shoppingListItemValue = TextFieldValue("")
                 }
                 TextField(
+                    singleLine = true,
+                    maxLines = 1,
                     value = shoppingListItemValue,
                     onValueChange = {
                         shoppingListItemValue = it
