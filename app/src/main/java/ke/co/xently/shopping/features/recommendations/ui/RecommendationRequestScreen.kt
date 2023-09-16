@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -43,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -135,6 +137,10 @@ fun RecommendationRequestScreen(
                 RecommendationRequestUIState.NameError.ImojisNotAllowed
             }
 
+            shoppingListItemValue.text.isBlank() -> {
+                RecommendationRequestUIState.BlankNameNotAllowed
+            }
+
             else -> {
                 RecommendationRequestUIState.OK
             }
@@ -144,7 +150,6 @@ fun RecommendationRequestScreen(
     val showAddButton by remember(shoppingListItemValue, uiState) {
         derivedStateOf {
             uiState is RecommendationRequestUIState.OK
-                    && shoppingListItemValue.text.isNotBlank()
         }
     }
 
@@ -155,6 +160,7 @@ fun RecommendationRequestScreen(
     }
 
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
     val snackbarHostState = LocalSnackbarHostState.current
 
     val currentOnSuccess by rememberUpdatedState(onSuccess)
@@ -219,8 +225,8 @@ fun RecommendationRequestScreen(
                     shoppingListItemValue = TextFieldValue("")
                 }
                 TextField(
-                    singleLine = true,
                     maxLines = 1,
+                    singleLine = true,
                     value = shoppingListItemValue,
                     onValueChange = {
                         shoppingListItemValue = it
@@ -236,6 +242,15 @@ fun RecommendationRequestScreen(
                         }
                     } else null,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (showAddButton) {
+                                addShoppingListItem()
+                            } else {
+                                focusManager.clearFocus()
+                            }
+                        },
+                    ),
                     trailingIcon = {
                         val contentDescription = stringResource(
                             R.string.xently_content_description_add_item,
@@ -283,7 +298,6 @@ fun RecommendationRequestScreen(
                     }
 
                     LazyColumn(
-                        reverseLayout = true,
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
                     ) {

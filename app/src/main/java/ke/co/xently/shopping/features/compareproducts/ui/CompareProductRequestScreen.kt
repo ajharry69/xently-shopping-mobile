@@ -1,7 +1,6 @@
 package ke.co.xently.shopping.features.compareproducts.ui
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -141,6 +140,10 @@ internal fun CompareProductsRequestScreen(
         comparisonListItemNameValue.text,
     ) {
         value = when {
+            comparisonListItemUnitPriceValue.text.isBlank() && comparisonListItemNameValue.text.isBlank() -> {
+                CompareProductRequestUIState.NameAndUnitPriceBlank
+            }
+
             comparisonListItemUnitPriceValue.text.isBlank() -> {
                 CompareProductRequestUIState.MissingUnitPrice
             }
@@ -214,15 +217,17 @@ internal fun CompareProductsRequestScreen(
                         },
                         supportingText = {
                             val message = if (uiState is CompareProductRequestUIState.NameError) {
-                                uiState.message
+                                uiState(context = LocalContext.current)
                             } else {
-                                R.string.xently_text_field_help_text_comparison_list_item_name
+                                stringResource(R.string.xently_text_field_help_text_comparison_list_item_name)
                             }
-                            Text(text = stringResource(message))
+                            Text(text = message)
                         },
                         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                     )
                     TextField(
+                        maxLines = 1,
+                        singleLine = true,
                         value = comparisonListItemUnitPriceValue,
                         onValueChange = {
                             comparisonListItemUnitPriceValue = it
@@ -238,7 +243,7 @@ internal fun CompareProductsRequestScreen(
                         ),
                         supportingText = if (uiState is CompareProductRequestUIState.UnitPriceError) {
                             {
-                                Text(text = stringResource(uiState.message))
+                                Text(text = uiState(context = LocalContext.current))
                             }
                         } else {
                             null
@@ -295,7 +300,6 @@ internal fun CompareProductsRequestScreen(
                     }
 
                     LazyColumn(
-                        reverseLayout = true,
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
                     ) {
@@ -469,29 +473,5 @@ private fun CompareProductsRequestScreenPreview() {
             clearDraftComparisonListItem = {},
             compareProducts = {},
         )
-    }
-}
-
-private sealed interface CompareProductRequestUIState {
-    @get:StringRes
-    val message: Int
-
-    sealed interface UnitPriceError : CompareProductRequestUIState
-    sealed interface NameError : CompareProductRequestUIState
-
-    object OK : CompareProductRequestUIState {
-        override val message: Int = android.R.string.ok
-    }
-
-    object MissingUnitPrice : UnitPriceError {
-        override val message: Int = R.string.xently_error_missing_unit_price
-    }
-
-    object InvalidUnitPrice : UnitPriceError {
-        override val message: Int = R.string.xently_error_invalid_unit_price
-    }
-
-    object MissingName : NameError {
-        override val message: Int = R.string.xently_error_missing_name
     }
 }
