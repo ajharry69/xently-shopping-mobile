@@ -168,4 +168,5 @@
     <string name="xently_content_description_terms_of_service">Terms of service</string>
     <string name="xently_menu_item_signout">Sign out</string>
     <string name="xently_menu_item_signin">Sign in</string>
+    <string name="xently_error_blank_not_allowed">Blank not allowed</string>
 </resources>
