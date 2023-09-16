@@ -12,5 +12,5 @@ jobs:
       - uses: actions/first-interaction@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: "Hello new contributor! Thanks for taking the time to file this a issue in the repository. We will do our best to get back on time."
-          pr-message: "Hello new contributor! We noticed it is this is your first PR in this repository. We will take a look at it ASAP. Thanks for your valued contributes and for showing interest in this great project."
+          issue-message: "Thank you for filing an issue in the repository. We appreciate your feedback and will do our best to respond promptly."
+          pr-message: "Welcome to the project, new contributor! We appreciate your first pull request (PR) and will review it as soon as possible. Thank you for your interest in this project and your valuable contributions."
