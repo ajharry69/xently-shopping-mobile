@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
@@ -104,6 +106,20 @@ private fun MpesaPaymentRequestScreen(
         }
     }
 
+    var phoneNumber by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    val uiState by produceState<MpesaPaymentRequestScreenState>(
+        MpesaPaymentRequestScreenState.OK,
+        phoneNumber,
+    ) {
+        value = when {
+            phoneNumber.isBlank() -> MpesaPaymentRequestScreenState.PhoneNumber.Blank
+            else -> MpesaPaymentRequestScreenState.OK
+        }
+    }
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(snackbarHostState)
@@ -143,26 +159,39 @@ private fun MpesaPaymentRequestScreen(
 
                     Text(text = stringResource(R.string.xently_checkout_mpesa_description))
 
-                    var phoneNumber by rememberSaveable {
-                        mutableStateOf("")
-                    }
-
                     TextField(
+                        maxLines = 1,
+                        singleLine = true,
                         value = phoneNumber,
                         onValueChange = { phoneNumber = it },
                         modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Phone,
+                        ),
                         label = {
                             Text(text = stringResource(R.string.xently_text_field_label_phone_number_required))
                         },
                         prefix = {
                             Text(text = "+254")
                         },
+                        isError = uiState is MpesaPaymentRequestScreenState.PhoneNumber,
+                        supportingText = if (uiState is MpesaPaymentRequestScreenState.PhoneNumber) {
+                            {
+                                Text(text = uiState(LocalContext.current))
+                            }
+                        } else null,
                     )
 
                     val focusManager = LocalFocusManager.current
+                    val enablePayButton by remember(loading, uiState) {
+                        derivedStateOf {
+                            !loading
+                                    && uiState is MpesaPaymentRequestScreenState.OK
+                        }
+                    }
                     Button(
-                        enabled = !loading,
+                        enabled = enablePayButton,
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             val cleansedPhoneNumber = phoneNumber.cleansedForNumberParsing()
