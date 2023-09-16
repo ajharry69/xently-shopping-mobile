@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,12 +66,12 @@ fun AddProductScreen(
     saveCurrentlyActiveStep: (AddProductStep) -> Unit,
 ) {
     val currentlyActiveStep = LocalAddProductStep.current
-    val navigateToNext: () -> Unit by rememberUpdatedState {
+    val navigateToNext: () -> Unit = {
         AddProductStep.valueOfOrdinalOrFirstByOrdinal(currentlyActiveStep.ordinal + 1)
             .also(saveCurrentlyActiveStep)
     }
 
-    val navigateToPrevious: () -> Unit by rememberUpdatedState {
+    val navigateToPrevious: () -> Unit = {
         AddProductStep.valueOfOrdinalOrFirstByOrdinal(currentlyActiveStep.ordinal - 1)
             .also(saveCurrentlyActiveStep)
     }
@@ -114,7 +113,7 @@ fun AddProductScreen(
         ) { step ->
             when (step) {
                 AddProductStep.Store -> {
-                    val productDraft: (Store) -> Product.LocalViewModel by rememberUpdatedState {
+                    val productDraft: (Store) -> Product.LocalViewModel = {
                         product.copy(store = it.toLocalViewModel())
                     }
                     AddStorePage(
@@ -132,7 +131,7 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.Shop -> {
-                    val productDraft: (Shop) -> Product.LocalViewModel by rememberUpdatedState {
+                    val productDraft: (Shop) -> Product.LocalViewModel = {
                         product.run {
                             copy(store = store.copy(shop = it.toLocalViewModel()))
                         }
@@ -153,7 +152,7 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.ProductName -> {
-                    val productDraft: (Product) -> Product.LocalViewModel by rememberUpdatedState {
+                    val productDraft: (Product) -> Product.LocalViewModel = {
                         val productViewModel = it.toLocalViewModel()
                         product.copy(
                             name = productViewModel.name,
@@ -180,7 +179,7 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.MeasurementUnitName -> {
-                    val productDraft: (Product) -> Product.LocalViewModel by rememberUpdatedState {
+                    val productDraft: (Product) -> Product.LocalViewModel = {
                         val productViewModel = it.toLocalViewModel()
                         product.copy(
                             name = productViewModel.name,
@@ -208,7 +207,7 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.MeasurementUnitQuantity -> {
-                    val productDraft: (Product) -> Product.LocalViewModel by rememberUpdatedState {
+                    val productDraft: (Product) -> Product.LocalViewModel = {
                         val productViewModel = it.toLocalViewModel()
                         product.copy(
                             name = productViewModel.name,
@@ -244,7 +243,7 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.Brands -> {
-                    val productDraft: (List<Brand>) -> Product.LocalViewModel by rememberUpdatedState {
+                    val productDraft: (List<Brand>) -> Product.LocalViewModel = {
                         product.copy(brands = it.map(Brand::toLocalViewModel))
                     }
                     AddBrandsPage(
@@ -263,7 +262,7 @@ fun AddProductScreen(
                 }
 
                 AddProductStep.Attributes -> {
-                    val productDraft: (List<AttributeValue>) -> Product.LocalViewModel by rememberUpdatedState {
+                    val productDraft: (List<AttributeValue>) -> Product.LocalViewModel = {
                         product.copy(attributeValues = it.map(AttributeValue::toLocalViewModel))
                     }
                     AddAttributesPage(
