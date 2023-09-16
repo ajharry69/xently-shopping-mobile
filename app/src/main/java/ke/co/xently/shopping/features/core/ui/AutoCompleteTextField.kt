@@ -16,9 +16,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,9 +28,8 @@ import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.features.core.hasEmojis
 import ke.co.xently.shopping.features.core.ui.components.AutoCompleteSearchResults
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
-import kotlinx.coroutines.delay
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.milliseconds
+import ke.co.xently.shopping.features.core.ui.autocomplete.AutoCompleteTextField as CoreAutoCompleteTextField
 
 
 class AutoCompleteTextFieldState {
@@ -71,10 +72,9 @@ fun <Q, R> AutoCompleteTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onSearch: (String) -> Q,
     onSuggestionSelected: (R) -> Unit,
-    closeSessionKey: @Composable () -> Any = { true },
-    label: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    supportingText: @Composable (() -> Unit)? = null,
+    label: @Composable() (() -> Unit)? = null,
+    trailingIcon: @Composable() (() -> Unit)? = null,
+    supportingText: @Composable() (() -> Unit)? = null,
     suggestionContent: @Composable (R) -> Unit,
 ) {
     val suggestions = remember {
@@ -86,29 +86,18 @@ fun <Q, R> AutoCompleteTextField(
     }
 
     LaunchedEffect(resultState) {
-        when (@Suppress("LocalVariableName") val _state = resultState) {
-            is AutoCompleteService.ResultState.Failure -> {
-                suggestions.clear()
-            }
-
-            is AutoCompleteService.ResultState.Success<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                val results = _state.data as List<R>
-                suggestions.clear()
-                suggestions.addAll(results)
-            }
-
-            AutoCompleteService.ResultState.Idle -> {
-
-            }
-
-            AutoCompleteService.ResultState.Loading -> {
-
-            }
+        if (resultState is AutoCompleteService.ResultState.Failure) {
+            suggestions.clear()
+        } else if (resultState is AutoCompleteService.ResultState.Success<*>) {
+            @Suppress("UNCHECKED_CAST")
+            val results =
+                (resultState as AutoCompleteService.ResultState.Success<*>).data as List<R>
+            suggestions.clear()
+            suggestions.addAll(results)
         }
     }
 
-    AutoCompleteSearchResults(service = service, closeSessionKey = closeSessionKey) {
+    AutoCompleteSearchResults(service = service) {
         resultState = it
     }
 
@@ -125,34 +114,33 @@ fun <Q, R> AutoCompleteTextField(
         mutableStateOf(false)
     }
 
-    val hasErrors = isError || shouldReportEmojiProhibition
+    val hasErrors by remember(isError, shouldReportEmojiProhibition) {
+        derivedStateOf {
+            isError || shouldReportEmojiProhibition
+        }
+    }
 
     LaunchedEffect(state.query, suggestions, hasErrors) {
         if (wasSuggestionSelected || hasErrors) {
             wasSuggestionSelected = false
-            if (hasErrors) {
-                delay(800.milliseconds) // Delay hiding the soft keyboard
-            }
             searchActive = false
         } else {
             (state.query.isNotBlank() && suggestions.isNotEmpty()).let {
-                if (!it) {
-                    delay(800.milliseconds) // Delay hiding the soft keyboard
-                }
                 searchActive = it
             }
         }
     }
 
+    val currentOnSearch by rememberUpdatedState(onSearch)
     if (!hasErrors) {
-        LaunchedEffect(state.query) {
+        LaunchedEffect(state.query, service, numberOfResults) {
             // No need to send an unnecessary search request if an error was encountered
-            val query = onSearch(state.query)
+            val query = currentOnSearch(state.query)
             service.search(query, numberOfResults)
         }
     }
 
-    ke.co.xently.shopping.features.core.ui.autocomplete.AutoCompleteTextField(
+    CoreAutoCompleteTextField(
         query = state.query,
         onQueryChange = state::updateQuery,
         isError = hasErrors,
@@ -169,6 +157,7 @@ fun <Q, R> AutoCompleteTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
     ) {
+        val focusManager = LocalFocusManager.current
         for (suggestion in suggestions) {
             ListItem(
                 headlineContent = {
@@ -178,6 +167,7 @@ fun <Q, R> AutoCompleteTextField(
                     onSuggestionSelected(suggestion)
                     wasSuggestionSelected = true
                     searchActive = false
+                    focusManager.clearFocus()
                 },
             )
         }
@@ -198,21 +188,20 @@ private fun AutoCompleteTextFieldPreview() {
         Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
             AutoCompleteTextField<String, String>(
                 modifier = Modifier.fillMaxWidth(),
-                state = rememberAutoCompleteTextFieldState(),
                 service = AutoCompleteService.Fake(
                     AutoCompleteService.ResultState.Success(
                         suggestions
                     )
                 ),
+                state = rememberAutoCompleteTextFieldState(),
                 onSearch = { "" },
                 onSuggestionSelected = {},
                 label = {
                     Text(text = "Search...")
                 },
-                suggestionContent = {
-                    Text(text = it)
-                },
-            )
+            ) {
+                Text(text = it)
+            }
         }
     }
 }

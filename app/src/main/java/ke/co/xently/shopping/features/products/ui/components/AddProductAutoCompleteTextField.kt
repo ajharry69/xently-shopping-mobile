@@ -8,7 +8,6 @@ import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.AutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
-import ke.co.xently.shopping.features.products.ui.LocalAddProductStep
 
 
 @Composable
@@ -43,6 +42,5 @@ fun <Q, R> AddProductAutoCompleteTextField(
         trailingIcon = trailingIcon,
         supportingText = supportingText,
         suggestionContent = suggestionContent,
-        closeSessionKey = { LocalAddProductStep.current },
     )
 }

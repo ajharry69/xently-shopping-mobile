@@ -25,7 +25,21 @@ sealed interface AttributeValueAutoCompleteService :
                         val data = if (response.currentQuery == null) {
                             it
                         } else {
-                            listOf(response.currentQuery.toLocalViewModel()) + it
+                            val strings = it.map { i ->
+                                i.toString()
+                                    .replace("\\s+".toRegex(), "")
+                                    .lowercase()
+                            }
+
+                            val item = response.currentQuery.toLocalViewModel()
+                            val itemString =
+                                item.toString().replace("\\s+".toRegex(), "").lowercase()
+
+                            if (itemString in strings) {
+                                it
+                            } else {
+                                listOf(item) + it
+                            }
                         }
                         AutoCompleteService.ResultState.Success(data)
                     }

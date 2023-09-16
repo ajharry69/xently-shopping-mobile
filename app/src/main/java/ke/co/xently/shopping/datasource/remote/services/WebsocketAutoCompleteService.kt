@@ -16,9 +16,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
@@ -133,31 +132,33 @@ open class WebsocketAutoCompleteService<in Q>(
     data class Response<Q>(val json: String, val currentQuery: Q?)
 
     override fun getSearchResults(): Flow<AutoCompleteService.ResultState> {
-        return socket?.run {
-            incoming.receiveAsFlow()
-                .filter { it is Frame.Text }
-                .map { frame ->
-                    val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
-                        Timber.tag(TAG).i("[%s]: results: %s", urlString, it)
+        return flow {
+            socket?.run {
+                incoming.receiveAsFlow()
+                    .filter { it is Frame.Text }
+                    .map { frame ->
+                        val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
+                            Timber.tag(TAG).i("[%s]: results: %s", urlString, it)
+                        }
+                        val json = Json {
+                            ignoreUnknownKeys = true
+                        }
+                        json.mapResponse(Response(json = response, currentQuery = currentQuery))
                     }
-                    val json = Json {
-                        ignoreUnknownKeys = true
+                    .onStart {
+                        emit(AutoCompleteService.ResultState.Loading)
+                        Timber.tag(TAG).i(
+                            "[%s]: session was successfully initialised. Getting search results...",
+                            urlString
+                        )
                     }
-                    json.mapResponse(Response(json = response, currentQuery = currentQuery))
-                }
-                .onStart {
-                    emit(AutoCompleteService.ResultState.Loading)
-                    Timber.tag(TAG).i(
-                        "[%s]: session was successfully initialised. Getting search results...",
-                        urlString
-                    )
-                }
-                .catch {
-                    emit(AutoCompleteService.ResultState.Failure(it))
-                    Timber.tag(TAG).e(it, "[%s]: error getting search results", urlString)
-                }
-        } ?: flowOf<AutoCompleteService.ResultState>().onEach {
-            Timber.tag(TAG).i("[%s]: getSearchResults: returned default flow...", urlString)
+                    .catch {
+                        emit(AutoCompleteService.ResultState.Failure(it))
+                        Timber.tag(TAG).e(it, "[%s]: error getting search results", urlString)
+                    }.collect {
+                        emit(it)
+                    }
+            }
         }
     }
 
