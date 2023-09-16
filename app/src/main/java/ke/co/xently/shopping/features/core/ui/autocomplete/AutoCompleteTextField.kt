@@ -36,7 +36,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +44,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
@@ -56,7 +54,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
-import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,8 +78,6 @@ fun AutoCompleteTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     content: @Composable (ColumnScope.() -> Unit),
 ) {
-    val focusManager = LocalFocusManager.current
-
     Surface(
         shape = shape,
         color = colors.containerColor,
@@ -127,15 +122,6 @@ fun AutoCompleteTextField(
                     content()
                 }
             }
-        }
-    }
-
-    LaunchedEffect(active) {
-        if (!active) {
-            // Not strictly needed according to the motion spec, but since the animation already has
-            // a delay, this works around b/261632544.
-            delay(AnimationDelayMillis.toLong())
-            focusManager.clearFocus()
         }
     }
 

@@ -20,6 +20,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,9 +28,8 @@ import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.features.core.hasEmojis
 import ke.co.xently.shopping.features.core.ui.components.AutoCompleteSearchResults
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
-import kotlinx.coroutines.delay
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.milliseconds
+import ke.co.xently.shopping.features.core.ui.autocomplete.AutoCompleteTextField as CoreAutoCompleteTextField
 
 
 class AutoCompleteTextFieldState {
@@ -123,15 +123,9 @@ fun <Q, R> AutoCompleteTextField(
     LaunchedEffect(state.query, suggestions, hasErrors) {
         if (wasSuggestionSelected || hasErrors) {
             wasSuggestionSelected = false
-            if (hasErrors) {
-                delay(800.milliseconds) // Delay hiding the soft keyboard
-            }
             searchActive = false
         } else {
             (state.query.isNotBlank() && suggestions.isNotEmpty()).let {
-                if (!it) {
-                    delay(800.milliseconds) // Delay hiding the soft keyboard
-                }
                 searchActive = it
             }
         }
@@ -146,7 +140,7 @@ fun <Q, R> AutoCompleteTextField(
         }
     }
 
-    ke.co.xently.shopping.features.core.ui.autocomplete.AutoCompleteTextField(
+    CoreAutoCompleteTextField(
         query = state.query,
         onQueryChange = state::updateQuery,
         isError = hasErrors,
@@ -163,6 +157,7 @@ fun <Q, R> AutoCompleteTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
     ) {
+        val focusManager = LocalFocusManager.current
         for (suggestion in suggestions) {
             ListItem(
                 headlineContent = {
@@ -172,6 +167,7 @@ fun <Q, R> AutoCompleteTextField(
                     onSuggestionSelected(suggestion)
                     wasSuggestionSelected = true
                     searchActive = false
+                    focusManager.clearFocus()
                 },
             )
         }
