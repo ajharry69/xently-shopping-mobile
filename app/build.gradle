@@ -36,7 +36,7 @@ android {
 
     defaultConfig {
         applicationId "ke.co.xently.shopping"
-        versionCode 2
+        versionCode 3
         versionName localProperties.get("versionName", "1.0")
 
         vectorDrawables {
