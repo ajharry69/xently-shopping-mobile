@@ -115,7 +115,7 @@ jobs:
           DEBUG_WEB_SOCKET_BASE_URL=ws://localhost/
           EOF
       - name: Run tests
-        run: ./gradlew --no-daemon test
+        run: ./gradlew --no-daemon testDebug
 
   instrumentation-test:
     runs-on: macos-latest
