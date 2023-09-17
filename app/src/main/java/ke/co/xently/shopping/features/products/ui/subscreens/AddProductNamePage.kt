@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -22,13 +23,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.hasEmojis
+import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.LabeledCheckbox
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.models.Product
 import ke.co.xently.shopping.features.products.ui.LocalProductAutoCompleteService
-import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 
 @Composable
 fun AddProductNamePage(
@@ -38,20 +39,18 @@ fun AddProductNamePage(
     onPreviousClick: () -> Unit,
     onContinueClick: (Product) -> Unit,
 ) {
-    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
-        query = product.name.name
-    )
+    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(product.name.name)
 
     var namePlural by remember(product.name.plural) {
         mutableStateOf(TextFieldValue(product.name.plural ?: ""))
     }
 
-    var uiState by remember {
-        mutableStateOf<ProductNameUIState>(ProductNameUIState.OK)
-    }
-
-    LaunchedEffect(nameAutoCompleteState.query, namePlural.text) {
-        uiState = when {
+    val uiState by produceState<ProductNameUIState>(
+        ProductNameUIState.OK,
+        nameAutoCompleteState.query,
+        namePlural.text,
+    ) {
+        value = when {
             nameAutoCompleteState.query.isBlank() -> {
                 ProductNameUIState.MissingProductName
             }
@@ -113,7 +112,7 @@ fun AddProductNamePage(
             }
         },
     ) {
-        AddProductAutoCompleteTextField(
+        AutoCompleteTextField(
             modifier = Modifier.fillMaxWidth(),
             service = LocalProductAutoCompleteService.current,
             state = nameAutoCompleteState,

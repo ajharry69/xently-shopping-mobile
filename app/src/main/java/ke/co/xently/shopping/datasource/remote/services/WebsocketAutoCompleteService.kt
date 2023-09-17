@@ -13,10 +13,10 @@ import ke.co.xently.shopping.BaseURL
 import ke.co.xently.shopping.datasource.remote.exceptions.WebsocketConnectionFailedException
 import ke.co.xently.shopping.datasource.remote.exceptions.WebsocketException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -33,6 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 open class WebsocketAutoCompleteService<in Q>(
     private val client: HttpClient,
     private val endpoint: String,
+    private val searchDelayDuration: (String) -> Duration? = { 100.milliseconds },
     private val waitDuration: Duration = 1.seconds,
     private val waitActiveRetryCount: Int = 3,
     private val waitBackoffMultiplier: Int = 2,
@@ -41,7 +42,14 @@ open class WebsocketAutoCompleteService<in Q>(
 ) : AutoCompleteService<Q> {
     companion object {
         private val TAG = WebsocketAutoCompleteService::class.java.simpleName
+        private val sessions = mutableMapOf<String, WebSocketSession>()
     }
+
+    @Keep
+    @Serializable
+    data class Request(val q: String, val size: Int = 5)
+
+    data class Response<Q>(val json: String, val currentQuery: Q?)
 
     private val urlString: String = buildString {
         append(BaseURL.WEB_SOCKET.removeSuffix("/"))
@@ -51,12 +59,94 @@ open class WebsocketAutoCompleteService<in Q>(
 
     private var currentQuery: Q? = null
 
-    private var socket: WebSocketSession? = null
+    private var socket: WebSocketSession? = sessions[urlString]
 
-    override suspend fun initSession(logSuccessfulInitialization: Boolean): AutoCompleteService.InitState {
+    private val _resultState = MutableSharedFlow<AutoCompleteService.ResultState>()
+    override val resultState = _resultState.asSharedFlow()
+    override suspend fun init(logSuccessfulInitialization: Boolean) {
+        val response = initSession(logSuccessfulInitialization)
+        if (response is AutoCompleteService.InitState.Success) {
+            initGetSearchResults()
+        }
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    override suspend fun search(query: Q, size: Int) {
+        val q = queryString(query)
+
+        if (q.isBlank()) {
+            currentQuery = null
+            Timber.tag(TAG).i("[%s]: skipping search of blank query...", urlString)
+            return
+        }
+        currentQuery = query
+
+        val searchDelay = searchDelayDuration(q)
+        if (searchDelay != null) {
+            delay(searchDelay)
+        }
+
+        val request = Request(q = q, size = size)
+        val content = Json.encodeToString(request)
+
+        try {
+            socket?.send(content)?.also {
+                Timber.tag(TAG)
+                    .i("[%s]: sent a search request for: %s", urlString, content)
+            }
+        } catch (ex: Exception) {
+            Timber.tag(TAG).e(ex, "[%s]: error searching for '%s'", urlString, content)
+        }
+    }
+
+    override suspend fun closeSession() {
+        Timber.tag(TAG).i("[%s]: requested session closure...", urlString)
+        try {
+            socket?.close()?.also {
+                Timber.tag(TAG).i("[%s]: successfully closed websocket session.", urlString)
+            }
+        } catch (ex: Exception) {
+            Timber.tag(TAG).e(ex, "[%s]: error closing session", urlString)
+        } finally {
+            socket = null
+            sessions.remove(urlString)
+            currentQuery = null
+        }
+    }
+
+    private suspend fun initGetSearchResults() {
+        socket?.incoming?.receiveAsFlow()?.filter { it is Frame.Text }?.map { frame ->
+            val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
+                Timber.tag(TAG).i("[%s]: results: %s", urlString, it)
+            }
+            val json = Json {
+                ignoreUnknownKeys = true
+            }
+            json.mapResponse(Response(json = response, currentQuery = currentQuery))
+        }?.onStart {
+            emit(AutoCompleteService.ResultState.Loading)
+            Timber.tag(TAG).i(
+                "[%s]: session was successfully initialised. Getting search results...",
+                urlString
+            )
+        }?.catch {
+            emit(AutoCompleteService.ResultState.Failure(it))
+            Timber.tag(TAG).e(it, "[%s]: error getting search results", urlString)
+        }?.collect(_resultState::emit)
+    }
+
+    private suspend fun initSession(logSuccessfulInitialization: Boolean): AutoCompleteService.InitState {
         return try {
-            socket = socket ?: client.webSocketSession {
-                url(urlString = urlString)
+            if (socket == null) {
+                socket = sessions.getOrPut(urlString) {
+                    Timber.tag(TAG).i(
+                        "[%s]: reinitialising websocket session...",
+                        urlString,
+                    )
+                    client.webSocketSession {
+                        url(urlString = urlString)
+                    }
+                }
             }
 
             var retryCountDown = waitActiveRetryCount
@@ -84,95 +174,6 @@ open class WebsocketAutoCompleteService<in Q>(
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "[%s]: error initialising session", urlString)
             AutoCompleteService.InitState.Failure(WebsocketException(e))
-        }
-    }
-
-    @Keep
-    @Serializable
-    data class Request(val q: String, val size: Int = 5)
-
-    @OptIn(ExperimentalSerializationApi::class)
-    override suspend fun search(query: Q, size: Int) {
-        val q = queryString(query)
-
-        if (q.isBlank()) {
-            currentQuery = null
-            Timber.tag(TAG).i("[%s]: skipping search of blank query...", urlString)
-            return
-        }
-        delay(250.milliseconds)
-
-        currentQuery = query
-
-        val request = Request(q = q, size = size)
-        val content = Json.encodeToString(request)
-
-        val state = initSession(logSuccessfulInitialization = false)
-        if (state !is AutoCompleteService.InitState.Success) {
-            Timber.tag(TAG)
-                .i(
-                    "[%s]: skipping search propagation for %s. Search session is not successfully initialised!",
-                    urlString,
-                    content,
-                )
-            return
-        }
-
-        try {
-            socket?.run {
-                send(content)
-                Timber.tag(TAG)
-                    .i("[%s]: sent a search request for: %s", urlString, content)
-            }
-        } catch (ex: Exception) {
-            Timber.tag(TAG).e(ex, "[%s]: error searching for '%s'", urlString, content)
-        }
-    }
-
-    data class Response<Q>(val json: String, val currentQuery: Q?)
-
-    override fun getSearchResults(): Flow<AutoCompleteService.ResultState> {
-        return flow {
-            socket?.run {
-                incoming.receiveAsFlow()
-                    .filter { it is Frame.Text }
-                    .map { frame ->
-                        val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
-                            Timber.tag(TAG).i("[%s]: results: %s", urlString, it)
-                        }
-                        val json = Json {
-                            ignoreUnknownKeys = true
-                        }
-                        json.mapResponse(Response(json = response, currentQuery = currentQuery))
-                    }
-                    .onStart {
-                        emit(AutoCompleteService.ResultState.Loading)
-                        Timber.tag(TAG).i(
-                            "[%s]: session was successfully initialised. Getting search results...",
-                            urlString
-                        )
-                    }
-                    .catch {
-                        emit(AutoCompleteService.ResultState.Failure(it))
-                        Timber.tag(TAG).e(it, "[%s]: error getting search results", urlString)
-                    }.collect {
-                        emit(it)
-                    }
-            }
-        }
-    }
-
-    override suspend fun closeSession() {
-        Timber.tag(TAG).i("[%s]: requested session closure...", urlString)
-        try {
-            socket?.close()?.also {
-                Timber.tag(TAG).i("[%s]: successfully closed websocket session.", urlString)
-            }
-        } catch (ex: Exception) {
-            Timber.tag(TAG).e(ex, "[%s]: error closing session", urlString)
-        } finally {
-            socket = null
-            currentQuery = null
         }
     }
 }

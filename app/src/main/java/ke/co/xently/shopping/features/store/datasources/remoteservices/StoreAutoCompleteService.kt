@@ -8,6 +8,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 sealed interface StoreAutoCompleteService : AutoCompleteService<Store> {
     @OptIn(ExperimentalSerializationApi::class)
@@ -15,6 +16,7 @@ sealed interface StoreAutoCompleteService : AutoCompleteService<Store> {
     class Actual @Inject constructor(client: HttpClient) : WebsocketAutoCompleteService<Store>(
         client = client,
         endpoint = "search/suggest/stores",
+        searchDelayDuration = { 250.milliseconds },
         queryString = { store ->
             val query = store.name
             if (query.isBlank()) {

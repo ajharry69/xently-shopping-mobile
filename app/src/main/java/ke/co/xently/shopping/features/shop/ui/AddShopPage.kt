@@ -8,10 +8,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,10 +21,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.shopping.R
+import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
-import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.shopping.features.shop.models.Shop
 
 
@@ -43,12 +43,8 @@ fun AddShopPage(
         mutableStateOf(TextFieldValue(shop.ecommerceSiteUrl ?: ""))
     }
 
-    var uiState by remember {
-        mutableStateOf<ShopUIState>(ShopUIState.OK)
-    }
-
-    LaunchedEffect(nameAutoCompleteState.query) {
-        uiState = if (nameAutoCompleteState.query.isBlank()) {
+    val uiState by produceState<ShopUIState>(ShopUIState.OK, nameAutoCompleteState.query) {
+        value = if (nameAutoCompleteState.query.isBlank()) {
             ShopUIState.MissingShopName
         } else {
             ShopUIState.OK
@@ -80,7 +76,7 @@ fun AddShopPage(
             }
         },
     ) {
-        AddProductAutoCompleteTextField<Shop, Shop>(
+        AutoCompleteTextField<Shop, Shop>(
             modifier = Modifier.fillMaxWidth(),
             state = nameAutoCompleteState,
             service = LocalShopAutoCompleteService.current,

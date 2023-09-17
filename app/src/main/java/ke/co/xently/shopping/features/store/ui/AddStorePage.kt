@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -35,12 +37,12 @@ import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.models.Location
 import ke.co.xently.shopping.features.core.models.toLocation
+import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.ForegroundLocationTracker
 import ke.co.xently.shopping.features.locationtracker.LocalLocationPermissionsState
-import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.shopping.features.store.models.Store
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -51,10 +53,6 @@ fun AddStorePage(
     saveDraft: (Store) -> Unit,
     onContinueClick: (Store) -> Unit,
 ) {
-    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
-        query = store.name,
-    )
-
     var location by remember(store.location) {
         mutableStateOf(store.location)
     }
@@ -74,6 +72,8 @@ fun AddStorePage(
             location = currentLocation!!
         }
     }
+
+    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(store.name)
 
     MultiStepScreen(
         modifier = modifier,
@@ -95,8 +95,13 @@ fun AddStorePage(
             }
         },
     ) {
-        AddProductAutoCompleteTextField<Store, Store>(
+        val focusManager = LocalFocusManager.current
+        var invalidateActiveSearch by remember {
+            mutableStateOf(false)
+        }
+        AutoCompleteTextField<Store, Store>(
             modifier = Modifier.fillMaxWidth(),
+            invalidateActiveSearch = invalidateActiveSearch,
             service = LocalStoreAutoCompleteService.current,
             state = nameAutoCompleteState,
             onSearch = { query ->
@@ -108,6 +113,10 @@ fun AddStorePage(
             suggestionContent = { Text(text = it.toLocalViewModel().toString()) },
             label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
+            },
+            keyboardActions = KeyboardActions {
+                invalidateActiveSearch = !invalidateActiveSearch
+                focusManager.clearFocus()
             },
         )
 

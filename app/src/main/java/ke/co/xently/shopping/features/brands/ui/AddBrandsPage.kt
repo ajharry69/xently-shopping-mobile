@@ -28,11 +28,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.brands.models.Brand
+import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.models.Product
-import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -48,8 +48,9 @@ fun AddBrandsPage(
         mutableStateListOf(*brands.toTypedArray())
     }
 
+    val currentSaveDraft by rememberUpdatedState(saveDraft)
     LaunchedEffect(manufacturers) {
-        saveDraft(manufacturers)
+        currentSaveDraft(manufacturers)
     }
 
     MultiStepScreen(
@@ -68,10 +69,10 @@ fun AddBrandsPage(
             }
         },
     ) {
-        val doSearch: () -> Brand by rememberUpdatedState {
+        val doSearch: () -> Brand = {
             Brand.LocalViewModel.default.copy(name = nameAutoCompleteState.query)
         }
-        AddProductAutoCompleteTextField<Brand, Brand>(
+        AutoCompleteTextField<Brand, Brand>(
             state = nameAutoCompleteState,
             service = LocalBrandAutoCompleteService.current,
             onSuggestionSelected = {

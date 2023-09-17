@@ -9,10 +9,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
+import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.features.attributes.datasources.remoteservices.AttributeAutoCompleteService
 import ke.co.xently.shopping.features.attributes.ui.LocalAttributeAutoCompleteService
 import ke.co.xently.shopping.features.attributesvalues.datasources.remoteservices.AttributeValueAutoCompleteService
@@ -31,6 +33,7 @@ import ke.co.xently.shopping.features.shop.datasources.remoteservices.ShopAutoCo
 import ke.co.xently.shopping.features.shop.ui.LocalShopAutoCompleteService
 import ke.co.xently.shopping.features.store.datasources.remoteservices.StoreAutoCompleteService
 import ke.co.xently.shopping.features.store.ui.LocalStoreAutoCompleteService
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -56,6 +59,34 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var measurementUnitAutoCompleteService: MeasurementUnitAutoCompleteService
+
+    private val autoCompleteServices: List<AutoCompleteService<*>> by lazy {
+        listOf(
+            shopAutoCompleteService,
+            storeAutoCompleteService,
+            brandAutoCompleteService,
+            productAutoCompleteService,
+            attributeAutoCompleteService,
+            attributeValueAutoCompleteService,
+            measurementUnitAutoCompleteService,
+        )
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        autoCompleteServices.forEach {
+            lifecycleScope.launch { it.init() }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        autoCompleteServices.forEach {
+            lifecycleScope.launch { it.closeSession() }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

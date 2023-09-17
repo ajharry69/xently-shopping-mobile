@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -54,12 +54,14 @@ fun AddMeasurementUnitQuantityPage(
         mutableStateOf(TextFieldValue(height))
     }
 
-    var uiState by remember {
-        mutableStateOf<MeasurementUnitQuantityUIState>(MeasurementUnitQuantityUIState.OK)
-    }
-
-    LaunchedEffect(standalone.text) {
-        uiState = when {
+    val uiState by produceState<MeasurementUnitQuantityUIState>(
+        MeasurementUnitQuantityUIState.OK,
+        standalone.text,
+        length.text,
+        width.text,
+        height.text,
+    ) {
+        value = when {
             standalone.text.isNotBlank() && standalone.text.cleansedForNumberParsing()
                 .toFloatOrNull() == null -> {
                 MeasurementUnitQuantityUIState.StandaloneError.InvalidStandalone

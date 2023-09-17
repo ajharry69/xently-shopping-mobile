@@ -34,7 +34,7 @@ fun XentlyNavHost() {
         }
     }
 
-    val onNavigateBack: () -> Unit by rememberUpdatedState {
+    val onNavigateBack: () -> Unit = {
         navController.navigateUp()
     }
 

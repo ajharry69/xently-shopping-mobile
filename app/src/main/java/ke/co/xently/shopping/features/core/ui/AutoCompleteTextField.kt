@@ -11,6 +11,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -26,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.features.core.hasEmojis
-import ke.co.xently.shopping.features.core.ui.components.AutoCompleteSearchResults
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import kotlin.random.Random
 import ke.co.xently.shopping.features.core.ui.autocomplete.AutoCompleteTextField as CoreAutoCompleteTextField
@@ -64,6 +64,7 @@ fun rememberAutoCompleteTextFieldState(
 fun <Q, R> AutoCompleteTextField(
     modifier: Modifier = Modifier,
     service: AutoCompleteService<Q> = AutoCompleteService.Fake(),
+    invalidateActiveSearch: Boolean = false,
     isError: Boolean = false,
     allowImojis: Boolean = false,
     numberOfResults: Int = 5,
@@ -81,9 +82,8 @@ fun <Q, R> AutoCompleteTextField(
         mutableStateListOf<R>()
     }
 
-    var resultState: AutoCompleteService.ResultState by remember {
-        mutableStateOf(AutoCompleteService.ResultState.Idle)
-    }
+    val resultState: AutoCompleteService.ResultState by service.resultState
+        .collectAsState(AutoCompleteService.ResultState.Idle)
 
     LaunchedEffect(resultState) {
         if (resultState is AutoCompleteService.ResultState.Failure) {
@@ -97,17 +97,13 @@ fun <Q, R> AutoCompleteTextField(
         }
     }
 
-    AutoCompleteSearchResults(service = service) {
-        resultState = it
-    }
-
     val shouldReportEmojiProhibition by remember(allowImojis, state.query) {
         derivedStateOf {
             !allowImojis && state.query.hasEmojis
         }
     }
 
-    var searchActive by remember {
+    var searchActive by remember(invalidateActiveSearch) {
         mutableStateOf(false)
     }
     var wasSuggestionSelected by remember {

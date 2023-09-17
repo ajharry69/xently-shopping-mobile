@@ -11,7 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -83,7 +85,11 @@ fun AddProductScreen(
         ) {
             val traversed by LocalFlowOfTraversedSteps.current.collectAsState(initial = emptySet())
             for (step in AddProductStep.values()) {
-                val enabled = step == currentlyActiveStep || step in traversed
+                val enabled by remember(step, traversed, currentlyActiveStep) {
+                    derivedStateOf {
+                        step == currentlyActiveStep || step in traversed
+                    }
+                }
                 Tab(
                     selected = step.ordinal <= currentlyActiveStep.ordinal,
                     enabled = enabled,
@@ -91,7 +97,7 @@ fun AddProductScreen(
                         if (enabled) {
                             this
                         } else {
-                            copy(alpha = 0.38f)
+                            copy(alpha = 0.7f)
                         }
                     },
                     onClick = {
@@ -299,13 +305,10 @@ fun AddProductScreen(
 @Composable
 private fun AddProductScreenPreview() {
     XentlyTheme {
-        CompositionLocalProvider(
-            LocalAddProductStep provides AddProductStep.valueOfOrdinalOrFirstByOrdinal(
-                Random.nextInt(
-                    AddProductStep.values().size
-                )
-            ),
-        ) {
+        val step = AddProductStep.valueOfOrdinalOrFirstByOrdinal(
+            Random.nextInt(AddProductStep.values().size)
+        )
+        CompositionLocalProvider(LocalAddProductStep provides step) {
             AddProductScreen(
                 modifier = Modifier.fillMaxSize(),
                 product = Product.LocalViewModel.default,
