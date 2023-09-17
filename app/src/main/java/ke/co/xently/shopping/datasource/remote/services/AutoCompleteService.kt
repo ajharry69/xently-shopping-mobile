@@ -22,24 +22,18 @@ interface AutoCompleteService<in Q> {
         data class Failure(val error: Throwable) : ResultState
     }
 
-    suspend fun initSession(logSuccessfulInitialization: Boolean = true): InitState
-
-    suspend fun search(query: Q, size: Int = 5)
-
     val resultState: SharedFlow<ResultState>
 
-    suspend fun initGetSearchResults()
+    suspend fun init(logSuccessfulInitialization: Boolean = true)
+
+    suspend fun search(query: Q, size: Int = 5)
 
     suspend fun closeSession()
 
     open class Fake<in Q>(results: ResultState = ResultState.Idle) : AutoCompleteService<Q> {
         override val resultState: SharedFlow<ResultState> = MutableStateFlow(results)
+        override suspend fun init(logSuccessfulInitialization: Boolean) {
 
-        override suspend fun initSession(logSuccessfulInitialization: Boolean): InitState {
-            return InitState.Idle
-        }
-
-        override suspend fun initGetSearchResults() {
         }
 
         override suspend fun closeSession() {

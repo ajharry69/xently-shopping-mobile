@@ -27,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.features.core.hasEmojis
-import ke.co.xently.shopping.features.core.ui.components.AutoCompleteSearchResults
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import kotlin.random.Random
 import ke.co.xently.shopping.features.core.ui.autocomplete.AutoCompleteTextField as CoreAutoCompleteTextField
@@ -65,6 +64,7 @@ fun rememberAutoCompleteTextFieldState(
 fun <Q, R> AutoCompleteTextField(
     modifier: Modifier = Modifier,
     service: AutoCompleteService<Q> = AutoCompleteService.Fake(),
+    invalidateActiveSearch: Boolean = false,
     isError: Boolean = false,
     allowImojis: Boolean = false,
     numberOfResults: Int = 5,
@@ -97,15 +97,13 @@ fun <Q, R> AutoCompleteTextField(
         }
     }
 
-    AutoCompleteSearchResults(service = service)
-
     val shouldReportEmojiProhibition by remember(allowImojis, state.query) {
         derivedStateOf {
             !allowImojis && state.query.hasEmojis
         }
     }
 
-    var searchActive by remember {
+    var searchActive by remember(invalidateActiveSearch) {
         mutableStateOf(false)
     }
     var wasSuggestionSelected by remember {
