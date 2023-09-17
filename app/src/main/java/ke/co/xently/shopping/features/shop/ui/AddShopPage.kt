@@ -83,6 +83,7 @@ fun AddShopPage(
             onSearch = { query ->
                 Shop.LocalViewModel.default.copy(name = query)
             },
+            queryToResponse = { it },
             onSuggestionSelected = saveDraft,
             suggestionContent = { Text(text = it.name) },
             label = {

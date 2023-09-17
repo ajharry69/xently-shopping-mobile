@@ -124,6 +124,7 @@ fun AddMeasurementUnitNamePage(
     ) {
         AutoCompleteTextField<MeasurementUnit, MeasurementUnit>(
             modifier = Modifier.fillMaxWidth(),
+            queryToResponse = { it },
             service = LocalMeasurementUnitAutoCompleteService.current,
             state = nameAutoCompleteState,
             onSearch = { query ->

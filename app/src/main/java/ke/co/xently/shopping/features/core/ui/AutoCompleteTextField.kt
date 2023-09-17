@@ -16,6 +16,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -72,6 +73,7 @@ fun <Q, R> AutoCompleteTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onSearch: (String) -> Q,
+    queryToResponse: (Q) -> R?,
     onSuggestionSelected: (R) -> Unit,
     label: @Composable() (() -> Unit)? = null,
     trailingIcon: @Composable() (() -> Unit)? = null,
@@ -82,6 +84,14 @@ fun <Q, R> AutoCompleteTextField(
         mutableStateListOf<R>()
     }
 
+    val currentOnSearch by rememberUpdatedState(onSearch)
+
+    val query by produceState<Q?>(null, state.query) {
+        value = currentOnSearch(state.query)
+    }
+
+    val currentQueryToResponse by rememberUpdatedState(queryToResponse)
+
     val resultState: AutoCompleteService.ResultState by service.resultState
         .collectAsState(AutoCompleteService.ResultState.Idle)
 
@@ -89,9 +99,13 @@ fun <Q, R> AutoCompleteTextField(
         if (resultState is AutoCompleteService.ResultState.Failure) {
             suggestions.clear()
         } else if (resultState is AutoCompleteService.ResultState.Success<*>) {
-            @Suppress("UNCHECKED_CAST")
-            val results =
-                (resultState as AutoCompleteService.ResultState.Success<*>).data as List<R>
+            val results = buildList {
+                query?.let(currentQueryToResponse)
+                    ?.let(::add)
+                @Suppress("UNCHECKED_CAST")
+                ((resultState as AutoCompleteService.ResultState.Success<*>).data as List<R>)
+                    .let(::addAll)
+            }
             suggestions.clear()
             suggestions.addAll(results)
         }
@@ -99,7 +113,8 @@ fun <Q, R> AutoCompleteTextField(
 
     val shouldReportEmojiProhibition by remember(allowImojis, state.query) {
         derivedStateOf {
-            !allowImojis && state.query.hasEmojis
+            !allowImojis
+                    && state.query.hasEmojis
         }
     }
 
@@ -112,7 +127,8 @@ fun <Q, R> AutoCompleteTextField(
 
     val hasErrors by remember(isError, shouldReportEmojiProhibition) {
         derivedStateOf {
-            isError || shouldReportEmojiProhibition
+            isError
+                    || shouldReportEmojiProhibition
         }
     }
 
@@ -127,12 +143,9 @@ fun <Q, R> AutoCompleteTextField(
         }
     }
 
-    val currentOnSearch by rememberUpdatedState(onSearch)
     if (!hasErrors) {
-        LaunchedEffect(state.query, service, numberOfResults) {
-            // No need to send an unnecessary search request if an error was encountered
-            val query = currentOnSearch(state.query)
-            service.search(query, numberOfResults)
+        LaunchedEffect(query, service, numberOfResults) {
+            query?.let { service.search(it, numberOfResults) }
         }
     }
 
@@ -182,7 +195,7 @@ private fun AutoCompleteTextFieldPreview() {
             }
         }
         Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
-            AutoCompleteTextField<String, String>(
+            AutoCompleteTextField(
                 modifier = Modifier.fillMaxWidth(),
                 service = AutoCompleteService.Fake(
                     AutoCompleteService.ResultState.Success(
@@ -192,6 +205,7 @@ private fun AutoCompleteTextFieldPreview() {
                 state = rememberAutoCompleteTextFieldState(),
                 onSearch = { "" },
                 onSuggestionSelected = {},
+                queryToResponse = { it },
                 label = {
                     Text(text = "Search...")
                 },
