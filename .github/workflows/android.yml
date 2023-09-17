@@ -42,7 +42,7 @@ jobs:
           EOF
 
       - name: Run build
-        run: ./gradlew lint
+        run: ./gradlew --no-deamon lint
 
   build:
     runs-on: ubuntu-latest
@@ -79,7 +79,7 @@ jobs:
           EOF
 
       - name: Run build
-        run: ./gradlew buildDebug -x test -x lint
+        run: ./gradlew --no-deamon buildDebug --exclude-task test --exclude-task lint
 
   unit-test:
     runs-on: ubuntu-latest
@@ -115,7 +115,7 @@ jobs:
           DEBUG_WEB_SOCKET_BASE_URL=ws://localhost/
           EOF
       - name: Run tests
-        run: ./gradlew test
+        run: ./gradlew --no-deamon test
 
   instrumentation-test:
     runs-on: macos-latest
@@ -187,4 +187,4 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedAndroidTest
+          script: ./gradlew --no-deamon connectedAndroidTest
