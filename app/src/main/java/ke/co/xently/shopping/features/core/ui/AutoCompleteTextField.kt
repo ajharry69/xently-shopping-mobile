@@ -11,6 +11,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -81,9 +82,8 @@ fun <Q, R> AutoCompleteTextField(
         mutableStateListOf<R>()
     }
 
-    var resultState: AutoCompleteService.ResultState by remember {
-        mutableStateOf(AutoCompleteService.ResultState.Idle)
-    }
+    val resultState: AutoCompleteService.ResultState by service.resultState
+        .collectAsState(AutoCompleteService.ResultState.Idle)
 
     LaunchedEffect(resultState) {
         if (resultState is AutoCompleteService.ResultState.Failure) {
@@ -97,9 +97,7 @@ fun <Q, R> AutoCompleteTextField(
         }
     }
 
-    AutoCompleteSearchResults(service = service) {
-        resultState = it
-    }
+    AutoCompleteSearchResults(service = service)
 
     val shouldReportEmojiProhibition by remember(allowImojis, state.query) {
         derivedStateOf {

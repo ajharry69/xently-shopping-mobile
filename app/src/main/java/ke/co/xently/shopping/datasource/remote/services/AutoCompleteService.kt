@@ -1,7 +1,7 @@
 package ke.co.xently.shopping.datasource.remote.services
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface AutoCompleteService<in Q> {
     sealed interface InitState {
@@ -26,19 +26,20 @@ interface AutoCompleteService<in Q> {
 
     suspend fun search(query: Q, size: Int = 5)
 
-    fun getSearchResults(): Flow<ResultState>
+    val resultState: SharedFlow<ResultState>
+
+    suspend fun initGetSearchResults()
 
     suspend fun closeSession()
 
-    open class Fake<in Q>(
-        private val results: ResultState = ResultState.Idle,
-    ) : AutoCompleteService<Q> {
+    open class Fake<in Q>(results: ResultState = ResultState.Idle) : AutoCompleteService<Q> {
+        override val resultState: SharedFlow<ResultState> = MutableStateFlow(results)
+
         override suspend fun initSession(logSuccessfulInitialization: Boolean): InitState {
             return InitState.Idle
         }
 
-        override fun getSearchResults(): Flow<ResultState> {
-            return flowOf(results)
+        override suspend fun initGetSearchResults() {
         }
 
         override suspend fun closeSession() {

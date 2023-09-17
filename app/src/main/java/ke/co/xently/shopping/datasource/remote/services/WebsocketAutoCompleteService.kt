@@ -12,11 +12,13 @@ import io.ktor.http.cio.websocket.send
 import ke.co.xently.shopping.BaseURL
 import ke.co.xently.shopping.datasource.remote.exceptions.WebsocketConnectionFailedException
 import ke.co.xently.shopping.datasource.remote.exceptions.WebsocketException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -44,6 +46,12 @@ open class WebsocketAutoCompleteService<in Q>(
         private val TAG = WebsocketAutoCompleteService::class.java.simpleName
         private val sessions = mutableMapOf<String, WebSocketSession>()
     }
+
+    @Keep
+    @Serializable
+    data class Request(val q: String, val size: Int = 5)
+
+    data class Response<Q>(val json: String, val currentQuery: Q?)
 
     private val urlString: String = buildString {
         append(BaseURL.WEB_SOCKET.removeSuffix("/"))
@@ -97,10 +105,6 @@ open class WebsocketAutoCompleteService<in Q>(
         }
     }
 
-    @Keep
-    @Serializable
-    data class Request(val q: String, val size: Int = 5)
-
     @OptIn(ExperimentalSerializationApi::class)
     override suspend fun search(query: Q, size: Int) {
         val q = queryString(query)
@@ -131,37 +135,28 @@ open class WebsocketAutoCompleteService<in Q>(
         }
     }
 
-    data class Response<Q>(val json: String, val currentQuery: Q?)
+    private val resultStateChannel = MutableSharedFlow<AutoCompleteService.ResultState>()
+    override val resultState = resultStateChannel.asSharedFlow()
 
-    override fun getSearchResults(): Flow<AutoCompleteService.ResultState> {
-        return flow {
-            socket?.run {
-                incoming.receiveAsFlow()
-                    .filter { it is Frame.Text }
-                    .map { frame ->
-                        val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
-                            Timber.tag(TAG).i("[%s]: results: %s", urlString, it)
-                        }
-                        val json = Json {
-                            ignoreUnknownKeys = true
-                        }
-                        json.mapResponse(Response(json = response, currentQuery = currentQuery))
-                    }
-                    .onStart {
-                        emit(AutoCompleteService.ResultState.Loading)
-                        Timber.tag(TAG).i(
-                            "[%s]: session was successfully initialised. Getting search results...",
-                            urlString
-                        )
-                    }
-                    .catch {
-                        emit(AutoCompleteService.ResultState.Failure(it))
-                        Timber.tag(TAG).e(it, "[%s]: error getting search results", urlString)
-                    }.collect {
-                        emit(it)
-                    }
+    override suspend fun initGetSearchResults() {
+        socket?.incoming?.receiveAsFlow()?.filter { it is Frame.Text }?.map { frame ->
+            val response = ((frame as? Frame.Text)?.readText() ?: "[]").also {
+                Timber.tag(TAG).i("[%s]: results: %s", urlString, it)
             }
-        }
+            val json = Json {
+                ignoreUnknownKeys = true
+            }
+            json.mapResponse(Response(json = response, currentQuery = currentQuery))
+        }?.flowOn(Dispatchers.Default)?.onStart {
+            emit(AutoCompleteService.ResultState.Loading)
+            Timber.tag(TAG).i(
+                "[%s]: session was successfully initialised. Getting search results...",
+                urlString
+            )
+        }?.catch {
+            emit(AutoCompleteService.ResultState.Failure(it))
+            Timber.tag(TAG).e(it, "[%s]: error getting search results", urlString)
+        }?.collect(resultStateChannel::emit)
     }
 
     override suspend fun closeSession() {

@@ -5,20 +5,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import ke.co.xently.shopping.datasource.remote.services.AutoCompleteService
 import ke.co.xently.shopping.features.core.ui.utils.CallOnLifecycleEvent
 
 @Composable
-fun <Q> AutoCompleteSearchResults(
-    service: AutoCompleteService<Q>,
-    suggestions: (AutoCompleteService.ResultState) -> Unit,
-) {
+fun <Q> AutoCompleteSearchResults(service: AutoCompleteService<Q>) {
     val initState by produceState<AutoCompleteService.InitState>(
         AutoCompleteService.InitState.Idle,
         service,
@@ -26,14 +20,9 @@ fun <Q> AutoCompleteSearchResults(
         value = service.initSession()
     }
 
-    val lifecycle = LocalLifecycleOwner.current
-    val currentSuggestions by rememberUpdatedState(suggestions)
     if (initState is AutoCompleteService.InitState.Success) {
-        LaunchedEffect(service, lifecycle) {
-            service.getSearchResults().flowWithLifecycle(
-                lifecycle = lifecycle.lifecycle,
-                minActiveState = Lifecycle.State.RESUMED,
-            ).collect(currentSuggestions)
+        LaunchedEffect(service) {
+            service.initGetSearchResults()
         }
     }
 
