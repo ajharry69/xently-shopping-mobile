@@ -125,6 +125,7 @@ fun AddAttributesPage(
                 service = LocalAttributeAutoCompleteService.current,
                 modifier = Modifier.weight(1f),
                 trailingIcon = trailingIcon,
+                queryToResponse = { it },
                 onSearch = { query ->
                     Attribute.LocalViewModel.default.copy(name = query)
                 },
@@ -161,6 +162,7 @@ fun AddAttributesPage(
                 service = LocalAttributeValueAutoCompleteService.current,
                 modifier = Modifier.weight(1f),
                 trailingIcon = trailingIcon,
+                queryToResponse = { it },
                 onSearch = { query ->
                     AttributeValue.LocalViewModel.default.run {
                         copy(

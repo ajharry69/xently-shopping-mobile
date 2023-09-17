@@ -72,7 +72,7 @@ fun AddBrandsPage(
         val doSearch: () -> Brand = {
             Brand.LocalViewModel.default.copy(name = nameAutoCompleteState.query)
         }
-        AutoCompleteTextField<Brand, Brand>(
+        AutoCompleteTextField(
             state = nameAutoCompleteState,
             service = LocalBrandAutoCompleteService.current,
             onSuggestionSelected = {
@@ -83,6 +83,7 @@ fun AddBrandsPage(
                 doSearch()
             },
             modifier = Modifier.fillMaxWidth(),
+            queryToResponse = { it },
             label = {
                 Text(text = stringResource(R.string.xently_search_bar_placeholder_name))
             },
