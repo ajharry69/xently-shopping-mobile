@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -62,6 +63,13 @@ fun MultiStepScreen(
     continueButton: @Composable BoxScope.() -> Unit,
     form: @Composable ColumnScope.() -> Unit,
 ) {
+    val scrollModifier = remember(scrollState) {
+        if (scrollState == null) {
+            Modifier
+        } else {
+            Modifier.verticalScroll(scrollState)
+        }
+    }
     Column(modifier = modifier) {
         Column(
             content = {
@@ -90,13 +98,7 @@ fun MultiStepScreen(
             },
             modifier = Modifier
                 .weight(1f)
-                .then(
-                    if (scrollState == null) {
-                        Modifier
-                    } else {
-                        Modifier.verticalScroll(scrollState)
-                    }
-                ),
+                .then(scrollModifier),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         )
 

@@ -35,12 +35,12 @@ import ke.co.xently.shopping.LocalSnackbarHostState
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.models.Location
 import ke.co.xently.shopping.features.core.models.toLocation
+import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.locationtracker.ForegroundLocationTracker
 import ke.co.xently.shopping.features.locationtracker.LocalLocationPermissionsState
-import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 import ke.co.xently.shopping.features.store.models.Store
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -51,10 +51,6 @@ fun AddStorePage(
     saveDraft: (Store) -> Unit,
     onContinueClick: (Store) -> Unit,
 ) {
-    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
-        query = store.name,
-    )
-
     var location by remember(store.location) {
         mutableStateOf(store.location)
     }
@@ -74,6 +70,8 @@ fun AddStorePage(
             location = currentLocation!!
         }
     }
+
+    val nameAutoCompleteState = rememberAutoCompleteTextFieldState(store.name)
 
     MultiStepScreen(
         modifier = modifier,
@@ -95,7 +93,7 @@ fun AddStorePage(
             }
         },
     ) {
-        AddProductAutoCompleteTextField<Store, Store>(
+        AutoCompleteTextField<Store, Store>(
             modifier = Modifier.fillMaxWidth(),
             service = LocalStoreAutoCompleteService.current,
             state = nameAutoCompleteState,

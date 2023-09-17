@@ -33,11 +33,11 @@ import ke.co.xently.shopping.features.attributes.models.Attribute
 import ke.co.xently.shopping.features.attributes.ui.LocalAttributeAutoCompleteService
 import ke.co.xently.shopping.features.attributesvalues.models.AttributeValue
 import ke.co.xently.shopping.features.core.javaLocale
+import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.models.Product
-import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -55,8 +55,9 @@ fun AddAttributesPage(
         mutableStateListOf(*attributes.toTypedArray())
     }
 
+    val currentSaveDraft by rememberUpdatedState(saveDraft)
     LaunchedEffect(attrs) {
-        saveDraft(attrs)
+        currentSaveDraft(attrs)
     }
 
     MultiStepScreen(
@@ -119,7 +120,7 @@ fun AddAttributesPage(
                 }
             } else null
 
-            AddProductAutoCompleteTextField<Attribute, Attribute>(
+            AutoCompleteTextField<Attribute, Attribute>(
                 state = nameAutoCompleteState,
                 service = LocalAttributeAutoCompleteService.current,
                 modifier = Modifier.weight(1f),
@@ -155,7 +156,7 @@ fun AddAttributesPage(
                 },
             )
 
-            AddProductAutoCompleteTextField<AttributeValue, AttributeValue>(
+            AutoCompleteTextField<AttributeValue, AttributeValue>(
                 state = valueAutoCompleteState,
                 service = LocalAttributeValueAutoCompleteService.current,
                 modifier = Modifier.weight(1f),

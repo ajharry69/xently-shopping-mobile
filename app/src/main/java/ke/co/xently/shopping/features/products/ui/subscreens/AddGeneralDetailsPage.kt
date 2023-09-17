@@ -28,11 +28,10 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +46,6 @@ import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.cleansedForNumberParsing
 import ke.co.xently.shopping.features.core.javaLocale
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
-import ke.co.xently.shopping.features.core.ui.UIState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.products.models.Product
 import java.math.BigDecimal
@@ -58,19 +56,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.util.Date
-
-private sealed class GeneralDetailUIState(message: Int) : UIState(message) {
-    sealed class UnitPriceError(message: Int) : GeneralDetailUIState(message)
-    sealed class PackCountError(message: Int) : GeneralDetailUIState(message)
-
-    object OK : GeneralDetailUIState(android.R.string.ok)
-
-    object MissingUnitPrice : UnitPriceError(R.string.xently_button_label_missing_unit_price)
-
-    object InvalidUnitPrice : UnitPriceError(R.string.xently_button_label_invalid_unit_price)
-
-    object InvalidPackCount : PackCountError(R.string.xently_button_label_invalid_pack_count)
-}
 
 @SuppressLint("NewApi") // TODO: Remove this
 @OptIn(ExperimentalMaterial3Api::class)
@@ -136,7 +121,7 @@ fun AddGeneralDetailsPage(
         mutableStateOf(false)
     }
     AnimatedVisibility(visible = showDatePicker) {
-        val onConfirmButtonClick by rememberUpdatedState {
+        val onConfirmButtonClick = {
             val instant = datePurchasedState.selectedDateMillis?.let {
                 Instant.ofEpochMilli(it)
             } ?: Instant.now()
@@ -173,7 +158,7 @@ fun AddGeneralDetailsPage(
         mutableStateOf(false)
     }
     AnimatedVisibility(visible = showTimePicker) {
-        val onConfirmButtonClick by rememberUpdatedState {
+        val onConfirmButtonClick = {
             val instant = datePurchasedState.selectedDateMillis?.let {
                 Instant.ofEpochMilli(it)
             } ?: Instant.now()
@@ -213,28 +198,21 @@ fun AddGeneralDetailsPage(
         }
     }
 
-    var uiState by remember {
-        mutableStateOf<GeneralDetailUIState>(GeneralDetailUIState.OK)
-    }
+    val uiState by produceState<GeneralDetailUIState>(
+        GeneralDetailUIState.OK,
+        unitPrice.text,
+        packCount.text,
+    ) {
+        value = when {
+            unitPrice.text.isBlank() -> GeneralDetailUIState.MissingUnitPrice
 
-    LaunchedEffect(unitPrice.text, packCount.text) {
-        uiState = when {
-            unitPrice.text.isBlank() -> {
-                GeneralDetailUIState.MissingUnitPrice
-            }
-
-            unitPrice.text.cleansedForNumberParsing().toBigDecimalOrNull() == null -> {
-                GeneralDetailUIState.InvalidUnitPrice
-            }
+            unitPrice.text.cleansedForNumberParsing()
+                .toBigDecimalOrNull() == null -> GeneralDetailUIState.InvalidUnitPrice
 
             packCount.text.isNotBlank() && packCount.text.cleansedForNumberParsing()
-                .toIntOrNull() == null -> {
-                GeneralDetailUIState.InvalidPackCount
-            }
+                .toIntOrNull() == null -> GeneralDetailUIState.InvalidPackCount
 
-            else -> {
-                GeneralDetailUIState.OK
-            }
+            else -> GeneralDetailUIState.OK
         }
     }
 

@@ -74,6 +74,8 @@ fun SummaryPage(
         submit(stepsToPersist.toTypedArray())
     }
 
+    val currentOnSubmissionSuccess by rememberUpdatedState(onSubmissionSuccess)
+
     val context = LocalContext.current
     val snackbarHostState = LocalSnackbarHostState.current
 
@@ -112,7 +114,7 @@ fun SummaryPage(
             }
 
             is State.Success -> {
-                onSubmissionSuccess()
+                currentOnSubmissionSuccess()
             }
         }
     }

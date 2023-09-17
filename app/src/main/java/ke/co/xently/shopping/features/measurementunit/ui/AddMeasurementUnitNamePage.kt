@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -23,13 +24,13 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import ke.co.xently.shopping.R
 import ke.co.xently.shopping.features.core.hasEmojis
+import ke.co.xently.shopping.features.core.ui.AutoCompleteTextField
 import ke.co.xently.shopping.features.core.ui.LabeledCheckbox
 import ke.co.xently.shopping.features.core.ui.MultiStepScreen
 import ke.co.xently.shopping.features.core.ui.rememberAutoCompleteTextFieldState
 import ke.co.xently.shopping.features.core.ui.theme.XentlyTheme
 import ke.co.xently.shopping.features.measurementunit.models.MeasurementUnit
 import ke.co.xently.shopping.features.products.models.Product
-import ke.co.xently.shopping.features.products.ui.components.AddProductAutoCompleteTextField
 
 @Composable
 fun AddMeasurementUnitNamePage(
@@ -40,7 +41,8 @@ fun AddMeasurementUnitNamePage(
     onContinueClick: (Product) -> Unit,
 ) {
     val nameAutoCompleteState = rememberAutoCompleteTextFieldState(
-        query = product.measurementUnit?.name ?: ""
+        query = product.measurementUnit?.name
+            ?: "",
     )
 
     var namePlural by remember(product.measurementUnit?.plural) {
@@ -68,12 +70,12 @@ fun AddMeasurementUnitNamePage(
         }
     }
 
-    var uiState by remember {
-        mutableStateOf<MeasurementUnitNameUIState>(MeasurementUnitNameUIState.OK)
-    }
-
-    LaunchedEffect(namePlural.text, symbol.text) {
-        uiState = when {
+    val uiState by produceState<MeasurementUnitNameUIState>(
+        MeasurementUnitNameUIState.OK,
+        namePlural.text,
+        symbol.text,
+    ) {
+        value = when {
             namePlural.text.hasEmojis -> {
                 MeasurementUnitNameUIState.NamePluralError.ImojiNotAllowedError
             }
@@ -120,7 +122,7 @@ fun AddMeasurementUnitNamePage(
             }
         },
     ) {
-        AddProductAutoCompleteTextField<MeasurementUnit, MeasurementUnit>(
+        AutoCompleteTextField<MeasurementUnit, MeasurementUnit>(
             modifier = Modifier.fillMaxWidth(),
             service = LocalMeasurementUnitAutoCompleteService.current,
             state = nameAutoCompleteState,
