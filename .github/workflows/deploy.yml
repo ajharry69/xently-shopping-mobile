@@ -8,8 +8,19 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
       - uses: actions/checkout@v3
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/674482302800/locations/global/workloadIdentityPools/android-automated-deployment/providers/github-actions'
+          service_account: 'android-automated-deployment@pc-api-6626610924622934378-492.iam.gserviceaccount.com'
 
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
