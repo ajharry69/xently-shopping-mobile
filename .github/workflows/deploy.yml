@@ -102,6 +102,6 @@ jobs:
           whatsNewDirectory: whatsnew/
           packageName: ke.co.xently.shopping${{ steps.aab.outputs.packageNameSuffix }}
           releaseName: ${{ steps.tagVersion.outputs.TAG }}
-          serviceAccountJson: secrets/service-account.json
+          serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           mappingFile: app/build/outputs/mapping/${{ steps.aab.outputs.track }}/mapping.txt
           releaseFiles: app/build/outputs/bundle/${{ steps.aab.outputs.track }}/app-${{ steps.aab.outputs.track }}.aab
