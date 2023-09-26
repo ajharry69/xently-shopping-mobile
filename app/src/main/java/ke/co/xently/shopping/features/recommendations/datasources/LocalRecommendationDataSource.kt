@@ -5,10 +5,11 @@ import ke.co.xently.shopping.features.recommendations.models.DecryptionCredentia
 import ke.co.xently.shopping.features.recommendations.models.RecommendationResponse
 import ke.co.xently.shopping.features.recommendations.models.toLocalCache
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 class LocalRecommendationDataSource(private val database: Database) : RecommendationDataSource() {
     override suspend fun saveDecryptionCredentials(
-        requestId: Long,
+        requestId: UUID,
         credentials: DecryptionCredentials
     ) {
         database.recommendationDao.saveDecryptionCredentials(
@@ -26,7 +27,7 @@ class LocalRecommendationDataSource(private val database: Database) : Recommenda
         database.recommendationDao.save(response.toLocalCache())
     }
 
-    override suspend fun getLatestUnprocessedRecommendationRequestId(): Long {
+    override suspend fun getLatestUnprocessedRecommendationRequestId(): UUID {
         return database.recommendationDao.getLatestUnprocessedRecommendationRequestId()
     }
 }

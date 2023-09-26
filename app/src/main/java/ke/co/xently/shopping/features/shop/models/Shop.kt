@@ -6,7 +6,6 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 sealed interface Shop {
-    val id: Long
     val slug: String
     val name: String
     val ecommerceSiteUrl: String?
@@ -17,7 +16,6 @@ sealed interface Shop {
 
     @Keep
     data class RemoteRequest(
-        override val id: Long,
         override val slug: String,
         override val name: String,
         override val ecommerceSiteUrl: String?,
@@ -26,7 +24,6 @@ sealed interface Shop {
     @Keep
     @Serializable
     data class RemoteResponse(
-        override val id: Long,
         override val slug: String,
         override val name: String,
         override val ecommerceSiteUrl: String?,
@@ -34,7 +31,6 @@ sealed interface Shop {
 
     @Keep
     data class LocalEntityRequest(
-        override val id: Long,
         override val slug: String,
         override val name: String,
         override val ecommerceSiteUrl: String?,
@@ -42,7 +38,6 @@ sealed interface Shop {
 
     @Keep
     data class LocalEntityResponse(
-        override val id: Long,
         override val slug: String,
         override val name: String,
         override val ecommerceSiteUrl: String?,
@@ -52,7 +47,6 @@ sealed interface Shop {
     @Parcelize
     @Serializable
     data class LocalViewModel(
-        override val id: Long,
         override val slug: String,
         override val name: String,
         override val ecommerceSiteUrl: String?,
@@ -63,7 +57,6 @@ sealed interface Shop {
 
         companion object {
             val default = LocalViewModel(
-                id = -1,
                 slug = "",
                 name = "",
                 ecommerceSiteUrl = null,
@@ -75,7 +68,6 @@ sealed interface Shop {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -84,7 +76,6 @@ sealed interface Shop {
 
             is LocalEntityResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -93,7 +84,6 @@ sealed interface Shop {
 
             is LocalViewModel -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -106,7 +96,6 @@ sealed interface Shop {
 
             is RemoteResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -120,7 +109,6 @@ sealed interface Shop {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -129,7 +117,6 @@ sealed interface Shop {
 
             is LocalEntityResponse -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -138,7 +125,6 @@ sealed interface Shop {
 
             is LocalViewModel -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -147,7 +133,6 @@ sealed interface Shop {
 
             is RemoteRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -169,7 +154,6 @@ sealed interface Shop {
 
             is LocalEntityResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -178,7 +162,6 @@ sealed interface Shop {
 
             is LocalViewModel -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -187,7 +170,6 @@ sealed interface Shop {
 
             is RemoteRequest -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -196,7 +178,6 @@ sealed interface Shop {
 
             is RemoteResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -210,7 +191,6 @@ sealed interface Shop {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -223,7 +203,6 @@ sealed interface Shop {
 
             is LocalViewModel -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -232,7 +211,6 @@ sealed interface Shop {
 
             is RemoteRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -241,7 +219,6 @@ sealed interface Shop {
 
             is RemoteResponse -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -255,7 +232,6 @@ sealed interface Shop {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -264,7 +240,6 @@ sealed interface Shop {
 
             is LocalEntityResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -277,7 +252,6 @@ sealed interface Shop {
 
             is RemoteRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,
@@ -286,7 +260,6 @@ sealed interface Shop {
 
             is RemoteResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                     ecommerceSiteUrl = ecommerceSiteUrl,

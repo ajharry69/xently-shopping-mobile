@@ -186,7 +186,6 @@ private fun RecommendationResponseDetailsScreenPreview() {
             copy(
                 store = store.run {
                     copy(
-                        id = 1,
                         name = "Store #".plus(Random.nextInt(1, 10)),
                         shop = shop.copy(name = "Shop #".plus(Random.nextInt(1, 10))),
                         distance = Random.nextDouble(50.0, 1000.0),

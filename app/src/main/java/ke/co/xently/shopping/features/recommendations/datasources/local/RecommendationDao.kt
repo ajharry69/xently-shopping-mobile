@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import ke.co.xently.shopping.features.recommendations.models.RecommendationResponse
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 
 @Dao
@@ -16,7 +17,7 @@ interface RecommendationDao {
     fun getLatestRecommendationResponse(): Flow<RecommendationResponse.LocalCache?>
 
     @Query("SELECT requestId FROM recommendations ORDER BY requestId DESC LIMIT 1")
-    suspend fun getLatestUnprocessedRecommendationRequestId(): Long
+    suspend fun getLatestUnprocessedRecommendationRequestId(): UUID
 
     @Query(
         """
@@ -27,7 +28,7 @@ interface RecommendationDao {
         """,
     )
     suspend fun saveDecryptionCredentials(
-        requestId: Long,
+        requestId: UUID,
         secretKeyPassword: String,
         base64EncodedIVParameterSpec: String,
     )

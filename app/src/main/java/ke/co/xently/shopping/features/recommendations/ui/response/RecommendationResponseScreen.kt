@@ -75,6 +75,7 @@ import ke.co.xently.shopping.features.recommendations.ui.components.Recommendati
 import ke.co.xently.shopping.features.recommendations.ui.components.RecommendationResponseSortOptions
 import ke.co.xently.shopping.features.recommendations.ui.components.RecommendationSummaryItemDropdownMenu
 import ke.co.xently.shopping.features.recommendations.ui.components.StoreRecommendationSummaryItem
+import java.util.UUID
 import kotlin.random.Random
 
 
@@ -258,7 +259,7 @@ private fun RecommendationResponseScreen(
 
             LazyColumn(modifier = Modifier.then(modifier)) {
                 if (state is RecommendationResponseState.Success) {
-                    items(state.data.recommendations, key = { it.store.id }) { response ->
+                    items(state.data.recommendations, key = { it.store.slug }) { response ->
                         Surface(onClick = { onViewProduct(response) }) {
                             StoreRecommendationSummaryItem(response = response) {
                                 var showComparisonListItemMenu by remember {
@@ -347,7 +348,6 @@ private fun RecommendationResponseScreenPreview() {
                 copy(
                     store = store.run {
                         copy(
-                            id = (it + 1).toLong(),
                             name = "Store #".plus(Random.nextInt(1, 10)),
                             shop = shop.copy(name = "Shop #".plus(Random.nextInt(1, 10))),
                             distance = if ((it + 1) in arrayOf(1, 3, 7)) {
@@ -375,7 +375,7 @@ private fun RecommendationResponseScreenPreview() {
             onPaymentRequest = {},
             state = RecommendationResponseState.Success(
                 data = RecommendationResponse.ViewModel(
-                    requestId = -1,
+                    requestId = UUID.randomUUID(),
                     recommendations = responseList,
                     serviceCharge = Random.nextDouble(50.0, 1000.0),
                 ),

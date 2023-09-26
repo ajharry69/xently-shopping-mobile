@@ -57,7 +57,7 @@ sealed interface RecommendationRepository {
                                 // issues when rendered on the UI, therefore we need to replace
                                 // the default with auto-generated - built from response positions
                                 val newStoreId = (index + 1).toLong()
-                                add(response.copy(store = response.store.copy(id = newStoreId)))
+                                add(response.copy(store = response.store.copy(slug = "slug-${newStoreId}")))
                             }
                         }
                         copy(recommendations = recommendations)

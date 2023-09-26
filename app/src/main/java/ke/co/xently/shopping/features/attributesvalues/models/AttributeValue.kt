@@ -7,14 +7,12 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 sealed interface AttributeValue {
-    val id: Long
     val slug: String
     val value: String
     val attribute: Attribute
 
     @Keep
     data class RemoteRequest(
-        override val id: Long,
         override val slug: String,
         override val value: String,
         override val attribute: Attribute.RemoteRequest,
@@ -23,7 +21,6 @@ sealed interface AttributeValue {
     @Keep
     @Serializable
     data class RemoteResponse(
-        override val id: Long,
         override val slug: String,
         override val value: String,
         override val attribute: Attribute.RemoteResponse,
@@ -31,7 +28,6 @@ sealed interface AttributeValue {
 
     @Keep
     data class LocalEntityRequest(
-        override val id: Long,
         override val slug: String,
         override val value: String,
         override val attribute: Attribute.LocalEntityRequest,
@@ -39,7 +35,6 @@ sealed interface AttributeValue {
 
     @Keep
     data class LocalEntityResponse(
-        override val id: Long,
         override val slug: String,
         override val value: String,
         override val attribute: Attribute.LocalEntityResponse,
@@ -48,7 +43,6 @@ sealed interface AttributeValue {
     @Keep
     @Parcelize
     data class LocalViewModel(
-        override val id: Long,
         override val slug: String,
         override val value: String,
         override val attribute: Attribute.LocalViewModel,
@@ -77,7 +71,6 @@ sealed interface AttributeValue {
 
         companion object {
             val default = LocalViewModel(
-                id = -1,
                 slug = "",
                 value = "",
                 attribute = Attribute.LocalViewModel.default,
@@ -89,7 +82,6 @@ sealed interface AttributeValue {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toRemoteRequest(),
@@ -98,7 +90,6 @@ sealed interface AttributeValue {
 
             is LocalEntityResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toRemoteRequest(),
@@ -107,7 +98,6 @@ sealed interface AttributeValue {
 
             is LocalViewModel -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toRemoteRequest(),
@@ -120,7 +110,6 @@ sealed interface AttributeValue {
 
             is RemoteResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toRemoteRequest(),
@@ -134,7 +123,6 @@ sealed interface AttributeValue {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toRemoteResponse(),
@@ -143,7 +131,6 @@ sealed interface AttributeValue {
 
             is LocalEntityResponse -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toRemoteResponse(),
@@ -152,7 +139,6 @@ sealed interface AttributeValue {
 
             is LocalViewModel -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toRemoteResponse(),
@@ -161,7 +147,6 @@ sealed interface AttributeValue {
 
             is RemoteRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toRemoteResponse(),
@@ -183,7 +168,6 @@ sealed interface AttributeValue {
 
             is LocalEntityResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalEntityRequest(),
@@ -192,7 +176,6 @@ sealed interface AttributeValue {
 
             is LocalViewModel -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalEntityRequest(),
@@ -201,7 +184,6 @@ sealed interface AttributeValue {
 
             is RemoteRequest -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalEntityRequest(),
@@ -210,7 +192,6 @@ sealed interface AttributeValue {
 
             is RemoteResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalEntityRequest(),
@@ -224,7 +205,6 @@ sealed interface AttributeValue {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalEntityResponse(),
@@ -237,7 +217,6 @@ sealed interface AttributeValue {
 
             is LocalViewModel -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalEntityResponse(),
@@ -246,7 +225,6 @@ sealed interface AttributeValue {
 
             is RemoteRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalEntityResponse(),
@@ -255,7 +233,6 @@ sealed interface AttributeValue {
 
             is RemoteResponse -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalEntityResponse(),
@@ -269,7 +246,6 @@ sealed interface AttributeValue {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalViewModel(),
@@ -278,7 +254,6 @@ sealed interface AttributeValue {
 
             is LocalEntityResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalViewModel(),
@@ -291,7 +266,6 @@ sealed interface AttributeValue {
 
             is RemoteRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalViewModel(),
@@ -300,7 +274,6 @@ sealed interface AttributeValue {
 
             is RemoteResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     value = value,
                     attribute = attribute.toLocalViewModel(),
