@@ -6,13 +6,11 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 sealed interface Attribute {
-    val id: Long
     val slug: String
     val name: String
 
     @Keep
     data class RemoteRequest(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Attribute
@@ -20,21 +18,18 @@ sealed interface Attribute {
     @Keep
     @Serializable
     data class RemoteResponse(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Attribute
 
     @Keep
     data class LocalEntityRequest(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Attribute
 
     @Keep
     data class LocalEntityResponse(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Attribute
@@ -42,7 +37,6 @@ sealed interface Attribute {
     @Keep
     @Parcelize
     data class LocalViewModel(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Attribute, Parcelable {
@@ -67,7 +61,6 @@ sealed interface Attribute {
 
         companion object {
             val default = LocalViewModel(
-                id = -1,
                 slug = "",
                 name = "",
             )
@@ -78,7 +71,6 @@ sealed interface Attribute {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -86,7 +78,6 @@ sealed interface Attribute {
 
             is LocalEntityResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -94,7 +85,6 @@ sealed interface Attribute {
 
             is LocalViewModel -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -106,7 +96,6 @@ sealed interface Attribute {
 
             is RemoteResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -119,7 +108,6 @@ sealed interface Attribute {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -127,7 +115,6 @@ sealed interface Attribute {
 
             is LocalEntityResponse -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -135,7 +122,6 @@ sealed interface Attribute {
 
             is LocalViewModel -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -143,7 +129,6 @@ sealed interface Attribute {
 
             is RemoteRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -164,7 +149,6 @@ sealed interface Attribute {
 
             is LocalEntityResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -172,7 +156,6 @@ sealed interface Attribute {
 
             is LocalViewModel -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -180,7 +163,6 @@ sealed interface Attribute {
 
             is RemoteRequest -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -188,7 +170,6 @@ sealed interface Attribute {
 
             is RemoteResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -201,7 +182,6 @@ sealed interface Attribute {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -213,7 +193,6 @@ sealed interface Attribute {
 
             is LocalViewModel -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -221,7 +200,6 @@ sealed interface Attribute {
 
             is RemoteRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -229,7 +207,6 @@ sealed interface Attribute {
 
             is RemoteResponse -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -242,7 +219,6 @@ sealed interface Attribute {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -250,7 +226,6 @@ sealed interface Attribute {
 
             is LocalEntityResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -262,7 +237,6 @@ sealed interface Attribute {
 
             is RemoteRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -270,7 +244,6 @@ sealed interface Attribute {
 
             is RemoteResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                 )

@@ -5,15 +5,16 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.Instant
+import java.util.UUID
 
 
 sealed interface RecommendationResponse {
-    val requestId: Long
+    val requestId: UUID
     val serviceCharge: Double
 
     @Keep
     data class ViewModel(
-        override val requestId: Long,
+        override val requestId: UUID,
         override val serviceCharge: Double,
         val recommendations: List<Recommendation.Response>,
         val isPaid: Boolean = false,
@@ -21,7 +22,7 @@ sealed interface RecommendationResponse {
 
     @Keep
     data class ServerSide(
-        override val requestId: Long,
+        override val requestId: UUID,
         override val serviceCharge: Double,
         val recommendations: List<Recommendation.Response>,
     ) : RecommendationResponse
@@ -30,7 +31,7 @@ sealed interface RecommendationResponse {
     @Entity("recommendations")
     data class LocalCache(
         @PrimaryKey
-        override val requestId: Long,
+        override val requestId: UUID,
         override val serviceCharge: Double,
         val recommendationsJson: String,
         @Embedded

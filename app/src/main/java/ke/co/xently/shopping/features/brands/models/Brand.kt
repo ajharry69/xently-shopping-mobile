@@ -6,13 +6,11 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 sealed interface Brand {
-    val id: Long
     val name: String
     val slug: String
 
     @Keep
     data class RemoteRequest(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Brand
@@ -20,21 +18,18 @@ sealed interface Brand {
     @Keep
     @Serializable
     data class RemoteResponse(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Brand
 
     @Keep
     data class LocalEntityRequest(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Brand
 
     @Keep
     data class LocalEntityResponse(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Brand
@@ -42,7 +37,6 @@ sealed interface Brand {
     @Keep
     @Parcelize
     data class LocalViewModel(
-        override val id: Long,
         override val slug: String,
         override val name: String,
     ) : Brand, Parcelable {
@@ -67,7 +61,6 @@ sealed interface Brand {
 
         companion object {
             val default = LocalViewModel(
-                id = -1,
                 slug = "",
                 name = "",
             )
@@ -78,7 +71,6 @@ sealed interface Brand {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -86,7 +78,6 @@ sealed interface Brand {
 
             is LocalEntityResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -94,7 +85,6 @@ sealed interface Brand {
 
             is LocalViewModel -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -106,7 +96,6 @@ sealed interface Brand {
 
             is RemoteResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -119,7 +108,6 @@ sealed interface Brand {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -127,7 +115,6 @@ sealed interface Brand {
 
             is LocalEntityResponse -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -135,7 +122,6 @@ sealed interface Brand {
 
             is LocalViewModel -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -143,7 +129,6 @@ sealed interface Brand {
 
             is RemoteRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -164,7 +149,6 @@ sealed interface Brand {
 
             is LocalEntityResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -172,7 +156,6 @@ sealed interface Brand {
 
             is LocalViewModel -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -180,7 +163,6 @@ sealed interface Brand {
 
             is RemoteRequest -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -188,7 +170,6 @@ sealed interface Brand {
 
             is RemoteResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -201,7 +182,6 @@ sealed interface Brand {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -213,7 +193,6 @@ sealed interface Brand {
 
             is LocalViewModel -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -221,7 +200,6 @@ sealed interface Brand {
 
             is RemoteRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -229,7 +207,6 @@ sealed interface Brand {
 
             is RemoteResponse -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -242,7 +219,6 @@ sealed interface Brand {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -250,7 +226,6 @@ sealed interface Brand {
 
             is LocalEntityResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -262,7 +237,6 @@ sealed interface Brand {
 
             is RemoteRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                 )
@@ -270,7 +244,6 @@ sealed interface Brand {
 
             is RemoteResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name,
                 )

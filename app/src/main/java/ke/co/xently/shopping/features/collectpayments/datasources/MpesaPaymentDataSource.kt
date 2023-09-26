@@ -1,6 +1,7 @@
 package ke.co.xently.shopping.features.collectpayments.datasources
 
 import ke.co.xently.shopping.features.collectpayments.models.MpesaPaymentRequest
+import java.util.UUID
 
 
 abstract class MpesaPaymentDataSource {
@@ -8,7 +9,7 @@ abstract class MpesaPaymentDataSource {
         TODO("Not yet implemented")
     }
 
-    open suspend fun getLatestUnprocessedRecommendationRequestId(): Long {
+    open suspend fun getLatestUnprocessedRecommendationRequestId(): UUID {
         TODO("Not yet implemented")
     }
 }

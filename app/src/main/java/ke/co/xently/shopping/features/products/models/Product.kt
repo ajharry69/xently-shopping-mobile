@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 sealed interface Product {
-    val id: Long
     val slug: String
     val name: ProductName
     val descriptiveName: String
@@ -104,7 +103,6 @@ sealed interface Product {
 
     @Keep
     data class RemoteRequest(
-        override val id: Long,
         override val slug: String,
         override val name: ProductName.RemoteRequest,
         override val descriptiveName: String,
@@ -126,7 +124,6 @@ sealed interface Product {
     @Keep
     @Serializable
     data class RemoteResponse(
-        override val id: Long,
         override val slug: String,
         override val name: ProductName.RemoteResponse,
         override val descriptiveName: String,
@@ -148,7 +145,6 @@ sealed interface Product {
 
     @Keep
     data class LocalEntityRequest(
-        override val id: Long,
         override val slug: String,
         override val name: ProductName.LocalEntityRequest,
         override val descriptiveName: String,
@@ -164,7 +160,6 @@ sealed interface Product {
 
     @Keep
     data class LocalEntityResponse(
-        override val id: Long,
         override val slug: String,
         override val name: ProductName.LocalEntityResponse,
         override val descriptiveName: String,
@@ -181,7 +176,6 @@ sealed interface Product {
     @Keep
     @Parcelize
     data class LocalViewModel(
-        override val id: Long,
         override val slug: String,
         override val name: ProductName.LocalViewModel,
         override val descriptiveName: String,
@@ -199,7 +193,6 @@ sealed interface Product {
     ) : Product, Parcelable {
         companion object {
             val default = LocalViewModel(
-                id = -1,
                 slug = "",
                 name = ProductName.LocalViewModel.default,
                 descriptiveName = "",
@@ -219,7 +212,6 @@ sealed interface Product {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
@@ -236,7 +228,6 @@ sealed interface Product {
 
             is LocalEntityResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
@@ -253,7 +244,6 @@ sealed interface Product {
 
             is LocalViewModel -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
@@ -274,7 +264,6 @@ sealed interface Product {
 
             is RemoteResponse -> {
                 RemoteRequest(
-                    id = id,
                     slug = slug,
                     name = name.toRemoteRequest(),
                     descriptiveName = descriptiveName,
@@ -296,7 +285,6 @@ sealed interface Product {
         return when (this) {
             is LocalEntityRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
@@ -313,7 +301,6 @@ sealed interface Product {
 
             is LocalEntityResponse -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
@@ -330,7 +317,6 @@ sealed interface Product {
 
             is LocalViewModel -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
@@ -347,7 +333,6 @@ sealed interface Product {
 
             is RemoteRequest -> {
                 RemoteResponse(
-                    id = id,
                     slug = slug,
                     name = name.toRemoteResponse(),
                     descriptiveName = descriptiveName,
@@ -377,7 +362,6 @@ sealed interface Product {
 
             is LocalEntityResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
@@ -394,7 +378,6 @@ sealed interface Product {
 
             is LocalViewModel -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
@@ -411,7 +394,6 @@ sealed interface Product {
 
             is RemoteRequest -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
@@ -431,7 +413,6 @@ sealed interface Product {
 
             is RemoteResponse -> {
                 LocalEntityRequest(
-                    id = id,
                     slug = slug,
                     name = name.toLocalEntityRequest(),
                     descriptiveName = descriptiveName,
@@ -456,7 +437,6 @@ sealed interface Product {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
@@ -477,7 +457,6 @@ sealed interface Product {
 
             is LocalViewModel -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
@@ -494,7 +473,6 @@ sealed interface Product {
 
             is RemoteRequest -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
@@ -514,7 +492,6 @@ sealed interface Product {
 
             is RemoteResponse -> {
                 LocalEntityResponse(
-                    id = id,
                     slug = slug,
                     name = name.toLocalEntityResponse(),
                     descriptiveName = descriptiveName,
@@ -539,7 +516,6 @@ sealed interface Product {
         return when (this) {
             is LocalEntityRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
@@ -556,7 +532,6 @@ sealed interface Product {
 
             is LocalEntityResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
@@ -577,7 +552,6 @@ sealed interface Product {
 
             is RemoteRequest -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,
@@ -597,7 +571,6 @@ sealed interface Product {
 
             is RemoteResponse -> {
                 LocalViewModel(
-                    id = id,
                     slug = slug,
                     name = name.toLocalViewModel(),
                     descriptiveName = descriptiveName,

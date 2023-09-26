@@ -5,6 +5,7 @@ import ke.co.xently.shopping.features.recommendations.datasources.remoteservices
 import ke.co.xently.shopping.features.recommendations.models.DecryptionCredentials
 import ke.co.xently.shopping.features.recommendations.models.Recommendation
 import ke.co.xently.shopping.features.recommendations.models.RecommendationResponse
+import java.util.UUID
 
 class RemoteRecommendationDataSource(private val service: RecommendationService) :
     RecommendationDataSource() {
@@ -14,7 +15,7 @@ class RemoteRecommendationDataSource(private val service: RecommendationService)
         }.getOrThrow()
     }
 
-    override suspend fun getDecryptionCredentials(requestId: Long): DecryptionCredentials {
+    override suspend fun getDecryptionCredentials(requestId: UUID): DecryptionCredentials {
         return SendHttpRequest {
             service.getDecryptionCredentials(requestId)
         }.getOrThrow()

@@ -12,7 +12,7 @@ import ke.co.xently.shopping.features.users.UserDao
         User::class,
         RecommendationResponse.LocalCache::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 abstract class Database : RoomDatabase() {
